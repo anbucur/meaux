@@ -1,0 +1,130 @@
+/* =====================================================================
+   FERROFLUID SPIKES & BRUTALIST CHROME TALISMAN ARTIFACTS
+   ===================================================================== */
+
+.ferro-spike-divider-container {
+  position: relative;
+  width: 100%;
+  height: 90px;
+  background: #060607;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.ferro-divider-label {
+  position: absolute;
+  top: 10px;
+  left: var(--gutter, 32px);
+  font-family: var(--font-mono, 'Space Mono', monospace);
+  font-size: 9px;
+  letter-spacing: 0.24em;
+  color: rgba(255, 255, 255, 0.25);
+  text-transform: uppercase;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.ferro-spike-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Talisman 3D Sculpture Modules */
+.talisman-sculpture-module {
+  display: grid;
+  grid-template-columns: 46% 54%;
+  gap: clamp(40px, 6vw, 90px);
+  align-items: center;
+  margin: 90px 0 110px;
+  padding: 40px var(--gutter, 32px);
+  background: #09090b;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.talisman-canvas-wrap {
+  position: relative;
+  aspect-ratio: 1;
+  background: radial-gradient(circle at center, #18181c 0%, #050506 80%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  overflow: hidden;
+  cursor: grab;
+}
+
+.talisman-canvas-wrap:active {
+  cursor: grabbing;
+}
+
+.talisman-3d-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.talisman-canvas-overlay {
+  position: absolute;
+  bottom: 12px;
+  left: 14px;
+  right: 14px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  color: #a1a1aa;
+  pointer-events: none;
+}
+
+.talisman-kicker {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: #71717a;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.talisman-title {
+  font-family: var(--font-display, 'Syne', sans-serif);
+  font-size: clamp(28px, 3.5vw, 44px);
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 16px;
+}
+
+.talisman-desc {
+  font-size: 14px;
+  line-height: 1.9;
+  color: #b5b5b0;
+  margin: 0 0 28px;
+}
+
+.talisman-metrics {
+  display: flex;
+  gap: 36px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  padding-top: 20px;
+}
+
+.talisman-metric-num {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: #ffffff;
+}
+
+.talisman-metric-label {
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  color: #71717a;
+  margin-top: 4px;
+}
+
+@media (max-width: 900px) {
+  .talisman-sculpture-module {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,162 @@
+/* =====================================================================
+   MEAUX — DYNAMIC BLOCKS & CMS UI STYLES
+   ===================================================================== */
+
+/* Footer admin trigger */
+.cms-admin-link {
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--muted, #8e8e8a);
+  font-family: var(--font-mono, 'Space Mono', monospace);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  margin-left: 12px;
+  border-radius: 2px;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: all 0.25s ease;
+}
+
+.cms-admin-link:hover {
+  opacity: 1;
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+/* Edit Mode Overlay & Inline Handles */
+body.cms-editing [data-cms],
+body.cms-editing [data-cms-block] {
+  position: relative;
+  transition: outline 0.15s ease, background-color 0.15s ease;
+}
+
+body.cms-editing [data-cms]:hover {
+  outline: 1px dashed rgba(255, 255, 255, 0.45);
+  outline-offset: 4px;
+  cursor: text;
+}
+
+body.cms-editing [data-cms][contenteditable="true"]:focus {
+  outline: 2px solid #ffffff;
+  outline-offset: 4px;
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+body.cms-editing [data-cms-img]:hover {
+  outline: 2px solid rgba(255, 255, 255, 0.8);
+  outline-offset: -2px;
+  cursor: pointer;
+}
+
+body.cms-editing [data-cms-img]:hover::after {
+  content: 'REPLACE IMAGE ⇪';
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(0, 0, 0, 0.85);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  color: #ffffff;
+  font-family: var(--font-mono, 'Space Mono', monospace);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  padding: 6px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  pointer-events: none;
+  z-index: 50;
+}
+
+/* Section block controls in edit mode */
+.cms-block-wrapper {
+  position: relative;
+  margin-bottom: 2rem;
+}
+
+body.cms-editing .cms-block-wrapper {
+  border: 1px dashed rgba(255, 255, 255, 0.15);
+  padding: 16px;
+  border-radius: 4px;
+  margin-top: 24px;
+}
+
+body.cms-editing .cms-block-wrapper:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.cms-block-actions {
+  display: none;
+  position: absolute;
+  top: -14px;
+  right: 16px;
+  background: #09090b;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  padding: 2px 6px;
+  border-radius: 3px;
+  gap: 6px;
+  z-index: 45;
+}
+
+body.cms-editing .cms-block-wrapper:hover > .cms-block-actions {
+  display: flex;
+}
+
+.cms-block-btn {
+  background: transparent;
+  border: 0;
+  color: #a1a1aa;
+  font-size: 11px;
+  padding: 4px 6px;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.cms-block-btn:hover {
+  color: #ffffff;
+}
+
+.cms-block-btn.delete:hover {
+  color: #f87171;
+}
+
+/* Add block placeholder in edit mode */
+.cms-add-block-zone {
+  display: none;
+  margin: 32px 0;
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  padding: 24px;
+  text-align: center;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.02);
+  transition: all 0.25s ease;
+}
+
+body.cms-editing .cms-add-block-zone {
+  display: block;
+}
+
+.cms-add-block-zone:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.cms-add-block-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  padding: 10px 20px;
+  font-family: var(--font-mono, 'Space Mono', monospace);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cms-add-block-btn:hover {
+  background: #ffffff;
+  color: #000000;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+}

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MEAUX — Spatial, Visual & Brand Atelier</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90' fill='%23ffffff'>✳</text></svg>">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts: Space Mono (Modernized Typewriter), Syne (Architectural Display), Cormorant Garamond (High-Contrast Editorial) -->
@@ -16,9 +17,9 @@
             theme: {
                 extend: {
                     fontFamily: {
-                        mono: ['"Space Mono"', 'monospace'],
-                        display: ['"Syne"', 'sans-serif'],
-                        serif: ['"Cormorant Garamond"', 'serif'],
+                        mono: ['var(--font-mono)'],
+                        display: ['var(--font-display)'],
+                        serif: ['var(--font-serif)'],
                     },
                     colors: {
                         obsidian: '#070707',
@@ -53,9 +54,9 @@
         }
 
         body {
-            background-color: #050506;
-            color: #f7f7f5;
-            font-family: 'Space Mono', monospace;
+            background-color: var(--obsidian, #050506);
+            color: var(--page-text, #f7f7f5);
+            font-family: var(--font-mono, 'Space Mono', monospace);
             overflow-x: hidden;
         }
 
@@ -264,9 +265,11 @@
             transform: translateY(0);
         }
     </style>
-<meta name="description" content="Meaux — an independent creative practice in photography, interior design, brand identity and social media.">
-<link rel="stylesheet" href="assets/site.css">
-<link rel="stylesheet" href="assets/entrance.css">
+<meta name="description" id="meta-description" content="Meaux — an independent creative practice in photography, interior design, brand identity and social media.">
+<link rel="stylesheet" href="assets/site.css?v=3">
+<link rel="stylesheet" href="assets/blocks.css?v=3">
+<link rel="stylesheet" href="assets/entrance.css?v=3">
+<link rel="stylesheet" href="assets/chrome-spikes.css?v=3">
 </head>
 <body class="vault-locked antialiased selection:bg-white selection:text-black">
 
@@ -301,18 +304,18 @@
     <div id="leather-vault" class="fixed inset-0 z-50 flex items-center justify-center select-none overflow-hidden" style="perspective: 1600px;">
         <div id="vault-stage" class="absolute inset-0 w-full h-full flex items-center justify-center overflow-hidden" style="transform-style: preserve-3d;">
         <!-- 4 Split Architectural Leather Panels with Living Ferrofluid Canvas Inside -->
-        <div id="vault-panel-0" class="leather-panel absolute top-0 left-0 w-1/2 h-1/2 border-r border-b border-white/20 overflow-hidden origin-top-left">
+        <div id="vault-panel-0" class="leather-panel absolute top-0 left-0 w-1/2 h-1/2 overflow-hidden origin-top-left">
             <div class="leather-grain-overlay absolute inset-0"></div>
             <div class="absolute inset-4 border-t border-l border-dashed border-white/15 pointer-events-none"></div>
         </div>
 
-        <div id="vault-panel-1" class="leather-panel absolute top-0 right-0 w-1/2 h-1/2 border-b border-white/20 overflow-hidden origin-top-right">
+        <div id="vault-panel-1" class="leather-panel absolute top-0 right-0 w-1/2 h-1/2 overflow-hidden origin-top-right">
             <div class="leather-grain-overlay absolute inset-0"></div>
             <div class="absolute inset-4 border-t border-r border-dashed border-white/15 pointer-events-none"></div>
             <span id="ferro-readout" class="sr-only"></span>
         </div>
 
-        <div id="vault-panel-2" class="leather-panel absolute bottom-0 left-0 w-1/2 h-1/2 border-r border-white/20 overflow-hidden origin-bottom-left">
+        <div id="vault-panel-2" class="leather-panel absolute bottom-0 left-0 w-1/2 h-1/2 overflow-hidden origin-bottom-left">
             <div class="leather-grain-overlay absolute inset-0"></div>
             <div class="absolute inset-4 border-b border-l border-dashed border-white/15 pointer-events-none"></div>
         </div>
@@ -379,7 +382,7 @@
 
             <!-- Vault Top Technical Bar -->
             <div class="vault-topbar relative z-20 flex items-center justify-between border-b border-white/15 pb-3 pt-2 px-6 sm:px-16 text-[10px] tracking-[0.22em] text-zinc-400 uppercase">
-                <span>A WORLD BY MEAUX</span>
+                <span data-cms="vault.kicker">A WORLD BY MEAUX</span>
                 <button onclick="toggleSound()" data-cursor="AUDIO" id="vault-sound-btn" aria-pressed="false" class="hover:text-white transition-colors flex items-center gap-1.5">
                     <span id="vault-sound-dot" class="w-1.5 h-1.5 rounded-full bg-zinc-600"></span>
                     <span id="vault-sound-label">SOUND OFF</span>
@@ -391,7 +394,7 @@
                 
                 <div class="vault-emblem" aria-hidden="true"></div>
 
-                <p class="text-[10px] sm:text-[11px] tracking-[0.36em] text-zinc-400 uppercase mb-1">
+                <p data-cms="vault.tagline" class="text-[10px] sm:text-[11px] tracking-[0.36em] text-zinc-400 uppercase mb-1">
                     IMAGE. IDENTITY. SPACE.
                 </p>
 
@@ -418,14 +421,14 @@
                     </button>
                 </div>
 
-                <p class="mt-3.5 text-[9px] sm:text-[10px] tracking-[0.22em] text-zinc-400 uppercase">
+                <p data-cms="vault.hint" class="mt-3.5 text-[9px] sm:text-[10px] tracking-[0.22em] text-zinc-400 uppercase">
                     Move your cursor. Disturb the surface.
                 </p>
             </div>
 
             <!-- Vault Bottom Technical Spec Bar -->
             <div class="vault-bottomline relative z-20 flex flex-wrap items-center justify-between border-t border-white/15 pt-3 pb-1 px-6 sm:px-16 text-[10px] tracking-[0.2em] text-zinc-400 uppercase gap-2">
-                <span>SOFT FORM. SHARP INSTINCT.</span>
+                <span data-cms="vault.motto">SOFT FORM. SHARP INSTINCT.</span>
                 <span id="vault-status-readout" class="text-white">READY TO EXPLORE</span>
             </div>
         </div>
@@ -496,7 +499,7 @@
             </div>
             <div class="hero-signature">
               <span>Bespoke Creative Direction</span>
-              <span>By Dahman / Meaux · Amsterdam</span>
+              <span>By Mohammed / Meaux · Amsterdam</span>
             </div>
           </div>
           <button class="hero-image image-link" data-post="DW9lQW_DUjv" aria-label="Open the Anouk portrait">
@@ -662,33 +665,13 @@
         </div>
       </section>
 
-      <!-- Atelier Direct Enquiry Teaser -->
-      <section class="contact-section" aria-labelledby="contact-home-title">
-        <div class="contact-top">
-          <span class="small-label">Bespoke Commissions</span>
-          <span class="contact-orb" aria-hidden="true"></span>
-        </div>
-        <div class="contact-heading cursor-pointer" onclick="switchTab('enquiries')">
-          <h2 id="contact-home-title">Have a vision?</h2>
-          <span aria-hidden="true">↗</span>
-        </div>
-        <div class="contact-bottom">
-          <button type="button" data-tab-target="enquiries" class="luxury-btn">
-            <span>Open Commission Dossier ↵</span>
-          </button>
-          <p>
-            Tell us about your project, timeline, and disciplines.<br>
-            Private & commercial commissions reviewed worldwide.
-          </p>
-        </div>
-      </section>
     </div>
 
     <!-- ==========================================
          TAB 2: PHOTOGRAPHY (DISCIPLINE STORY)
          ========================================== -->
     <div id="view-photography" class="tab-view" role="tabpanel" aria-labelledby="tab-photography" hidden>
-      <section class="discipline-page">
+      <section class="discipline-page" data-cms-container>
         <div class="discipline-header">
           <div class="discipline-tagline">
             <span>01 // DISCIPLINE</span>
@@ -859,7 +842,7 @@
          TAB 3: STYLING (DISCIPLINE STORY)
          ========================================== -->
     <div id="view-styling" class="tab-view" role="tabpanel" aria-labelledby="tab-styling" hidden>
-      <section class="discipline-page">
+      <section class="discipline-page" data-cms-container>
         <div class="discipline-header">
           <div class="discipline-tagline">
             <span>02 // DISCIPLINE</span>
@@ -873,7 +856,7 @@
         </div>
 
         <!-- Narrative Split -->
-        <div class="discipline-narrative-split">
+        <div class="discipline-narrative-split is-reversed">
           <div class="narrative-image-wrap">
             <img src="instagram/meauxsvision/images/CqOSc5kN3gA.jpg" alt="Sculptural leather styling for Vanderwilt" loading="lazy" width="1440" height="1800">
             <div class="narrative-image-caption">
@@ -1030,7 +1013,7 @@
          TAB 4: SOCIAL MEDIA CURATION (DISCIPLINE STORY)
          ========================================== -->
     <div id="view-social-media" class="tab-view" role="tabpanel" aria-labelledby="tab-social-media" hidden>
-      <section class="discipline-page">
+      <section class="discipline-page" data-cms-container>
         <div class="discipline-header">
           <div class="discipline-tagline">
             <span>03 // DISCIPLINE</span>
@@ -1201,7 +1184,7 @@
          TAB 5: INTERIOR DESIGN (DISCIPLINE STORY)
          ========================================== -->
     <div id="view-interior-design" class="tab-view" role="tabpanel" aria-labelledby="tab-interior-design" hidden>
-      <section class="discipline-page">
+      <section class="discipline-page" data-cms-container>
         <div class="discipline-header">
           <div class="discipline-tagline">
             <span>04 // DISCIPLINE</span>
@@ -1215,7 +1198,7 @@
         </div>
 
         <!-- Narrative Split -->
-        <div class="discipline-narrative-split">
+        <div class="discipline-narrative-split is-reversed">
           <div class="narrative-image-wrap">
             <img src="instagram/meauxsvision/images/CfY3m5vNidV.jpg" alt="Spatial and textural study" loading="lazy" width="1440" height="1800">
             <div class="narrative-image-caption">
@@ -1275,6 +1258,34 @@
               <div class="material-swatch-box swatch-wood"></div>
               <h5>Smoked Oiled Walnut</h5>
               <p>Deep rich grain with warm undertones, grounding the room in organic quietude.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Spatial Artifact 02: Interactive 3D Brutalist Spiked Stele -->
+        <div class="talisman-sculpture-module">
+          <div class="talisman-canvas-wrap" id="interior-talisman-wrap" role="region" aria-label="Interactive 3D Spatial Chrome Artifact">
+            <canvas class="talisman-3d-canvas" id="interior-talisman-canvas"></canvas>
+            <div class="talisman-canvas-overlay">
+              <span class="talisman-drag-hint">DRAG TO ROTATE 3D</span>
+              <span>ARTIFACT // SPATIAL_02</span>
+            </div>
+          </div>
+          <div class="talisman-copy">
+            <span class="talisman-kicker">SPATIAL SCULPTURE // CHROME & TENSION</span>
+            <h3 class="talisman-title">Brutalist Chrome Stele</h3>
+            <p class="talisman-desc">
+              Conceived as a focal spatial anchor for residential and gallery sanctuaries. Cold machined chrome geometry pierced by organic magnetic spikes that interact dynamically with the viewer's movement and room illumination.
+            </p>
+            <div class="talisman-metrics">
+              <div>
+                <div class="talisman-metric-num">SOLID BILLET STEEL</div>
+                <div class="talisman-metric-label">MATERIAL PURITY</div>
+              </div>
+              <div>
+                <div class="talisman-metric-num">INTERACTIVE FIELD</div>
+                <div class="talisman-metric-label">DYNAMIC SHADOW THROW</div>
+              </div>
             </div>
           </div>
         </div>
@@ -1344,7 +1355,7 @@
         <div class="discipline-cta-banner">
           <div class="discipline-cta-text">
             <h3>Commission a Spatial Project</h3>
-            <p>Private residential suites, creative studio ateliers, and boutique commercial spaces conceived by Dahman.</p>
+            <p>Private residential suites, creative studio ateliers, and boutique commercial spaces conceived by Mohammed.</p>
           </div>
           <button type="button" data-tab-target="enquiries" data-preselect-discipline="Interior Design" class="luxury-btn">
             <span>Initiate Spatial Dossier ↗</span>
@@ -1357,19 +1368,19 @@
          TAB 6: ABOUT ME (EDITORIAL PROFILE)
          ========================================== -->
     <div id="view-about" class="tab-view" role="tabpanel" aria-labelledby="tab-about" hidden>
-      <section class="about-page">
+      <section class="about-page" data-cms-container>
         <!-- Hero Grid -->
         <div class="about-hero-grid">
           <div class="about-portrait-wrap">
-            <img src="instagram/meauxsvision/images/DW9lQW_DUjv.jpg" alt="Editorial portrait study by Dahman" loading="lazy" width="1440" height="1919">
+            <img src="instagram/meauxsvision/images/DZ5dX4SjAXv.jpg" alt="Editorial portrait study of Mohammed" loading="lazy" width="1440" height="1920">
             <div class="about-portrait-caption">
-              <span>Dahman / Meaux</span>
+              <span>Mohammed / Meaux</span>
               <span>Amsterdam · Worldwide</span>
             </div>
           </div>
           <div class="about-hero-copy">
             <span class="about-moniker">The Creative Behind Meaux</span>
-            <h2>Dahman</h2>
+            <h2>Mohammed</h2>
             <p class="about-statement">
               “Soft form. Sharp instinct. Form follows feeling.”
             </p>
@@ -1384,9 +1395,9 @@
                 Why practice all four disciplines simultaneously? Because they are not separate silos—they are different scales of the exact same question: <em>How does it feel to inhabit this world?</em> When the same creative eye choreographs the room, styles the clothes, directs the photograph, and curates the feed, the result is an unmistakable, unbreakable world.
               </p>
             </div>
-            <div class="mt-8 flex flex-wrap gap-4 items-center">
+            <div class="about-cta-row">
               <button type="button" data-tab-target="enquiries" class="luxury-btn">
-                <span>Start a Dialogue with Dahman ↗</span>
+                <span>Start a Dialogue with Mohammed ↗</span>
               </button>
               <a href="https://www.instagram.com/meauxsvision/" target="_blank" rel="noopener noreferrer" class="text-link">
                 Instagram @meauxsvision ↗
@@ -1421,7 +1432,7 @@
               <span class="value-num">03 // PRINCIPLE</span>
               <h3>Singular Authorship</h3>
               <p>
-                A unified vision cannot be achieved by committee. Every campaign, lookbook, and space directed by Meaux is guided from inception to delivery by Dahman’s singular aesthetic compass.
+                A unified vision cannot be achieved by committee. Every campaign, lookbook, and space directed by Meaux is guided from inception to delivery by Mohammed’s singular aesthetic compass.
               </p>
             </div>
           </div>
@@ -1459,7 +1470,7 @@
          TAB 7: ENQUIRIES (BESPOKE FORM)
          ========================================== -->
     <div id="view-enquiries" class="tab-view" role="tabpanel" aria-labelledby="tab-enquiries" hidden>
-      <section class="enquiries-page">
+      <section class="enquiries-page" data-cms-container>
         <div class="enquiries-layout">
           <!-- Sidebar -->
           <div class="enquiries-sidebar">
@@ -1468,7 +1479,7 @@
               <h2 class="mt-3">Initiate a dialogue.</h2>
             </div>
             <p>
-              Meaux accepts a limited number of private and commercial commissions each quarter across Photography, Styling, Social Media Curation, and Interior Design. Every inquiry is reviewed personally by Dahman.
+              Meaux accepts a limited number of private and commercial commissions each quarter across Photography, Styling, Social Media Curation, and Interior Design. Every inquiry is reviewed personally by Mohammed.
             </p>
             
             <div class="enquiries-meta-list">
@@ -1617,12 +1628,12 @@
   <!-- Site Footer -->
   <footer class="site-footer">
     <a class="wordmark brand-logo" href="#atelier" data-tab-target="atelier" aria-label="Meaux Atelier Home">MEAUX<span class="brand-star" aria-hidden="true">✳</span></a>
-    <span>Independent in thought. Intentional in form.</span>
+    <span data-cms="footer.tagline">Independent in thought. Intentional in form.</span>
     <div class="flex items-center gap-6">
-      <a href="https://www.instagram.com/meauxsvision/" target="_blank" rel="noopener noreferrer">Instagram @meauxsvision ↗</a>
+      <a href="https://www.instagram.com/meauxsvision/" target="_blank" rel="noopener noreferrer" data-cms="footer.instagram">Instagram @meauxsvision ↗</a>
       <button type="button" id="replay-intro">Replay entrance</button>
     </div>
-    <small>© <span id="current-year"></span> Meaux Atelier · All rights reserved.</small>
+    <small><span data-cms="footer.copyright">© <span id="current-year"></span> Meaux Atelier · All rights reserved.</span> <button type="button" id="cms-admin-link" class="cms-admin-link" aria-label="Administrator sign in">Admin</button></small>
   </footer>
 </div>
 <dialog id="project-dialog" aria-labelledby="project-title"><div class="project-dialog-top"><span id="project-position"></span><button type="button" id="close-project" aria-label="Close project">Close <span aria-hidden="true">×</span></button></div><div class="project-dialog-body"><div class="project-image-wrap"><img id="project-image" alt=""></div><div class="project-copy"><p class="small-label">From the photographic archive</p><h2 id="project-title"></h2><p id="project-caption"></p><p id="project-cover-note" class="project-note"></p><a id="project-source" class="text-link" target="_blank" rel="noopener noreferrer">View the original post <span aria-hidden="true">↗</span></a><a class="text-link project-commission" href="mailto:bucuralexandrunicolae@gmail.com">Discuss a project <span aria-hidden="true">↗</span></a></div></div><div class="project-dialog-bottom"><button type="button" id="previous-project">← Previous</button><span>Meaux’s vision</span><button type="button" id="next-project">Next →</button></div></dialog>
@@ -1631,5 +1642,9 @@
 <script src="assets/vault.js"></script>
 <script src="assets/materials.js"></script>
 <script src="assets/site.js"></script>
+<script src="assets/chrome-spikes.js"></script>
+<!-- Content management: public content loader + lazily loaded admin editor -->
+<script src="assets/cms/config.js"></script>
+<script type="module" src="assets/cms/runtime.js"></script>
 </body>
 </html>

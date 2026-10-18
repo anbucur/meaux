@@ -1,10 +1,10 @@
 /* One composition: quiet lambskin, a magnetic aperture, and the wordmark. */
 #leather-vault{isolation:isolate;background:#080808;transform-style:preserve-3d}
-#leather-vault .leather-panel{border:0;background:radial-gradient(ellipse at 50% 40%,#171717,#090909 75%);background-size:200% 200%;box-shadow:none}
-#leather-vault #vault-panel-0{background-position:0 0}
-#leather-vault #vault-panel-1{background-position:100% 0}
-#leather-vault #vault-panel-2{background-position:0 100%}
-#leather-vault #vault-panel-3{background-position:100% 100%}
+#leather-vault .leather-panel{border:0!important;outline:none!important;background:radial-gradient(ellipse at 50% 40%,#171717,#090909 75%);background-size:200% 200%;box-shadow:none}
+#leather-vault #vault-panel-0{top:0;left:0;width:calc(50% + 2px);height:calc(50% + 2px);background-position:0 0}
+#leather-vault #vault-panel-1{top:0;right:0;width:calc(50% + 2px);height:calc(50% + 2px);background-position:100% 0}
+#leather-vault #vault-panel-2{bottom:0;left:0;width:calc(50% + 2px);height:calc(50% + 2px);background-position:0 100%}
+#leather-vault #vault-panel-3{bottom:0;right:0;width:calc(50% + 2px);height:calc(50% + 2px);background-position:100% 100%}
 #leather-vault .leather-grain-overlay{opacity:.105}
 #leather-vault .leather-panel>div.border-dashed{display:none}
 #leather-vault #vault-fluid-canvas{z-index:6;opacity:1!important;mix-blend-mode:normal}
@@ -65,6 +65,15 @@
   height:100%;
   transform-style:preserve-3d;
   transform-origin:center center;
+  pointer-events:none;
+  background:radial-gradient(ellipse at 50% 40%,#171717,#090909 75%);
+}
+#vault-stage::before{
+  content:'';
+  position:absolute;
+  inset:-20px;
+  background:#080808;
+  z-index:0;
   pointer-events:none;
 }
 
