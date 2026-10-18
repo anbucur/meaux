@@ -254,6 +254,20 @@ button:disabled {
   padding: 0 var(--gutter);
 }
 
+.atelier-fluid {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@media (prefers-reduced-motion: reduce), (pointer: coarse) {
+  .atelier-fluid { display: none; }
+}
+
 .hero-topline {
   display: flex;
   justify-content: space-between;
@@ -584,10 +598,28 @@ button:disabled {
    PORTFOLIO ARCHIVE SECTION
    ========================================== */
 .work-section {
-  background: var(--paper);
-  color: var(--ink);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: radial-gradient(ellipse at 35% 25%, #ffffff04, #00000070 85%),
+    url('leather-grain.svg') repeat;
+  color: var(--paper);
   padding: 120px var(--gutter) 80px;
 }
+
+/* Every photograph and its controls stay above the decorative liquid. */
+.work-section > :not(.atelier-fluid) { position: relative; z-index: 1; }
+.work-section .section-intro h2,
+.work-section .work-meta h3,
+.work-section .view-switch button[aria-pressed="true"],
+.work-section .archive-search input { color: var(--paper); }
+.work-section .section-intro p:not(.small-label),
+.work-section .selection-count,
+.work-section .work-meta p,
+.work-section .work-meta > span,
+.work-section .view-switch button,
+.work-section .archive-status,
+.work-section .archive-end p { color: #aaa9a5; }
 
 .section-intro {
   display: grid;
@@ -730,7 +762,7 @@ button:disabled {
 }
 
 .work-card:nth-child(4n+3) {
-  grid-column: span 4;
+  grid-column: span 5;
   margin-top: 90px;
 }
 
