@@ -20,6 +20,17 @@ class CmsRuntime {
   }
 
   async init() {
+    // 0. Check for OAuth error in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+    const authErrorDesc = urlParams.get('error_description') || hashParams.get('error_description') || urlParams.get('error');
+    if (authErrorDesc) {
+      const decoded = decodeURIComponent(authErrorDesc).replace(/\+/g, ' ');
+      console.error('OAuth Redirect Error:', decoded);
+      alert(`Google Login Error from Supabase:\n\n"${decoded}"\n\nFix: In Supabase -> Auth -> Providers -> Google, check that your Google Client Secret exactly matches the Client Secret created in Google Cloud Console.`);
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
     // 1. Initialize Supabase client if configured
     if (this.config.isConfigured()) {
       try {
@@ -31,6 +42,17 @@ class CmsRuntime {
             detectSessionInUrl: true
           }
         });
+
+        // Handle PKCE code exchange if present in URL
+        const code = urlParams.get('code');
+        if (code) {
+          try {
+            await this.supabase.auth.exchangeCodeForSession(code);
+            window.history.replaceState({}, document.title, window.location.pathname);
+          } catch (e) {
+            console.warn('PKCE exchange error:', e);
+          }
+        }
 
         // Listen for OAuth sign-in redirect and session events
         this.supabase.auth.onAuthStateChange(async (event, session) => {
@@ -275,11 +297,11 @@ class CmsRuntime {
 
     // 2. Check local mock admin session (convenient testing / demo mode)
     try {
-      const mock = JSON.parse(sessionStorage.getItem(MOCK_AUTH_KEY) || 'null');
+      const mock = JSON.parse(localStorage.getItem(MOCK_AUTH_KEY) || sessionStorage.getItem(MOCK_AUTH_KEY) || 'null');
       if (mock && mock.email) {
         this.user = { email: mock.email, isMock: true };
         this.isAdmin = true;
-        this.loadAdminInterface();
+        await this.loadAdminInterface();
       }
     } catch (e) {}
   }
@@ -384,7 +406,7 @@ class CmsRuntime {
     modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
 
     document.getElementById('cms-instant-admin-btn').addEventListener('click', async () => {
-      sessionStorage.setItem(MOCK_AUTH_KEY, JSON.stringify({ email: this.config.initialAdmin }));
+      localStorage.setItem(MOCK_AUTH_KEY, JSON.stringify({ email: this.config.initialAdmin }));
       modal.remove();
       await this.checkAuth();
     });
