@@ -23,3 +23,5 @@ yarn-error.log*
 *.sw?
 
 .playwright-mcp/
+.vercel
+supabase/.temp/
