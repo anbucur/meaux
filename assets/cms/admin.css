@@ -454,3 +454,53 @@
 .cms-media-thumb.selected {
   border: 2px solid #ffffff;
 }
+
+/* Inline Editing Highlights */
+.cms-editing .cms-editable-text {
+  outline: 1px dashed rgba(255, 255, 255, 0.3) !important;
+  outline-offset: 3px !important;
+  cursor: text !important;
+  transition: all 0.15s ease !important;
+  border-radius: 2px !important;
+}
+
+.cms-editing .cms-editable-text:hover {
+  outline: 1px dashed #ffffff !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+}
+
+.cms-editing .cms-editable-text:focus {
+  outline: 2px solid #22c55e !important;
+  background: rgba(34, 197, 94, 0.08) !important;
+}
+
+/* Image Swap in Edit Mode */
+.cms-editing .cms-image-editable {
+  position: relative !important;
+  cursor: pointer !important;
+}
+
+.cms-editing .cms-image-editable::after {
+  content: '✦ Swap Image';
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(0, 0, 0, 0.85);
+  color: #ffffff;
+  padding: 6px 12px;
+  font-size: 11px;
+  font-family: var(--font-mono, monospace);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.cms-editing .cms-image-editable:hover::after {
+  opacity: 1;
+}
+

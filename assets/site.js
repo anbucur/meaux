@@ -327,7 +327,7 @@ document.addEventListener('click', (event) => {
     return;
   }
   const postEl = event.target.closest('[data-post]');
-  if (postEl && !postEl.closest('dialog')) {
+  if (postEl && !postEl.closest('dialog') && !isEditing()) {
     openProject(postEl.dataset.post, postEl);
   }
 });

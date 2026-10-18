@@ -42,6 +42,15 @@ class AdminManager {
   }
 
   async mount() {
+    // Check if unpublished draft exists in localStorage
+    try {
+      const localDraft = localStorage.getItem('meaux_content_draft');
+      if (localDraft) {
+        this.draft = JSON.parse(localDraft);
+        this.runtime.applyContent(this.draft);
+      }
+    } catch (e) {}
+
     this.buildAdminBar();
     this.buildDrawer();
     this.bindInlineEditing();
@@ -108,19 +117,214 @@ class AdminManager {
       label.textContent = this.isEditMode ? 'Edit Mode: ON' : 'Edit Mode: OFF';
     }
 
-    // Toggle contenteditable on text elements
-    document.querySelectorAll('[data-cms]').forEach(el => {
+    // Ensure all elements have deterministic keys
+    if (this.runtime && this.runtime.assignContentAndImageKeys) {
+      this.runtime.assignContentAndImageKeys();
+    }
+
+    // Select all site textual content across the entire page
+    const textSelectors = [
+      'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p',
+      '.small-label', '.about-statement', '.card-num', '.value-num',
+      '.discipline-title', '.discipline-subtitle', '.discipline-tagline span',
+      '.hero-signature span', '.hero-image-caption',
+      '.story-chapter h3', '.story-chapter p',
+      '.value-card h3', '.value-card p',
+      '.client-item', '.meta-content', '[data-cms]', '[data-cms-key]'
+    ];
+
+    document.querySelectorAll(textSelectors.join(', ')).forEach((el, index) => {
+      // Never make admin UI elements editable
+      if (el.closest('#cms-admin-bar, #cms-admin-drawer, #cms-login-modal, #cms-image-picker-modal, dialog')) {
+        return;
+      }
+      if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'BUTTON' || el.closest('button.tab-btn')) {
+        return;
+      }
+
+      if (!el.getAttribute('data-cms-key')) {
+        const explicit = el.getAttribute('data-cms');
+        const fallbackKey = 'text_' + (el.id || (el.className.replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 20) + '_' + index));
+        el.setAttribute('data-cms-key', explicit || fallbackKey);
+      }
+
       if (this.isEditMode) {
-        if (el.tagName !== 'INPUT' && el.tagName !== 'TEXTAREA') {
-          el.setAttribute('contenteditable', 'true');
-        }
+        el.setAttribute('contenteditable', 'true');
+        el.classList.add('cms-editable-text');
       } else {
         el.removeAttribute('contenteditable');
+        el.classList.remove('cms-editable-text');
       }
     });
 
+    // Toggle image swap overlays
+    this.bindImageEditing();
+
     // Toggle add block zones
     this.updateAddBlockZones();
+  }
+
+  bindImageEditing() {
+    const images = document.querySelectorAll('main img, .hero-image, .about-portrait-wrap img, .discipline-narrative-split img, .project-image-wrap img');
+    images.forEach(img => {
+      if (img.closest('#cms-admin-bar, #cms-admin-drawer, #cms-login-modal, #cms-image-picker-modal, dialog')) return;
+      const container = img.closest('.image-link') || img.closest('.narrative-image-wrap') || img.closest('.about-portrait-wrap') || img.parentElement || img;
+      if (this.isEditMode) {
+        container.classList.add('cms-image-editable');
+        if (!container.__cmsClickHandler) {
+          container.__cmsClickHandler = (e) => {
+            if (!this.isEditMode) return;
+            e.preventDefault();
+            e.stopPropagation();
+            this.openImagePickerModal(img);
+          };
+          container.addEventListener('click', container.__cmsClickHandler, true);
+        }
+      } else {
+        container.classList.remove('cms-image-editable');
+        if (container.__cmsClickHandler) {
+          container.removeEventListener('click', container.__cmsClickHandler, true);
+          delete container.__cmsClickHandler;
+        }
+      }
+    });
+  }
+
+  openImagePickerModal(targetImg) {
+    let modal = document.getElementById('cms-image-picker-modal');
+    if (modal) modal.remove();
+
+    const currentImgSrc = targetImg.src || '';
+    const imgKey = targetImg.getAttribute('data-cms-img') || this.getElementSelector(targetImg);
+
+    modal = document.createElement('div');
+    modal.id = 'cms-image-picker-modal';
+    modal.className = 'cms-modal-overlay';
+    modal.innerHTML = `
+      <div class="cms-modal-card" style="max-width: 720px; max-height: 88vh; display: flex; flex-direction: column;">
+        <div class="cms-modal-header">
+          <div>
+            <span class="small-label">Atelier Asset Vault</span>
+            <h3 class="cms-modal-title" style="font-size: 20px; margin: 4px 0;">Swap Image</h3>
+            <span style="font-size: 10px; color: #71717a; font-family: monospace;">Key: ${this.escape(imgKey)}</span>
+          </div>
+          <button type="button" class="cms-modal-close" id="cms-img-picker-close">✕</button>
+        </div>
+
+        <!-- Quick Upload / URL Controls -->
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); padding: 14px; margin-bottom: 16px; border-radius: 4px;">
+          <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 10px; flex-wrap: wrap;">
+            <span style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: #a1a1aa;">Upload & Swap:</span>
+            <label style="font-size: 11px; display: flex; align-items: center; gap: 4px; cursor: pointer;">
+              <input type="radio" name="modal-upload-mode" value="blob" checked>
+              <span>Database Blob (Postgres Base64)</span>
+            </label>
+            <label style="font-size: 11px; display: flex; align-items: center; gap: 4px; cursor: pointer;">
+              <input type="radio" name="modal-upload-mode" value="storage">
+              <span>Storage Bucket</span>
+            </label>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <input type="file" id="cms-modal-file-upload" accept="image/*" class="cms-input" style="flex: 1; padding: 6px;">
+            <div id="cms-modal-upload-status" style="font-size: 11px; color: #22c55e; align-self: center;"></div>
+          </div>
+
+          <div class="cms-divider-line" style="margin: 12px 0;"><span>OR ENTER URL</span></div>
+
+          <div style="display: flex; gap: 8px;">
+            <input type="text" id="cms-img-url-input" class="cms-input" placeholder="Paste image link (https://...)" value="${currentImgSrc}" style="flex: 1;">
+            <button type="button" id="cms-apply-img-url-btn" class="cms-btn-subtle" style="white-space: nowrap;">Apply Link ↵</button>
+          </div>
+        </div>
+
+        <!-- Library Filter & Grid -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #a1a1aa;">
+            Media Library (<span id="cms-picker-count">${this.mediaList.length}</span> items):
+          </div>
+          <input type="search" id="cms-picker-search" placeholder="Filter images..." style="background: #18181b; border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 4px 8px; font-size: 11px; width: 160px;">
+        </div>
+
+        <div class="cms-media-grid" id="cms-picker-grid" style="overflow-y: auto; max-height: 320px; padding-right: 4px;">
+          <!-- Thumbs rendered dynamically -->
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+
+    const renderThumbs = (query = '') => {
+      const grid = document.getElementById('cms-picker-grid');
+      if (!grid) return;
+      const lower = query.toLowerCase();
+      const filtered = this.mediaList.filter(m => 
+        !lower || (m.name && m.name.toLowerCase().includes(lower)) || (m.title && m.title.toLowerCase().includes(lower)) || (m.filename && m.filename.toLowerCase().includes(lower))
+      );
+      document.getElementById('cms-picker-count').textContent = filtered.length;
+
+      grid.innerHTML = filtered.map(m => `
+        <div class="cms-media-thumb" data-url="${m.url}" title="${this.escape(m.title || m.name || m.filename)}">
+          <img src="${m.url}" loading="lazy">
+          <span style="position: absolute; bottom: 2px; left: 2px; font-size: 8px; background: rgba(0,0,0,0.75); color: #fff; padding: 1px 4px; border-radius: 2px; text-transform: uppercase;">
+            ${m.source || (m.isBlob ? 'blob' : 'catalog')}
+          </span>
+        </div>
+      `).join('');
+
+      grid.querySelectorAll('.cms-media-thumb').forEach(thumb => {
+        thumb.addEventListener('click', () => {
+          applyImage(thumb.dataset.url);
+        });
+      });
+    };
+
+    renderThumbs();
+
+    document.getElementById('cms-picker-search').addEventListener('input', (e) => {
+      renderThumbs(e.target.value.trim());
+    });
+
+    document.getElementById('cms-img-picker-close').addEventListener('click', () => modal.remove());
+    modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+
+    const applyImage = (url) => {
+      targetImg.src = url;
+      if (!this.draft.customImages) this.draft.customImages = {};
+      this.draft.customImages[imgKey] = url;
+      this.markDraftModified();
+      modal.remove();
+    };
+
+    document.getElementById('cms-apply-img-url-btn').addEventListener('click', () => {
+      const url = document.getElementById('cms-img-url-input').value.trim();
+      if (url) applyImage(url);
+    });
+
+    // Handle instant file upload directly inside picker modal
+    document.getElementById('cms-modal-file-upload').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const statusEl = document.getElementById('cms-modal-upload-status');
+      statusEl.textContent = 'Uploading...';
+      const mode = modal.querySelector('input[name="modal-upload-mode"]:checked').value;
+      
+      const newUrl = await this.uploadMediaFile(file, mode);
+      if (newUrl) {
+        statusEl.textContent = '✓ Uploaded!';
+        renderThumbs();
+        applyImage(newUrl);
+      }
+    });
+  }
+
+  getElementSelector(el) {
+    if (el.getAttribute('data-cms-img')) return `[data-cms-img="${el.getAttribute('data-cms-img')}"]`;
+    if (el.id) return '#' + el.id;
+    if (el.dataset.post) return `[data-post="${el.dataset.post}"] img`;
+    const parent = el.closest('[data-tab-target]') || el.parentElement;
+    if (parent && parent.className) {
+      return '.' + parent.className.split(' ')[0] + ' img';
+    }
+    return el.tagName.toLowerCase();
   }
 
   toggleSidebar(forceState = null) {
@@ -526,50 +730,200 @@ class AdminManager {
      TAB: MEDIA LIBRARY & UPLOADS
      ------------------------------------------------------------------- */
   renderMediaTab(container) {
-    const imagesHtml = this.mediaList.map(m => `
-      <div class="cms-media-thumb" data-media-url="${m.url}" title="${m.name}">
-        <img src="${m.url}" loading="lazy">
-      </div>
-    `).join('');
+    const isSupabaseConnected = !!this.supabase;
 
     container.innerHTML = `
       <div class="cms-control-group">
-        <label>Direct Asset Upload</label>
-        <p style="font-size: 11px; color: #a1a1aa; margin-bottom: 14px;">
-          Upload high-res imagery to the Supabase Media storage bucket or preview library.
+        <label>Media Asset Ingestion</label>
+        <p style="font-size: 11px; color: #a1a1aa; margin-bottom: 12px;">
+          Upload imagery as direct Database Blobs (Base64 in PostgreSQL) or Storage Bucket public URLs.
         </p>
+
+        <!-- Mode selector -->
+        <div style="display: flex; gap: 14px; margin-bottom: 12px; background: rgba(255,255,255,0.04); padding: 10px; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px;">
+          <label style="font-size: 11px; display: flex; align-items: center; gap: 6px; cursor: pointer;">
+            <input type="radio" name="cms-upload-dest" value="blob" checked>
+            <span><strong>Database Blob</strong> (Base64 in DB)</span>
+          </label>
+          <label style="font-size: 11px; display: flex; align-items: center; gap: 6px; cursor: pointer;">
+            <input type="radio" name="cms-upload-dest" value="storage">
+            <span><strong>Storage Bucket</strong> (CDN URL)</span>
+          </label>
+        </div>
+
         <input type="file" id="cms-file-uploader" accept="image/*" class="cms-input" style="padding: 8px;">
         <div id="cms-upload-progress" style="font-size: 11px; color: #22c55e; margin-top: 6px;"></div>
       </div>
 
-      <div class="cms-divider-line"><span>MEDIA ASSET VAULT</span></div>
+      <div class="cms-control-group" style="margin-top: 14px;">
+        <label>Add Image by Web Link</label>
+        <div style="display: flex; gap: 8px;">
+          <input type="text" id="cms-add-link-input" class="cms-input" placeholder="https://images.unsplash.com/..." style="flex: 1;">
+          <button type="button" id="cms-add-link-btn" class="cms-btn-subtle" style="white-space: nowrap;">Add Link ↵</button>
+        </div>
+      </div>
 
-      <div class="cms-media-grid">
-        ${imagesHtml || '<p style="font-size: 11px; color: #71717a; grid-column: span 3;">No custom uploads yet. Upload an image above.</p>'}
+      <div class="cms-divider-line"><span>ATELIER MEDIA VAULT</span></div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #a1a1aa;">
+          All Assets (<span id="cms-media-tab-count">${this.mediaList.length}</span>)
+        </span>
+        <button type="button" id="cms-seed-db-btn" class="cms-btn-subtle" title="Sync all 61 portfolio pictures into the Supabase database table">
+          ⚡ Seed 61 Pictures to DB
+        </button>
+      </div>
+
+      <input type="search" id="cms-media-tab-search" placeholder="Search archive by keyword..." class="cms-input" style="margin-bottom: 12px; font-size: 11px;">
+
+      <div class="cms-media-grid" id="cms-media-tab-grid" style="max-height: 400px; overflow-y: auto; padding-right: 4px;">
+        <!-- Injected via renderMediaList() -->
       </div>
     `;
+
+    const renderMediaList = (query = '') => {
+      const grid = document.getElementById('cms-media-tab-grid');
+      if (!grid) return;
+      const lower = query.toLowerCase();
+      const filtered = this.mediaList.filter(m => 
+        !lower || (m.name && m.name.toLowerCase().includes(lower)) || (m.title && m.title.toLowerCase().includes(lower)) || (m.filename && m.filename.toLowerCase().includes(lower))
+      );
+      document.getElementById('cms-media-tab-count').textContent = filtered.length;
+
+      if (!filtered.length) {
+        grid.innerHTML = '<p style="font-size: 11px; color: #71717a; grid-column: span 3;">No images matching filter.</p>';
+        return;
+      }
+
+      grid.innerHTML = filtered.map(m => `
+        <div class="cms-media-thumb" data-media-url="${m.url}" data-media-id="${m.id || ''}" title="${this.escape(m.title || m.name || m.filename)}">
+          <img src="${m.url}" loading="lazy">
+          <span style="position: absolute; bottom: 2px; left: 2px; font-size: 8px; background: rgba(0,0,0,0.8); color: #fff; padding: 1px 4px; border-radius: 2px; text-transform: uppercase;">
+            ${m.source || (m.isBlob ? 'blob' : 'catalog')}
+          </span>
+          ${m.source === 'upload' || m.source === 'blob' || m.source === 'storage' || m.source === 'link' ? `
+            <button type="button" class="cms-media-del-btn" data-del-id="${m.id || ''}" style="position: absolute; top: 2px; right: 2px; background: rgba(220,38,38,0.85); color: #fff; border: none; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center;" title="Delete this upload">✕</button>
+          ` : ''}
+        </div>
+      `).join('');
+
+      grid.querySelectorAll('.cms-media-thumb').forEach(thumb => {
+        thumb.addEventListener('click', (e) => {
+          if (e.target.closest('.cms-media-del-btn')) return;
+          const url = thumb.dataset.mediaUrl;
+          if (url.startsWith('data:')) {
+            alert('Copied Database Blob (Base64) to clipboard!');
+            navigator.clipboard.writeText(url);
+          } else {
+            navigator.clipboard.writeText(url);
+            alert(`Copied image URL to clipboard:\n${url}`);
+          }
+        });
+      });
+
+      grid.querySelectorAll('.cms-media-del-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          const id = btn.dataset.delId;
+          if (id) await this.deleteMedia(id);
+        });
+      });
+    };
+
+    renderMediaList();
+
+    document.getElementById('cms-media-tab-search').addEventListener('input', (e) => {
+      renderMediaList(e.target.value.trim());
+    });
 
     document.getElementById('cms-file-uploader').addEventListener('change', async (e) => {
       const file = e.target.files[0];
       if (!file) return;
-      await this.uploadMedia(file);
+      const mode = container.querySelector('input[name="cms-upload-dest"]:checked').value;
+      await this.uploadMediaFile(file, mode);
+      renderMediaList(document.getElementById('cms-media-tab-search').value.trim());
     });
 
-    container.querySelectorAll('.cms-media-thumb').forEach(thumb => {
-      thumb.addEventListener('click', () => {
-        const url = thumb.dataset.mediaUrl;
-        navigator.clipboard.writeText(url);
-        alert(`Copied image URL to clipboard:\n${url}`);
-      });
+    document.getElementById('cms-add-link-btn').addEventListener('click', async () => {
+      const url = document.getElementById('cms-add-link-input').value.trim();
+      if (!url) return alert('Please enter a valid image URL.');
+      await this.addImageLink(url);
+      document.getElementById('cms-add-link-input').value = '';
+      renderMediaList();
+    });
+
+    document.getElementById('cms-seed-db-btn').addEventListener('click', async () => {
+      const btn = document.getElementById('cms-seed-db-btn');
+      btn.textContent = 'Seeding...';
+      btn.disabled = true;
+      await this.seedMediaToSupabase(true);
+      btn.textContent = '✓ Seeded!';
+      await this.fetchMedia();
+      renderMediaList();
+      setTimeout(() => { btn.textContent = '⚡ Seed 61 Pictures to DB'; btn.disabled = false; }, 2000);
     });
   }
 
-  async uploadMedia(file) {
+  async uploadMediaFile(file, mode = 'blob') {
     const progressEl = document.getElementById('cms-upload-progress');
-    progressEl.textContent = 'Uploading asset...';
+    if (progressEl) progressEl.textContent = 'Processing asset...';
 
-    // 1. Supabase Storage Upload if connected
-    if (this.supabase) {
+    if (mode === 'blob') {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+          const base64Data = e.target.result;
+          const newMediaItem = {
+            id: 'media_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+            filename: file.name,
+            title: file.name.replace(/\.[^/.]+$/, ''),
+            caption: 'Direct manual upload (Blob)',
+            blob_data: base64Data,
+            url: null,
+            source: 'blob',
+            mime_type: file.type || 'image/jpeg',
+            created_by: this.user.email || 'admin'
+          };
+
+          if (this.supabase) {
+            try {
+              const { error } = await this.supabase
+                .from('media_items')
+                .insert(newMediaItem);
+              if (error) {
+                console.warn('DB blob insert error:', error);
+                alert('Note: Could not insert into media_items table in Supabase (' + error.message + '). Saved in active session.');
+              }
+            } catch (err) {
+              console.warn('DB blob error:', err);
+            }
+          }
+
+          const localItem = {
+            id: newMediaItem.id,
+            name: newMediaItem.title,
+            filename: newMediaItem.filename,
+            title: newMediaItem.title,
+            caption: newMediaItem.caption,
+            url: base64Data,
+            isBlob: true,
+            source: 'blob'
+          };
+
+          this.mediaList.unshift(localItem);
+          if (progressEl) progressEl.textContent = '✓ Saved as Database Blob!';
+          resolve(base64Data);
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    if (mode === 'storage') {
+      if (!this.supabase) {
+        alert('Supabase client not initialized. Storing as Database Blob.');
+        return this.uploadMediaFile(file, 'blob');
+      }
+
       try {
         const ext = file.name.split('.').pop();
         const filename = `${Date.now()}_${Math.random().toString(36).substr(2, 6)}.${ext}`;
@@ -583,37 +937,169 @@ class AdminManager {
           .from('media')
           .getPublicUrl(filename);
 
-        this.mediaList.unshift({ name: file.name, url: publicUrl });
-        progressEl.textContent = 'Uploaded successfully!';
-        this.renderMediaTab(document.getElementById('cms-drawer-content'));
-        return;
+        const newMediaItem = {
+          id: 'media_' + Date.now(),
+          filename: file.name,
+          title: file.name.replace(/\.[^/.]+$/, ''),
+          caption: 'Storage bucket upload',
+          url: publicUrl,
+          blob_data: null,
+          source: 'storage',
+          mime_type: file.type || 'image/jpeg',
+          created_by: this.user.email || 'admin'
+        };
+
+        await this.supabase.from('media_items').insert(newMediaItem).catch(() => {});
+
+        this.mediaList.unshift({
+          id: newMediaItem.id,
+          name: newMediaItem.title,
+          filename: newMediaItem.filename,
+          title: newMediaItem.title,
+          url: publicUrl,
+          isBlob: false,
+          source: 'storage'
+        });
+
+        if (progressEl) progressEl.textContent = '✓ Uploaded to Storage bucket!';
+        return publicUrl;
       } catch (err) {
-        console.warn('Storage upload failed, falling back to local base64:', err);
+        console.warn('Storage bucket failed, falling back to Database Blob:', err);
+        if (progressEl) progressEl.textContent = 'Storage bucket unavailable, storing as Database Blob...';
+        return this.uploadMediaFile(file, 'blob');
+      }
+    }
+  }
+
+  async addImageLink(url, title = '') {
+    if (!url) return;
+    const newMediaItem = {
+      id: 'media_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+      filename: (title || 'External Image').replace(/[^a-zA-Z0-9_-]/g, '_') + '.jpg',
+      title: title || 'External Image',
+      caption: 'Direct URL reference',
+      url: url,
+      blob_data: null,
+      source: 'link',
+      created_by: this.user.email || 'admin'
+    };
+
+    if (this.supabase) {
+      try {
+        const { error } = await this.supabase
+          .from('media_items')
+          .insert(newMediaItem);
+        if (error) console.warn('Could not insert link into DB:', error);
+      } catch (err) {
+        console.warn('DB link error:', err);
       }
     }
 
-    // 2. Fallback: Base64 data URL
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const url = e.target.result;
-      this.mediaList.unshift({ name: file.name, url });
-      progressEl.textContent = 'Image loaded locally.';
-      this.renderMediaTab(document.getElementById('cms-drawer-content'));
-    };
-    reader.readAsDataURL(file);
+    this.mediaList.unshift({
+      id: newMediaItem.id,
+      name: newMediaItem.title,
+      filename: newMediaItem.filename,
+      title: newMediaItem.title,
+      url: url,
+      isBlob: false,
+      source: 'link'
+    });
+  }
+
+  async deleteMedia(id) {
+    if (!confirm('Remove this media asset?')) return;
+    if (this.supabase) {
+      try {
+        await this.supabase.from('media_items').delete().eq('id', id);
+      } catch (e) {}
+    }
+    this.mediaList = this.mediaList.filter(m => m.id !== id);
+    this.renderMediaTab(document.getElementById('cms-drawer-content'));
   }
 
   async fetchMedia() {
+    const catalog = Array.isArray(window.MEAUX_CATALOG_MEDIA) ? window.MEAUX_CATALOG_MEDIA : [];
+
+    let dbItems = [];
     if (this.supabase) {
       try {
-        const { data, error } = await this.supabase.storage.from('media').list();
-        if (data && !error) {
-          this.mediaList = data.map(item => ({
-            name: item.name,
-            url: this.supabase.storage.from('media').getPublicUrl(item.name).data.publicUrl
+        const { data, error } = await this.supabase
+          .from('media_items')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (data && !error && data.length > 0) {
+          dbItems = data.map(item => ({
+            id: item.id,
+            name: item.title || item.filename,
+            filename: item.filename,
+            title: item.title,
+            caption: item.caption,
+            url: item.blob_data || item.url,
+            isBlob: !!item.blob_data,
+            source: item.source || (item.blob_data ? 'blob' : 'url')
           }));
+        } else if (data && data.length === 0 && catalog.length > 0) {
+          // Table exists but has 0 records: auto-seed catalog in background!
+          this.seedMediaToSupabase(false);
         }
-      } catch (e) {}
+      } catch (err) {
+        console.warn('Could not load from media_items table:', err);
+      }
+    }
+
+    if (dbItems.length > 0) {
+      const dbFilenames = new Set(dbItems.map(d => d.filename));
+      const dbUrls = new Set(dbItems.map(d => d.url));
+      const remainingCatalog = catalog.filter(c => !dbFilenames.has(c.filename) && !dbUrls.has(c.url));
+      this.mediaList = [...dbItems, ...remainingCatalog];
+    } else {
+      this.mediaList = catalog.map(c => ({
+        id: c.id,
+        name: c.title || c.filename,
+        filename: c.filename,
+        title: c.title,
+        caption: c.caption,
+        url: c.url,
+        isBlob: false,
+        source: 'catalog'
+      }));
+    }
+  }
+
+  async seedMediaToSupabase(alertOnComplete = false) {
+    if (!this.supabase) {
+      if (alertOnComplete) alert('Supabase client not initialized.');
+      return;
+    }
+    const catalog = window.MEAUX_CATALOG_MEDIA || [];
+    if (!catalog.length) return;
+
+    try {
+      const rows = catalog.map(c => ({
+        id: c.id,
+        filename: c.filename,
+        title: c.title,
+        caption: c.caption,
+        url: 'https://alexnbucur.space/' + c.url.replace(/^\/?/, ''),
+        source: 'catalog',
+        created_by: this.user.email || 'seed'
+      }));
+
+      const { error } = await this.supabase
+        .from('media_items')
+        .upsert(rows, { onConflict: 'id' });
+
+      if (error) {
+        console.warn('Seed media_items error:', error);
+        if (alertOnComplete) alert('Seeding failed: ' + error.message + '\n\nPlease ensure you have run the supabase/seed_media.sql in your Supabase SQL editor.');
+      } else {
+        console.log(`Successfully seeded ${rows.length} media items into Supabase!`);
+        if (alertOnComplete) alert(`Successfully seeded ${rows.length} portfolio pictures into Supabase!`);
+      }
+    } catch (e) {
+      console.warn('Seed media_items exception:', e);
+      if (alertOnComplete) alert('Seed error: ' + e.message);
     }
   }
 
@@ -763,17 +1249,53 @@ class AdminManager {
      INLINE EDITING & ATTACHMENT
      ------------------------------------------------------------------- */
   bindInlineEditing() {
+    // 1. Text input listener for inline edits
     document.addEventListener('input', (e) => {
-      const el = e.target.closest('[data-cms]');
-      if (!el || !this.isEditMode) return;
-      const path = el.getAttribute('data-cms').split('.');
-      let target = this.draft;
-      for (let i = 0; i < path.length - 1; i++) {
-        if (!target[path[i]]) target[path[i]] = {};
-        target = target[path[i]];
+      if (!this.isEditMode) return;
+      const el = e.target.closest('[data-cms-key], [data-cms]');
+      if (!el) return;
+      if (el.closest('#cms-admin-bar, #cms-admin-drawer, #cms-login-modal, #cms-image-picker-modal, dialog')) return;
+
+      const key = el.getAttribute('data-cms-key') || el.getAttribute('data-cms');
+      if (!this.draft.customContent) this.draft.customContent = {};
+      this.draft.customContent[key] = el.innerHTML;
+
+      // Handle dot-path if present (e.g. footer.tagline)
+      const dotPath = el.getAttribute('data-cms');
+      if (dotPath && dotPath.includes('.')) {
+        const path = dotPath.split('.');
+        let target = this.draft;
+        for (let i = 0; i < path.length - 1; i++) {
+          if (!target[path[i]]) target[path[i]] = {};
+          target = target[path[i]];
+        }
+        target[path[path.length - 1]] = el.textContent.trim();
       }
-      target[path[path.length - 1]] = el.textContent.trim();
+
       this.markDraftModified();
+    });
+
+    // 2. Prevent link navigation when clicking inside editable text in edit mode
+    document.addEventListener('click', (e) => {
+      if (!this.isEditMode) return;
+      const editable = e.target.closest('.cms-editable-text, [contenteditable="true"]');
+      if (editable) {
+        const link = e.target.closest('a');
+        if (link) {
+          e.preventDefault();
+        }
+      }
+    }, true);
+
+    // 3. Tab switching listener to preserve edit mode across pages
+    document.querySelectorAll('.atelier-tabs button, [data-tab-target]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        setTimeout(() => {
+          if (this.isEditMode) {
+            this.toggleEditMode(true);
+          }
+        }, 80);
+      });
     });
   }
 
@@ -813,6 +1335,8 @@ class AdminManager {
     const indicator = document.getElementById('cms-bar-indicator');
     if (indicator) indicator.className = 'cms-status-indicator draft';
 
+    let publishedSuccessfully = false;
+
     // 1. Supabase Postgres Publish RPC
     if (this.supabase) {
       try {
@@ -821,13 +1345,33 @@ class AdminManager {
           note: `Published by ${this.user.email} at ${new Date().toISOString()}`
         });
         if (error) throw error;
-        alert('Site published live to Supabase production database!');
+        publishedSuccessfully = true;
+        alert('✓ Site published live to Supabase production database!');
       } catch (err) {
-        console.warn('Remote publish failed:', err);
-        alert('Note: Published locally (Supabase returned: ' + err.message + ')');
+        console.warn('publish_site RPC error, falling back to direct table update:', err);
+        // Fallback: direct table update
+        try {
+          const { error: directError } = await this.supabase
+            .from('site_content')
+            .upsert({
+              key: 'published',
+              data: this.draft,
+              updated_at: new Date().toISOString(),
+              updated_by: this.user.email
+            });
+          if (!directError) {
+            publishedSuccessfully = true;
+            alert('✓ Site published live to Supabase production database (via direct table update)!');
+          } else {
+            throw directError;
+          }
+        } catch (tableErr) {
+          console.warn('Direct publish failed:', tableErr);
+          alert('Note: Published locally (Supabase returned: ' + err.message + ')');
+        }
       }
     } else {
-      alert('Published to local storage! (Connect Supabase in settings for remote database deployment)');
+      alert('Published to local storage cache! (Connect Supabase in settings for remote database deployment)');
     }
 
     // 2. Local published cache update

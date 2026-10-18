@@ -65,18 +65,61 @@ class CmsRuntime {
       }
     }
 
-    // 2. Fetch and apply public site content
+    // 2. Assign deterministic keys to all text & media elements
+    this.assignContentAndImageKeys();
+
+    // 3. Fetch and apply public site content
     await this.loadContent();
     this.applyContent(this.content);
 
-    // 3. Check authentication status
+    // 4. Check authentication status
     await this.checkAuth();
 
-    // 4. Attach admin footer link trigger
+    // 5. Attach admin footer link trigger
     this.initAdminTrigger();
 
-    // 5. Expose runtime instance globally
+    // 6. Expose runtime instance globally
     window.MeauxCMS = this;
+  }
+
+  assignContentAndImageKeys() {
+    // 1. Assign deterministic keys to all editable text elements
+    const textSelectors = [
+      'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p',
+      '.small-label', '.about-statement', '.card-num', '.value-num',
+      '.discipline-title', '.discipline-subtitle', '.discipline-tagline span',
+      '.hero-signature span', '.hero-image-caption',
+      '.story-chapter h3', '.story-chapter p',
+      '.value-card h3', '.value-card p',
+      '.client-item', '.meta-content', '[data-cms]'
+    ];
+
+    document.querySelectorAll(textSelectors.join(', ')).forEach((el, index) => {
+      if (el.closest('#cms-admin-bar, #cms-admin-drawer, #cms-login-modal, #cms-image-picker-modal, dialog')) return;
+      if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'BUTTON' || el.closest('button.tab-btn')) return;
+
+      if (!el.getAttribute('data-cms-key')) {
+        const explicit = el.getAttribute('data-cms');
+        if (explicit) {
+          el.setAttribute('data-cms-key', explicit);
+        } else {
+          const parentView = el.closest('[id^="view-"], .site-footer, .header-inner, .brand-header, .about-section, .contact-section') || el.parentElement;
+          const parentPrefix = parentView && parentView.id ? parentView.id : (parentView && parentView.className ? parentView.className.split(' ')[0] : 'sec');
+          const cleanClass = el.className ? '_' + el.className.split(' ')[0].replace(/[^a-zA-Z0-9_-]/g, '') : '';
+          el.setAttribute('data-cms-key', `txt_${parentPrefix}_${el.tagName.toLowerCase()}${cleanClass}_${index}`);
+        }
+      }
+    });
+
+    // 2. Assign deterministic keys to all replaceable images
+    document.querySelectorAll('main img, .hero-image, .about-portrait-wrap img, .discipline-narrative-split img, .project-image-wrap img').forEach((img, index) => {
+      if (img.closest('#cms-admin-bar, #cms-admin-drawer, #cms-login-modal, #cms-image-picker-modal, dialog')) return;
+      if (!img.getAttribute('data-cms-img')) {
+        const parentView = img.closest('[id^="view-"], .about-section, .discipline-page') || img.parentElement;
+        const parentPrefix = parentView && parentView.id ? parentView.id : 'img';
+        img.setAttribute('data-cms-img', `img_${parentPrefix}_${index}`);
+      }
+    });
   }
 
   async loadContent() {
@@ -154,6 +197,36 @@ class CmsRuntime {
         }
       }
     });
+
+    // Apply custom inline-edited content dictionary
+    if (doc.customContent) {
+      for (const [key, html] of Object.entries(doc.customContent)) {
+        const el = document.querySelector(`[data-cms-key="${key}"], [data-cms="${key}"]`);
+        if (el && html !== undefined && html !== null) {
+          el.innerHTML = html;
+        }
+      }
+    }
+
+    // Apply custom images dictionary
+    if (doc.customImages) {
+      for (const [key, src] of Object.entries(doc.customImages)) {
+        if (!src) continue;
+        let img = document.querySelector(`[data-cms-img="${key}"]`);
+        if (!img) {
+          try {
+            img = document.querySelector(key);
+          } catch (e) {}
+        }
+        if (img) {
+          if (img.tagName === 'IMG') img.src = src;
+          else {
+            const innerImg = img.querySelector('img');
+            if (innerImg) innerImg.src = src;
+          }
+        }
+      }
+    }
 
     // Apply portfolio updates if present
     if (doc.portfolio && window.MeauxSite) {

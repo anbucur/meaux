@@ -35,13 +35,15 @@ create table if not exists public.site_revisions (
   created_by  text
 );
 
--- Initial administrator (add more later from the admin panel → Settings → Admins)
+-- Initial administrators
 insert into public.admins (email, added_by)
-values ('alexandru.n.bucur@gmail.com', 'seed')
+values 
+  ('alexandru.n.bucur@gmail.com', 'seed'),
+  ('bucuralexandrunicolae@gmail.com', 'seed')
 on conflict (email) do nothing;
 
 -- ---------------------------------------------------------------------
--- 2. Helper: is the current request made by an allow-listed Google user?
+-- 2. Helper: is the current request made by an allow-listed user?
 -- ---------------------------------------------------------------------
 create or replace function public.is_admin()
 returns boolean
@@ -50,14 +52,9 @@ stable
 security definer
 set search_path = public
 as $$
-  select coalesce(
-    -- must have authenticated through Google (blocks e-mail/password look-alikes)
-    (auth.jwt() -> 'app_metadata' -> 'providers') ? 'google'
-    and exists (
-      select 1 from public.admins a
-      where a.email = lower(auth.jwt() ->> 'email')
-    ),
-    false
+  select exists (
+    select 1 from public.admins a
+    where a.email = lower(auth.jwt() ->> 'email')
   );
 $$;
 
@@ -209,3 +206,37 @@ $$;
 revoke all on function public.hook_admins_only(jsonb) from public, anon, authenticated;
 grant execute on function public.hook_admins_only(jsonb) to supabase_auth_admin;
 grant select on public.admins to supabase_auth_admin;
+
+-- ---------------------------------------------------------------------
+-- 7. Media Items table (supports links, CDN URLs, and direct Base64 blobs)
+-- ---------------------------------------------------------------------
+create table if not exists public.media_items (
+  id          text primary key default gen_random_uuid()::text,
+  filename    text not null,
+  title       text,
+  caption     text,
+  url         text,          -- Absolute or relative HTTP link
+  blob_data   text,          -- Base64 encoded blob / data URL for manual direct uploads
+  source      text not null default 'catalog', -- 'catalog', 'upload', 'link'
+  mime_type   text default 'image/jpeg',
+  created_at  timestamptz not null default now(),
+  created_by  text
+);
+
+alter table public.media_items enable row level security;
+
+drop policy if exists "media_items: public read" on public.media_items;
+create policy "media_items: public read" on public.media_items for select to anon, authenticated using (true);
+
+drop policy if exists "media_items: admin insert" on public.media_items;
+create policy "media_items: admin insert" on public.media_items for insert to authenticated with check (public.is_admin());
+
+drop policy if exists "media_items: admin update" on public.media_items;
+create policy "media_items: admin update" on public.media_items for update to authenticated using (public.is_admin()) with check (public.is_admin());
+
+drop policy if exists "media_items: admin delete" on public.media_items;
+create policy "media_items: admin delete" on public.media_items for delete to authenticated using (public.is_admin());
+
+grant select on public.media_items to anon, authenticated;
+grant insert, update, delete on public.media_items to authenticated;
+
