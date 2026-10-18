@@ -1,0 +1,1635 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MEAUX — Spatial, Visual & Brand Atelier</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Space Mono (Modernized Typewriter), Syne (Architectural Display), Cormorant Garamond (High-Contrast Editorial) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        mono: ['"Space Mono"', 'monospace'],
+                        display: ['"Syne"', 'sans-serif'],
+                        serif: ['"Cormorant Garamond"', 'serif'],
+                    },
+                    colors: {
+                        obsidian: '#070707',
+                        leather: '#0e0e0f',
+                        ash: '#1c1c1e',
+                        chrome: '#d4d4d8',
+                        chalk: '#f7f7f5',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        :root {
+            --cursor-x: 50vw;
+            --cursor-y: 50vh;
+            --light-angle: 135deg;
+            --tilt-x: 0deg;
+            --tilt-y: 0deg;
+        }
+
+        * {
+            box-sizing: border-box;
+            selection-background-color: #ffffff;
+            selection-color: #000000;
+        }
+
+        ::selection {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        body {
+            background-color: #050506;
+            color: #f7f7f5;
+            font-family: 'Space Mono', monospace;
+            overflow-x: hidden;
+        }
+
+        body.vault-locked {
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        /* ==========================================
+           TACTILE BLACK LEATHER VAULT & SPRING PHYSICS
+           ========================================== */
+        .leather-panel {
+            background-color: #080809;
+            background-image: 
+                radial-gradient(950px circle at var(--cursor-x) var(--cursor-y), rgba(255, 255, 255, 0.13), rgba(200, 200, 220, 0.04) 32%, transparent 68%),
+                repeating-linear-gradient(45deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 5px),
+                radial-gradient(circle at 50% 50%, #161619 0%, #050506 100%);
+            box-shadow: 
+                inset 0 0 110px rgba(0, 0, 0, 0.98),
+                0 0 60px rgba(0, 0, 0, 0.9);
+            will-change: transform, filter;
+        }
+
+        /* Procedural SVG Leather Grain Overlay */
+        .leather-grain-overlay {
+            filter: url(#leather-grain-filter);
+            opacity: 0.42;
+            mix-blend-mode: overlay;
+            pointer-events: none;
+        }
+
+        /* Stitched Architectural Seam Lines */
+        .stitched-border {
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            outline: 1px dashed rgba(255, 255, 255, 0.22);
+            outline-offset: -7px;
+        }
+
+        /* 3D Perspective Tilt Plate */
+        .vault-center-plate {
+            transform-style: preserve-3d;
+            perspective: 1400px;
+            will-change: transform, opacity, filter;
+        }
+
+        /* ==========================================
+           3D CANVAS SCREW ASSEMBLIES
+           ========================================== */
+        .screw-assembly {
+            position: relative;
+            width: 112px;
+            height: 112px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .screw-canvas {
+            width: 112px;
+            height: 112px;
+            display: block;
+            pointer-events: none;
+            filter: drop-shadow(0 18px 24px rgba(0, 0, 0, 0.92));
+            transition: filter 0.35s ease;
+        }
+
+        .screw-assembly:hover .screw-canvas {
+            filter: drop-shadow(0 24px 32px rgba(0, 0, 0, 0.98)) drop-shadow(0 0 18px rgba(255, 255, 255, 0.25));
+        }
+
+        /* Leather Dimple / Puckering Ring around each Screw */
+        .leather-dimple-ring {
+            position: absolute;
+            inset: 10px;
+            border-radius: 9999px;
+            background: radial-gradient(circle at 50% 50%, #000000 0%, #050506 48%, rgba(255,255,255,0.08) 68%, transparent 75%);
+            box-shadow: 
+                inset 0 8px 18px rgba(0,0,0,1),
+                inset 0 -2px 6px rgba(255,255,255,0.16),
+                0 2px 10px rgba(0,0,0,0.95);
+            pointer-events: none;
+            transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.6s ease;
+        }
+
+        .screw-assembly.is-unscrewed .leather-dimple-ring {
+            transform: scale(0.93);
+            box-shadow: 
+                inset 0 12px 24px rgba(0,0,0,1),
+                inset 0 -1px 3px rgba(255,255,255,0.08);
+        }
+
+        /* ==========================================
+           PURE LIQUID CHROME REFLECTIONS & BLOBS
+           ========================================== */
+        @keyframes liquidMorph {
+            0%, 100% {
+                border-radius: 54% 46% 48% 52% / 52% 54% 46% 48%;
+            }
+            33% {
+                border-radius: 46% 54% 56% 44% / 48% 44% 56% 52%;
+            }
+            66% {
+                border-radius: 58% 42% 45% 55% / 54% 58% 42% 46%;
+            }
+        }
+
+        .liquid-chrome-surface {
+            background: linear-gradient(
+                var(--light-angle),
+                #09090b 0%,
+                #52525b 18%,
+                #ffffff 32%,
+                #18181b 48%,
+                #e4e4e7 68%,
+                #09090b 85%,
+                #ffffff 100%
+            );
+            background-size: 200% 200%;
+        }
+
+        .organic-blob {
+            animation: liquidMorph 8s ease-in-out infinite;
+            background: radial-gradient(circle at 32% 28%, #ffffff 0%, #d4d4d8 18%, #52525b 42%, #09090b 74%, #a1a1aa 94%, #ffffff 100%);
+            box-shadow: 
+                inset 0 4px 15px rgba(255,255,255,0.85),
+                inset -10px -15px 30px rgba(0,0,0,0.9),
+                0 25px 60px rgba(0,0,0,0.45);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #050506;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #52525b;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ffffff;
+        }
+
+        /* 3D Tilt Editorial Portfolio Card Treatments */
+        .editorial-card {
+            transform-style: preserve-3d;
+            transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.35s ease;
+            will-change: transform;
+        }
+        .editorial-card-img {
+            filter: grayscale(100%) contrast(120%);
+            transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1), filter 0.65s ease;
+        }
+        .editorial-card:hover .editorial-card-img {
+            transform: scale(1.06);
+            filter: grayscale(100%) contrast(135%) brightness(1.06);
+        }
+
+        /* Blinking Typewriter Cursor */
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        .typewriter-cursor {
+            display: inline-block;
+            width: 8px;
+            height: 1em;
+            background-color: currentColor;
+            vertical-align: middle;
+            margin-left: 4px;
+            animation: blink 1s step-end infinite;
+        }
+
+        /* Subtle Scanline & Reflection Sheen */
+        .reflection-sheen {
+            position: relative;
+            overflow: hidden;
+        }
+        .reflection-sheen::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -60%;
+            width: 40%;
+            height: 200%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.32), transparent);
+            transform: rotate(25deg);
+            transition: left 0.85s cubic-bezier(0.19, 1, 0.22, 1);
+            pointer-events: none;
+        }
+        .reflection-sheen:hover::after {
+            left: 130%;
+        }
+
+        /* Smooth Scroll Reveal States */
+        .reveal-item {
+            opacity: 0;
+            transform: translateY(28px);
+            transition: opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1), transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .reveal-item.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+<meta name="description" content="Meaux — an independent creative practice in photography, interior design, brand identity and social media.">
+<link rel="stylesheet" href="assets/site.css">
+<link rel="stylesheet" href="assets/entrance.css">
+</head>
+<body class="vault-locked antialiased selection:bg-white selection:text-black">
+
+    <!-- ==========================================
+         PROCEDURAL SVG FILTERS (LEATHER & CHROME)
+         ========================================== -->
+    <svg style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
+        <defs>
+            <!-- Fine Matte Calfskin Leather Grain Filter -->
+            <filter id="leather-grain-filter" x="0%" y="0%" width="100%" height="100%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.24 0.38" numOctaves="3" stitchTiles="stitch" result="noise" />
+                <feColorMatrix type="saturate" values="0" in="noise" result="monoNoise" />
+                <feDiffuseLighting in="monoNoise" lighting-color="#ffffff" surfaceScale="1.3" result="diffuse">
+                    <feDistantLight azimuth="135" elevation="32" />
+                </feDiffuseLighting>
+                <feComposite operator="in" in="diffuse" in2="SourceGraphic" />
+            </filter>
+        </defs>
+    </svg>
+
+    <!-- ==========================================
+         CUSTOM INERTIA & VELOCITY-DEFORMING CURSOR
+         ========================================== -->
+    <div id="custom-cursor-outer" class="fixed top-0 left-0 w-10 h-10 rounded-full border border-white/60 pointer-events-none z-[120] mix-blend-difference hidden md:flex items-center justify-center will-change-transform">
+        <div id="custom-cursor-label" class="text-[7px] tracking-[0.2em] font-bold uppercase text-white opacity-0 transition-opacity duration-200"></div>
+    </div>
+    <div id="custom-cursor-dot" class="fixed top-0 left-0 w-2 h-2 bg-white rounded-full pointer-events-none z-[121] mix-blend-difference hidden md:block will-change-transform"></div>
+
+    <!-- ==========================================
+         1. THE FLUID LEATHER & FERROFLUID VAULT OVERLAY
+         ========================================== -->
+    <div id="leather-vault" class="fixed inset-0 z-50 flex items-center justify-center select-none overflow-hidden" style="perspective: 1600px;">
+        <div id="vault-stage" class="absolute inset-0 w-full h-full flex items-center justify-center overflow-hidden" style="transform-style: preserve-3d;">
+        <!-- 4 Split Architectural Leather Panels with Living Ferrofluid Canvas Inside -->
+        <div id="vault-panel-0" class="leather-panel absolute top-0 left-0 w-1/2 h-1/2 border-r border-b border-white/20 overflow-hidden origin-top-left">
+            <div class="leather-grain-overlay absolute inset-0"></div>
+            <div class="absolute inset-4 border-t border-l border-dashed border-white/15 pointer-events-none"></div>
+        </div>
+
+        <div id="vault-panel-1" class="leather-panel absolute top-0 right-0 w-1/2 h-1/2 border-b border-white/20 overflow-hidden origin-top-right">
+            <div class="leather-grain-overlay absolute inset-0"></div>
+            <div class="absolute inset-4 border-t border-r border-dashed border-white/15 pointer-events-none"></div>
+            <span id="ferro-readout" class="sr-only"></span>
+        </div>
+
+        <div id="vault-panel-2" class="leather-panel absolute bottom-0 left-0 w-1/2 h-1/2 border-r border-white/20 overflow-hidden origin-bottom-left">
+            <div class="leather-grain-overlay absolute inset-0"></div>
+            <div class="absolute inset-4 border-b border-l border-dashed border-white/15 pointer-events-none"></div>
+        </div>
+
+        <div id="vault-panel-3" class="leather-panel absolute bottom-0 right-0 w-1/2 h-1/2 overflow-hidden origin-bottom-right">
+            <div class="leather-grain-overlay absolute inset-0"></div>
+            <div class="absolute inset-4 border-b border-r border-dashed border-white/15 pointer-events-none"></div>
+            <span id="vault-fastener-count" class="sr-only"></span>
+        </div>
+
+        <!-- Full-Screen Interactive Embossed Leather, Ferrofluid & Light-Blade Shader Canvas -->
+        <canvas id="vault-fluid-canvas" class="absolute inset-0 w-full h-full pointer-events-none z-[5] mix-blend-screen opacity-90"></canvas>
+    </div>
+
+        <!-- Central 3D Tilting Leather Lock Plate & 4 Raymarched Chrome Orb Screws -->
+        <div id="vault-center-plate" class="vault-center-plate relative z-10 w-[94vw] max-w-[840px] min-h-[540px] sm:min-h-[600px] leather-panel stitched-border p-6 sm:p-12 flex flex-col justify-between shadow-[0_45px_120px_rgba(0,0,0,0.98)]">
+            
+            <!-- Leather Grain & Dynamic Specular Sheen Inside Central Plate -->
+            <div class="leather-grain-overlay absolute inset-0"></div>
+
+            <!-- Sharp Inner Architectural Framing Lines + Diagonal Sunlight Blade -->
+            <div class="absolute inset-5 border border-white/20 pointer-events-none"></div>
+            <div class="absolute top-5 bottom-5 left-1/2 w-[1px] bg-white/10 pointer-events-none"></div>
+            <div class="absolute left-5 right-5 top-1/2 h-[1px] bg-white/10 pointer-events-none"></div>
+
+            <!-- ==========================================
+                 4 ULTRA-REALISTIC 3D CANVAS ORB SCREWS
+                 ========================================== -->
+            <!-- Top-Left 3D Orb Screw -->
+            <div class="absolute -top-7 -left-7 sm:top-1 sm:left-1 z-30 flex items-center group">
+                <div onclick="toggleSingleScrew(0)" data-cursor="UNSCREW" id="screw-wrap-0" class="screw-assembly" role="button" tabindex="0" aria-label="Unscrew Fastener 01">
+                    <div class="leather-dimple-ring"></div>
+                    <canvas id="screw-canvas-0" width="224" height="224" class="screw-canvas"></canvas>
+                </div>
+                <span id="screw-status-0" class="sr-only">TORQUE: 18.4 N·m</span>
+            </div>
+
+            <!-- Top-Right 3D Orb Screw -->
+            <div class="absolute -top-7 -right-7 sm:top-1 sm:right-1 z-30 flex flex-row-reverse items-center group">
+                <div onclick="toggleSingleScrew(1)" data-cursor="UNSCREW" id="screw-wrap-1" class="screw-assembly" role="button" tabindex="0" aria-label="Unscrew Fastener 02">
+                    <div class="leather-dimple-ring"></div>
+                    <canvas id="screw-canvas-1" width="224" height="224" class="screw-canvas"></canvas>
+                </div>
+                <span id="screw-status-1" class="sr-only">TORQUE: 18.4 N·m</span>
+            </div>
+
+            <!-- Bottom-Left 3D Orb Screw -->
+            <div class="absolute -bottom-7 -left-7 sm:bottom-1 sm:left-1 z-30 flex items-center group">
+                <div onclick="toggleSingleScrew(2)" data-cursor="UNSCREW" id="screw-wrap-2" class="screw-assembly" role="button" tabindex="0" aria-label="Unscrew Fastener 03">
+                    <div class="leather-dimple-ring"></div>
+                    <canvas id="screw-canvas-2" width="224" height="224" class="screw-canvas"></canvas>
+                </div>
+                <span id="screw-status-2" class="sr-only">TORQUE: 18.4 N·m</span>
+            </div>
+
+            <!-- Bottom-Right 3D Orb Screw -->
+            <div class="absolute -bottom-7 -right-7 sm:bottom-1 sm:right-1 z-30 flex flex-row-reverse items-center group">
+                <div onclick="toggleSingleScrew(3)" data-cursor="UNSCREW" id="screw-wrap-3" class="screw-assembly" role="button" tabindex="0" aria-label="Unscrew Fastener 04">
+                    <div class="leather-dimple-ring"></div>
+                    <canvas id="screw-canvas-3" width="224" height="224" class="screw-canvas"></canvas>
+                </div>
+                <span id="screw-status-3" class="sr-only">TORQUE: 18.4 N·m</span>
+            </div>
+
+            <!-- Vault Top Technical Bar -->
+            <div class="vault-topbar relative z-20 flex items-center justify-between border-b border-white/15 pb-3 pt-2 px-6 sm:px-16 text-[10px] tracking-[0.22em] text-zinc-400 uppercase">
+                <span>A WORLD BY MEAUX</span>
+                <button onclick="toggleSound()" data-cursor="AUDIO" id="vault-sound-btn" aria-pressed="false" class="hover:text-white transition-colors flex items-center gap-1.5">
+                    <span id="vault-sound-dot" class="w-1.5 h-1.5 rounded-full bg-zinc-600"></span>
+                    <span id="vault-sound-label">SOUND OFF</span>
+                </button>
+            </div>
+
+            <!-- Vault Center Sculptural Liquid-Chrome Monolith Lens & Brand Title -->
+            <div class="vault-content relative z-20 my-auto py-6 text-center flex flex-col items-center">
+                
+                <div class="vault-emblem" aria-hidden="true"></div>
+
+                <p class="text-[10px] sm:text-[11px] tracking-[0.36em] text-zinc-400 uppercase mb-1">
+                    IMAGE. IDENTITY. SPACE.
+                </p>
+
+                <h1 onclick="triggerVaultSequence()" data-cursor="ENTER" class="brand-logo vault-logo cursor-pointer font-display text-6xl sm:text-8xl font-extrabold tracking-[-0.04em] text-white uppercase leading-none select-all drop-shadow-[0_10px_25px_rgba(0,0,0,0.9)]">
+                    MEAUX<span class="brand-star" aria-hidden="true">✳</span>
+                </h1>
+
+                <!-- Sharp Architectural Divider with Chrome Center -->
+                <div class="w-52 sm:w-72 h-[1px] bg-gradient-to-r from-transparent via-white/80 to-transparent my-4"></div>
+
+                <!-- Live Typewriter Discipline Cycling -->
+                <div class="h-6 flex items-center justify-center text-xs sm:text-sm tracking-[0.25em] text-zinc-200 uppercase">
+                    <span class="text-zinc-500 mr-2">[</span>
+                    <span id="vault-typewriter">INTERIOR DESIGN</span><span class="typewriter-cursor"></span>
+                    <span class="text-zinc-500 ml-2">]</span>
+                </div>
+
+                <!-- Interactive Enter Trigger Button -->
+                <div class="mt-7">
+                    <button id="enter-atelier-btn" data-cursor="RELEASE" onclick="triggerVaultSequence()" class="reflection-sheen group relative inline-flex items-center gap-4 bg-white text-black px-8 sm:px-11 py-4 text-xs sm:text-sm font-bold tracking-[0.28em] uppercase border border-white hover:bg-transparent hover:text-white transition-all duration-300 shadow-[0_0_50px_rgba(255,255,255,0.28)]">
+                        <span class="w-2 h-2 rounded-full bg-black group-hover:bg-white transition-colors"></span>
+                        <span id="enter-btn-text">ENTER THE ATELIER</span>
+                        <span class="text-[10px] opacity-60">↵</span>
+                    </button>
+                </div>
+
+                <p class="mt-3.5 text-[9px] sm:text-[10px] tracking-[0.22em] text-zinc-400 uppercase">
+                    Move your cursor. Disturb the surface.
+                </p>
+            </div>
+
+            <!-- Vault Bottom Technical Spec Bar -->
+            <div class="vault-bottomline relative z-20 flex flex-wrap items-center justify-between border-t border-white/15 pt-3 pb-1 px-6 sm:px-16 text-[10px] tracking-[0.2em] text-zinc-400 uppercase gap-2">
+                <span>SOFT FORM. SHARP INSTINCT.</span>
+                <span id="vault-status-readout" class="text-white">READY TO EXPLORE</span>
+            </div>
+        </div>
+        <button id="skip-intro" class="vault-skip" type="button">Skip entrance ↗</button>
+    </div>
+
+<div id="atelier-world" inert>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  
+  <!-- Architectural Sticky Atelier Navigation Header -->
+  <header class="site-header">
+    <a class="wordmark brand-logo" href="#atelier" data-tab-target="atelier" aria-label="Meaux Atelier Home">MEAUX<span class="brand-star" aria-hidden="true">✳</span></a>
+    
+    <nav class="atelier-tabs" aria-label="Atelier disciplines and pages">
+      <button type="button" class="tab-btn active" data-tab="atelier" aria-controls="view-atelier" aria-selected="true">
+        <span>Atelier</span>
+      </button>
+      <button type="button" class="tab-btn" data-tab="photography" aria-controls="view-photography" aria-selected="false">
+        <span>Photography</span>
+      </button>
+      <button type="button" class="tab-btn" data-tab="styling" aria-controls="view-styling" aria-selected="false">
+        <span>Styling</span>
+      </button>
+      <button type="button" class="tab-btn" data-tab="social-media" aria-controls="view-social-media" aria-selected="false">
+        <span>Social Media Curation</span>
+      </button>
+      <button type="button" class="tab-btn" data-tab="interior-design" aria-controls="view-interior-design" aria-selected="false">
+        <span>Interior Design</span>
+      </button>
+      <button type="button" class="tab-btn" data-tab="about" aria-controls="view-about" aria-selected="false">
+        <span>About Me</span>
+      </button>
+      <button type="button" class="tab-btn tab-enquire" data-tab="enquiries" aria-controls="view-enquiries" aria-selected="false">
+        <span>Enquiries <span class="tab-arrow" aria-hidden="true">↗</span></span>
+      </button>
+    </nav>
+  </header>
+
+  <main id="main-content">
+    <!-- ==========================================
+         TAB 1: ATELIER (HOME / OVERVIEW)
+         ========================================== -->
+    <div id="view-atelier" class="tab-view active" role="tabpanel" aria-labelledby="tab-atelier">
+      
+      <!-- Hero Section -->
+      <section class="hero" id="hero" aria-labelledby="hero-title">
+        <div class="hero-topline">
+          <span>Independent creative practice</span>
+          <span>Photography · Styling · Social Media · Interior Design</span>
+        </div>
+        <h1 class="hero-word brand-logo" id="hero-title" tabindex="-1">
+          MEAUX<span class="hero-asterisk brand-star" aria-hidden="true">✳</span>
+        </h1>
+        <div class="hero-composition">
+          <div class="hero-copy">
+            <p class="hero-statement">A different<br>way of seeing.</p>
+            <p class="hero-description">
+              Shaping images, silhouettes, digital worlds, and physical spaces. A multi-disciplinary atelier guided by instinct, craftsmanship, and radical restraint.
+            </p>
+            <div class="flex flex-wrap gap-5 items-center">
+              <a class="round-link" href="#works">
+                <span class="round-icon" aria-hidden="true">↓</span>
+                <span>Selected archive</span>
+              </a>
+              <button type="button" data-tab-target="enquiries" class="tab-btn border border-white/30 text-white hover:bg-white hover:text-black py-3 px-5 text-xs font-bold tracking-[0.16em] uppercase transition-colors">
+                Commission a project ↗
+              </button>
+            </div>
+            <div class="hero-signature">
+              <span>Bespoke Creative Direction</span>
+              <span>By Dahman / Meaux · Amsterdam</span>
+            </div>
+          </div>
+          <button class="hero-image image-link" data-post="DW9lQW_DUjv" aria-label="Open the Anouk portrait">
+            <img src="instagram/meauxsvision/images/DW9lQW_DUjv.jpg" alt="Sculptural portrait with a wide black hat and a sliver of light across the eye" fetchpriority="high" width="1440" height="1919">
+            <span class="image-corner" aria-hidden="true">↗</span>
+            <span class="hero-image-caption">Anouk <span>Portrait study</span></span>
+          </button>
+          <div class="hero-sculpture" aria-hidden="true">
+            <div class="chrome-loop"></div>
+            <span>Soft form.<br>Sharp instinct.</span>
+          </div>
+        </div>
+        <div class="hero-baseline">
+          <span>Amsterdam · Worldwide Commissions</span>
+          <span>Scroll to explore ↓</span>
+        </div>
+      </section>
+
+      <!-- 4-Discipline Luxury Portals Strip -->
+      <section class="home-disciplines-section" aria-labelledby="disciplines-overview-title">
+        <div class="home-disciplines-heading">
+          <div>
+            <span class="small-label">The Atelier Disciplines</span>
+            <h2 id="disciplines-overview-title">Four disciplines. One vision.</h2>
+          </div>
+          <button type="button" data-tab-target="about" class="text-link">Read the philosophy ↗</button>
+        </div>
+
+        <div class="discipline-cards-grid">
+          <!-- 01 Photography -->
+          <div class="discipline-card">
+            <div>
+              <span class="card-num">01 // DISCIPLINE</span>
+              <h3>Photography</h3>
+              <p>High-contrast chiaroscuro, sculptured portraits, and high-fashion campaign imagery that isolate character from noise.</p>
+            </div>
+            <button type="button" data-tab-target="photography" class="card-cta">
+              Explore photography story <span>↗</span>
+            </button>
+          </div>
+
+          <!-- 02 Styling -->
+          <div class="discipline-card">
+            <div>
+              <span class="card-num">02 // DISCIPLINE</span>
+              <h3>Styling</h3>
+              <p>Architectural silhouette, archival garment sourcing, tactile leather drapery, and wardrobe direction commanding quiet authority.</p>
+            </div>
+            <button type="button" data-tab-target="styling" class="card-cta">
+              Explore styling story <span>↗</span>
+            </button>
+          </div>
+
+          <!-- 03 Social Media Curation -->
+          <div class="discipline-card">
+            <div>
+              <span class="card-num">03 // DISCIPLINE</span>
+              <h3>Social Media Curation</h3>
+              <p>The grid as an architectural exhibition. Rhythmic pacing, aesthetic ecosystems, and timeless visual identity over fleeting trends.</p>
+            </div>
+            <button type="button" data-tab-target="social-media" class="card-cta">
+              Explore curation story <span>↗</span>
+            </button>
+          </div>
+
+          <!-- 04 Interior Design -->
+          <div class="discipline-card">
+            <div>
+              <span class="card-num">04 // DISCIPLINE</span>
+              <h3>Interior Design</h3>
+              <p>Habitable sculpture. Obsidian leathers, raw mineral plasters, liquid chrome accents, and raking light shaping emotional sanctuary.</p>
+            </div>
+            <button type="button" data-tab-target="interior-design" class="card-cta">
+              Explore spatial story <span>↗</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Portfolio Archive Section -->
+      <section id="works" class="work-section" aria-labelledby="work-title">
+        <div class="section-intro">
+          <p class="small-label">The Archive</p>
+          <div>
+            <h2 id="work-title">Selected visions.</h2>
+            <p>Characters, textures, light. A curated survey from the photographic & styling atelier archive.</p>
+          </div>
+          <span class="small-label selection-count">Meaux’s point of view</span>
+        </div>
+
+        <div class="work-toolbar">
+          <div class="view-switch" aria-label="Portfolio view">
+            <button type="button" data-view="selected" aria-pressed="true">Selected work <span>08</span></button>
+            <button type="button" data-view="archive" aria-pressed="false">Full archive <span>61</span></button>
+          </div>
+          <label class="archive-search" hidden>
+            <span class="sr-only">Search the archive</span>
+            <input type="search" placeholder="Search a name or project" id="archive-search">
+            <span aria-hidden="true">⌕</span>
+          </label>
+        </div>
+
+        <div id="portfolio-grid" class="work-grid"></div>
+        <p id="archive-status" class="archive-status" aria-live="polite"></p>
+
+        <div class="archive-end">
+          <p>There is always another way to look.</p>
+          <button type="button" id="show-archive" class="text-link">Explore the full archive <span aria-hidden="true">↗</span></button>
+        </div>
+      </section>
+
+      <!-- Image Interlude -->
+      <section class="image-interlude" aria-label="Art direction by Meaux">
+        <img src="instagram/meauxsvision/images/CqOSc5kN3gA.jpg" alt="A figure in sculptural black clothing in motion against a pale background" loading="lazy" width="1440" height="1800">
+        <div class="interlude-caption">
+          <span>Photography & creative direction</span>
+          <span>For Vanderwilt Amsterdam</span>
+        </div>
+        <p>Form follows<br>feeling.</p>
+      </section>
+
+      <!-- Studio / Practice Section -->
+      <section id="studio" class="studio-section" aria-labelledby="studio-title">
+        <div class="studio-heading">
+          <span class="small-label">The Practice</span>
+          <h2 id="studio-title">One point of view.<br>Many forms.</h2>
+          <p>Meaux moves between the tangible and the visual. From the atmospheric silence of a room to the tension in a photographic portrait, every project begins with an emotion — and finds its uncompromising form.</p>
+          <button type="button" data-tab-target="enquiries" class="text-link">Discuss a bespoke commission <span aria-hidden="true">↗</span></button>
+        </div>
+        <div class="services">
+          <details open>
+            <summary><span>Photography</span><span class="service-plus" aria-hidden="true">+</span></summary>
+            <div>
+              <p>Portraits and fashion images that command stillness. Sculptural chiaroscuro, expressive raking light, and an instinct for raw presence.</p>
+              <span>Haute Editorial · Sculptural Portraiture · Campaign Suites</span>
+              <button type="button" data-tab-target="photography" class="text-link mt-4">View Photography Story ↗</button>
+            </div>
+          </details>
+          <details>
+            <summary><span>Styling</span><span class="service-plus" aria-hidden="true">+</span></summary>
+            <div>
+              <p>Clothing treated as spatial design on the human form. Architectural tailoring, rare archival garments, and tactile leather drapery.</p>
+              <span>Runway & Editorial · Private VIP Dressing · Silhouette Identity</span>
+              <button type="button" data-tab-target="styling" class="text-link mt-4">View Styling Story ↗</button>
+            </div>
+          </details>
+          <details>
+            <summary><span>Social Media Curation</span><span class="service-plus" aria-hidden="true">+</span></summary>
+            <div>
+              <p>A considered digital presence, image by image. Turning feeds into curated gallery pavilions with rhythmic pacing and negative space.</p>
+              <span>Grid Architecture · Bespoke Content Suites · Brand Repositioning</span>
+              <button type="button" data-tab-target="social-media" class="text-link mt-4">View Curation Story ↗</button>
+            </div>
+          </details>
+          <details>
+            <summary><span>Interior Design</span><span class="service-plus" aria-hidden="true">+</span></summary>
+            <div>
+              <p>Spaces with an unforgettable atmosphere. An exploration of obsidian leathers, raw plasters, and lighting choreography.</p>
+              <span>Spatial Concepts · Bespoke Materials · Curatorial Atmosphere</span>
+              <button type="button" data-tab-target="interior-design" class="text-link mt-4">View Interior Design Story ↗</button>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <!-- Atelier Direct Enquiry Teaser -->
+      <section class="contact-section" aria-labelledby="contact-home-title">
+        <div class="contact-top">
+          <span class="small-label">Bespoke Commissions</span>
+          <span class="contact-orb" aria-hidden="true"></span>
+        </div>
+        <div class="contact-heading cursor-pointer" onclick="switchTab('enquiries')">
+          <h2 id="contact-home-title">Have a vision?</h2>
+          <span aria-hidden="true">↗</span>
+        </div>
+        <div class="contact-bottom">
+          <button type="button" data-tab-target="enquiries" class="luxury-btn">
+            <span>Open Commission Dossier ↵</span>
+          </button>
+          <p>
+            Tell us about your project, timeline, and disciplines.<br>
+            Private & commercial commissions reviewed worldwide.
+          </p>
+        </div>
+      </section>
+    </div>
+
+    <!-- ==========================================
+         TAB 2: PHOTOGRAPHY (DISCIPLINE STORY)
+         ========================================== -->
+    <div id="view-photography" class="tab-view" role="tabpanel" aria-labelledby="tab-photography" hidden>
+      <section class="discipline-page">
+        <div class="discipline-header">
+          <div class="discipline-tagline">
+            <span>01 // DISCIPLINE</span>
+            <span>·</span>
+            <span>ATELIER MEAUX</span>
+          </div>
+          <h2 class="discipline-title">Photography</h2>
+          <p class="discipline-subtitle">
+            “The camera does not record light; it carves form out of shadow.”
+          </p>
+        </div>
+
+        <!-- Narrative Split -->
+        <div class="discipline-narrative-split">
+          <div class="narrative-image-wrap">
+            <img src="instagram/meauxsvision/images/DW9lQW_DUjv.jpg" alt="Anouk in wide sculptural hat" loading="lazy" width="1440" height="1919">
+            <div class="narrative-image-caption">
+              <span>Anouk Study</span>
+              <span>Photographic Direction</span>
+            </div>
+          </div>
+          <div class="narrative-text-wrap">
+            <div class="story-chapter">
+              <h3>The Archaeology of Light</h3>
+              <p>
+                Photography at Meaux is not passive observation; it is an architectural excavation of human presence. Stripping away superficial ornamentation, we operate in deep, high-contrast monochrome and directional raking light. Every shadow is deliberate—sculpted to accentuate bone structure, posture, and the palpable tension between the subject and the surrounding void.
+              </p>
+            </div>
+            <div class="story-chapter">
+              <h3>Sculptural Portraiture & High Fashion</h3>
+              <p>
+                Having photographed campaigns and editorial stories for houses such as Gucci Beauty, Vanderwilt Amsterdam, and Jacquemus, our visual language draws heavily from classical chiaroscuro, modern brutalism, and avant-garde couture. We treat the human body as an immutable monument in space.
+              </p>
+            </div>
+            <div class="story-chapter">
+              <h3>Surgical Precision</h3>
+              <p>
+                Every frame is treated as a museum monograph. From medium format digital sensor calibration to custom black-and-white tonal curves, each capture delivers immense depth, velvet blacks, and silvery highlights that command quiet awe.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bespoke Luxury Service Tiers -->
+        <div class="discipline-services">
+          <h3 class="discipline-section-title">Photographic Service Scope</h3>
+          <p class="discipline-section-intro">
+            Executed with complete creative authorship, from initial mood architecture to final exhibition-grade mastering.
+          </p>
+
+          <div class="service-tiers-grid">
+            <div class="service-tier-card">
+              <span class="tier-badge">TIER 01 // EDITORIAL</span>
+              <h4>Haute Editorial & Campaign Direction</h4>
+              <p>
+                Full-scale conceptual direction, location and lighting architecture, model casting, on-set direction, and comprehensive master grading.
+              </p>
+              <div class="tier-deliverables">
+                <span class="tier-deliverables-title">Scope & Deliverables</span>
+                <ul>
+                  <li>Complete creative treatment & lighting plan</li>
+                  <li>30–60 master-graded campaign captures</li>
+                  <li>Full commercial global print & digital rights</li>
+                  <li>Archival TIFF & high-res web deliverables</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="service-tier-card">
+              <span class="tier-badge">TIER 02 // PORTRAITURE</span>
+              <h4>Private Sculptural Portraiture Studies</h4>
+              <p>
+                Intimate private sessions for artists, cultural icons, founders, and collectors in our Amsterdam studio or worldwide residences.
+              </p>
+              <div class="tier-deliverables">
+                <span class="tier-deliverables-title">Scope & Deliverables</span>
+                <ul>
+                  <li>Half-day or full-day private atelier session</li>
+                  <li>12 bespoke museum-grade portrait studies</li>
+                  <li>Museum rag archival fine-art physical prints</li>
+                  <li>Private digital monograph archive</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="service-tier-card">
+              <span class="tier-badge">TIER 03 // LOOKBOOK</span>
+              <h4>Architectural Lookbook & Capsule Suites</h4>
+              <p>
+                Precision garment framing, tactile textile macro close-ups, and lookbook suites translating tactile design into digital desire.
+              </p>
+              <div class="tier-deliverables">
+                <span class="tier-deliverables-title">Scope & Deliverables</span>
+                <ul>
+                  <li>Curated seasonal lookbook capture suite</li>
+                  <li>Garment movement & drape choreography</li>
+                  <li>E-commerce & editorial dual delivery</li>
+                  <li>Color-matched tonal consistency across capsule</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Curated Archive Showcase -->
+        <div class="discipline-gallery">
+          <h3 class="discipline-section-title">Selected Photographic Works</h3>
+          <div class="gallery-grid">
+            <div class="gallery-item" data-post="DEXuQ0gNbcp">
+              <img src="instagram/meauxsvision/images/DEXuQ0gNbcp.jpg" alt="Tenebris Papilionem" loading="lazy">
+              <div class="gallery-overlay">
+                <h5>Tenebris Papilionem</h5>
+                <span>Anouk Study · Chiaroscuro</span>
+              </div>
+            </div>
+            <div class="gallery-item" data-post="CbI4R9FMcTQ">
+              <img src="instagram/meauxsvision/images/CbI4R9FMcTQ.jpg" alt="Gucci Beauty" loading="lazy">
+              <div class="gallery-overlay">
+                <h5>Gucci Beauty</h5>
+                <span>Campaign Direction · Khaoula</span>
+              </div>
+            </div>
+            <div class="gallery-item" data-post="DTPohhYjdPI">
+              <img src="instagram/meauxsvision/images/DTPohhYjdPI.jpg" alt="Powerwoman" loading="lazy">
+              <div class="gallery-overlay">
+                <h5>Powerwoman</h5>
+                <span>Fatima Essahsah · Portrait</span>
+              </div>
+            </div>
+            <div class="gallery-item" data-post="DT2XryvjWCB">
+              <img src="instagram/meauxsvision/images/DT2XryvjWCB.jpg" alt="Daan Sanders" loading="lazy">
+              <div class="gallery-overlay">
+                <h5>Daan Series</h5>
+                <span>Sculptural Form Study</span>
+              </div>
+            </div>
+            <div class="gallery-item" data-post="C4a1FCkNysZ">
+              <img src="instagram/meauxsvision/images/C4a1FCkNysZ.jpg" alt="Gloom" loading="lazy">
+              <div class="gallery-overlay">
+                <h5>Gloom</h5>
+                <span>Monochrome Portrait</span>
+              </div>
+            </div>
+            <div class="gallery-item" data-post="DALs3rUt3RC">
+              <img src="instagram/meauxsvision/images/DALs3rUt3RC.jpg" alt="Vigil" loading="lazy">
+              <div class="gallery-overlay">
+                <h5>Vigil</h5>
+                <span>Princeps Tenebris Direction</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Commission CTA Banner -->
+        <div class="discipline-cta-banner">
+          <div class="discipline-cta-text">
+            <h3>Commission a Photographic Series</h3>
+            <p>Direct inquiries for seasonal campaigns, private portraits, and lookbook suites in Amsterdam or on global location.</p>
+          </div>
+          <button type="button" data-tab-target="enquiries" data-preselect-discipline="Photography" class="luxury-btn">
+            <span>Initiate Photographic Dossier ↗</span>
+          </button>
+        </div>
+      </section>
+    </div>
+
+    <!-- ==========================================
+         TAB 3: STYLING (DISCIPLINE STORY)
+         ========================================== -->
+    <div id="view-styling" class="tab-view" role="tabpanel" aria-labelledby="tab-styling" hidden>
+      <section class="discipline-page">
+        <div class="discipline-header">
+          <div class="discipline-tagline">
+            <span>02 // DISCIPLINE</span>
+            <span>·</span>
+            <span>ATELIER MEAUX</span>
+          </div>
+          <h2 class="discipline-title">Styling</h2>
+          <p class="discipline-subtitle">
+            “Garments are not adornment; they are body architecture.”
+          </p>
+        </div>
+
+        <!-- Narrative Split -->
+        <div class="discipline-narrative-split">
+          <div class="narrative-image-wrap">
+            <img src="instagram/meauxsvision/images/CqOSc5kN3gA.jpg" alt="Sculptural leather styling for Vanderwilt" loading="lazy" width="1440" height="1800">
+            <div class="narrative-image-caption">
+              <span>Vanderwilt Amsterdam</span>
+              <span>Silhouette & Leather Direction</span>
+            </div>
+          </div>
+          <div class="narrative-text-wrap">
+            <div class="story-chapter">
+              <h3>Silhouette Architecture</h3>
+              <p>
+                Styling at Meaux is rooted in tactile contrast: heavy oil-tanned lambskins paired with flowing Japanese cottons; structured shoulders framing vulnerability; razor-sharp hemlines cutting through space. We do not dress bodies—we construct living silhouettes that hold sovereign presence in any room.
+              </p>
+            </div>
+            <div class="story-chapter">
+              <h3>Archival Curation & Atelier Collaborations</h3>
+              <p>
+                Working closely with independent artisan houses like Vanderwilt Amsterdam as well as archival collections from Jean Paul Gaultier, Rick Owens, and Jacquemus, our wardrobe curation favors timeless garments with sculptural weight over ephemeral trends.
+              </p>
+            </div>
+            <div class="story-chapter">
+              <h3>Movement & Sensory Weight</h3>
+              <p>
+                How a textile moves in air, how leather creases under natural light, how a collarbone catches an edge of darkness—these tactile details determine how the garment lives on film and in memory.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bespoke Luxury Service Tiers -->
+        <div class="discipline-services">
+          <h3 class="discipline-section-title">Styling Service Scope</h3>
+          <p class="discipline-section-intro">
+            Comprehensive wardrobe architecture for high-fashion houses, runway presentations, and private VIP appearances.
+          </p>
+
+          <div class="service-tiers-grid">
+            <div class="service-tier-card">
+              <span class="tier-badge">TIER 01 // EDITORIAL</span>
+              <h4>Editorial & Runway Wardrobe Architecture</h4>
+              <p>
+                Concept moodboarding, rare archival sourcing, silhouette drafting, bespoke tailoring coordination, and on-set dressing.
+              </p>
+              <div class="tier-deliverables">
+                <span class="tier-deliverables-title">Scope & Deliverables</span>
+                <ul>
+                  <li>Curated runway or editorial wardrobe pulls</li>
+                  <li>Archival designer piece procurement</li>
+                  <li>On-set silhouette management & movement coaching</li>
+                  <li>Accessories, footwear, and tactile detailing</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="service-tier-card">
+              <span class="tier-badge">TIER 02 // VIP WARDROBE</span>
+              <h4>Private VIP & Red Carpet Direction</h4>
+              <p>
+                Bespoke wardrobe consulting for artists, founders, and cultural figures for international appearances, galas, and film festivals.
+              </p>
+              <div class="tier-deliverables">
+                <span class="tier-deliverables-title">Scope & Deliverables</span>
+                <ul>
+                  <li>Private silhouette and body-architecture consultation</li>
+                  <li>Bespoke fitting sessions in Amsterdam, Paris, or London</li>
+                  <li>Direct atelier artisan commissions</li>
+                  <li>Complete day-of-event styling suite</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="service-tier-card">
+              <span class="tier-badge">TIER 03 // BRAND IDENTITY</span>
+              <h4>Brand Silhouette & Capsule Styling</h4>
+              <p>
+                Consulting for fashion labels, jewelry houses, and leather ateliers to establish their core styling DNA and signature silhouettes.
+              </p>
+              <div class="tier-deliverables">
+                <span class="tier-deliverables-title">Scope & Deliverables</span>
+                <ul>
+                  <li>Foundational styling guidelines & lookbooks</li>
+                  <li>Seasonal pairing schedules & fabric interaction notes</li>
+                  <li>Showroom presentation choreography</li>
+                  <li>Commercial styling playbook for in-house teams</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Curated Archive Showcase -->
+        <div class="discipline-gallery">
+          <h3 class="discipline-section-title">Selected Styling Case Studies</h3>
+          <div class="gallery-grid">
+            <div class="gallery-item" data-post="Cr8e19bN3mq">
+              <img src="instagram/meauxsvision/images/Cr8e19bN3mq.jpg" alt="Jean Paul Gaultier styling" loading="lazy">
+              <div class="gallery-overlay">
+                <h5>Jean Paul Gaultier</h5>
+                <span>Archival Styling · Mel</span>
+              </div>
+            </div>
+            <div class="gallery-item" data-post="CoITMmjtXDQ">
+              <img src="instagram/meauxsvision/images/CoITMmjtXDQ.jpg" alt="Jacquemus styling" loading="lazy">
+              <div class="gallery-overlay">
+                <h5>Jacquemus Session</h5>
+                <span>Silhouette Architecture</span>
+              </div>
+            </div>
+            <div class="gallery-item" data-post="DTpuNcKjeUN">
+              <img src="instagram/meauxsvision/images/DTpuNcKjeUN.jpg" alt="Unidentified" loading="lazy">
+              <div class="gallery-overlay">
+                <h5>Unidentified</h5>
+                <span>Styling & Photography Study</span>
+              </div>
+            </div>
+            <div class="gallery-item" data-post="Cxz0P5ytark">
+              <img src="instagram/meauxsvision/images/Cxz0P5ytark.jpg" alt="Gowtu by Wissal Aziz" loading="lazy">
+              <div class="gallery-overlay">
+                <h5>Vanderwilt × Gowtu</h5>
+                <span>Wissal Aziz Leather Styling</span>
+              </div>
+            </div>
+            <div class="gallery-item" data-post="C7b4UpfNrcR">
+              <img src="instagram/meauxsvision/images/C7b4UpfNrcR.jpg" alt="Larissa Bruin in Milos" loading="lazy">
+              <div class="gallery-overlay">
+                <h5>Milos Series</h5>
+                <span>Larissa Bruin · Tactile Styling</span>
+              </div>
+            </div>
+            <div class="gallery-item" data-post="CdVsxkntawa">
+              <img src="instagram/meauxsvision/images/CdVsxkntawa.jpg" alt="Fendi Versace styling" loading="lazy">
+              <div class="gallery-overlay">
+                <h5>Fendi / Versace</h5>
+                <span>Romy Fonseca Editorial</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Commission CTA Banner -->
+        <div class="discipline-cta-banner">
+          <div class="discipline-cta-text">
+            <h3>Commission Styling Direction</h3>
+            <p>Retain Meaux for editorial shoots, red-carpet appearances, or brand silhouette identity consulting.</p>
+          </div>
+          <button type="button" data-tab-target="enquiries" data-preselect-discipline="Styling" class="luxury-btn">
+            <span>Initiate Styling Dossier ↗</span>
+          </button>
+        </div>
+      </section>
+    </div>
+
+    <!-- ==========================================
+         TAB 4: SOCIAL MEDIA CURATION (DISCIPLINE STORY)
+         ========================================== -->
+    <div id="view-social-media" class="tab-view" role="tabpanel" aria-labelledby="tab-social-media" hidden>
+      <section class="discipline-page">
+        <div class="discipline-header">
+          <div class="discipline-tagline">
+            <span>03 // DISCIPLINE</span>
+            <span>·</span>
+            <span>ATELIER MEAUX</span>
+          </div>
+          <h2 class="discipline-title">Social Media Curation</h2>
+          <p class="discipline-subtitle">
+            “Treat your feed not as a bulletin board, but as a permanent museum exhibition.”
+          </p>
+        </div>
+
+        <!-- Narrative Split -->
+        <div class="discipline-narrative-split">
+          <div class="narrative-image-wrap">
+            <img src="instagram/meauxsvision/images/C-VSlnaNa_c.jpg" alt="Rouhi curation study" loading="lazy" width="1440" height="1800">
+            <div class="narrative-image-caption">
+              <span>Rouhi Amsterdam</span>
+              <span>Aesthetic Feed Architecture</span>
+            </div>
+          </div>
+          <div class="narrative-text-wrap">
+            <div class="story-chapter">
+              <h3>The Digital Flagship</h3>
+              <p>
+                In an era dominated by hyperactive algorithmic noise and disposable video, Meaux builds digital ecosystems governed by stillness, intentional pacing, and supreme aesthetic authority. We transform social presence into an immersive editorial publication where every square has purpose.
+              </p>
+            </div>
+            <div class="story-chapter">
+              <h3>The Grid as Architectural Pavilion</h3>
+              <p>
+                We curate feeds the way a gallery director hangs an exhibition. We orchestrate alternating rhythms of high-contrast editorial captures, sculptural macro textures, deep shadows, and breathing negative space. The result is a profile that immediately communicates prestige, exclusivity, and pedigree.
+              </p>
+            </div>
+            <div class="story-chapter">
+              <h3>Long-Term Aesthetic Equity</h3>
+              <p>
+                Collaborating with luxury hospitality, high-end beauty, and boutique fashion houses (Rouhi, Babush Amsterdam, Modest Art, Wissal Aziz), our curation elevates brand valuation and commands respect from top-tier clientele and international press.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bespoke Luxury Service Tiers -->
+        <div class="discipline-services">
+          <h3 class="discipline-section-title">Curation Service Scope</h3>
+          <p class="discipline-section-intro">
+            A comprehensive strategic discipline transforming client perception through meticulous visual curation.
+          </p>
+
+          <div class="service-tiers-grid">
+            <div class="service-tier-card">
+              <span class="tier-badge">TIER 01 // ARCHITECTURE</span>
+              <h4>Full-Scope Grid Architecture & Direction</h4>
+              <p>
+                Multi-month visual roadmap, aesthetic identity calibration, color-story development, rhythm sequencing, and typographic restraint.
+              </p>
+              <div class="tier-deliverables">
+                <span class="tier-deliverables-title">Scope & Deliverables</span>
+                <ul>
+                  <li>Complete 3-month grid architecture blueprint</li>
+                  <li>Triptych & negative space choreography</li>
+                  <li>Tonal palette & asset contrast grading</li>
+                  <li>Caption voice & typographic styling rules</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="service-tier-card">
+              <span class="tier-badge">TIER 02 // PRODUCTION</span>
+              <h4>Bespoke Content Production Suites</h4>
+              <p>
+                Quarterly on-location shoots producing exclusive photography, short-form motion vignettes, and behind-the-scenes glimpses for the grid.
+              </p>
+              <div class="tier-deliverables">
+                <span class="tier-deliverables-title">Scope & Deliverables</span>
+                <ul>
+                  <li>Quarterly high-fashion production days</li>
+                  <li>45+ bespoke editorial assets tailored for grid harmony</li>
+                  <li>Vertical video motion vignettes (cinematic, non-hyped)</li>
+                  <li>Asset bank categorized by aesthetic weight</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="service-tier-card">
+              <span class="tier-badge">TIER 03 // LAUNCH ROLLOUT</span>
+              <h4>Campaign Drops & Digital Rebranding</h4>
+              <p>
+                High-impact multi-week narrative rollouts for new collection drops, hotel openings, or total brand repositioning.
+              </p>
+              <div class="tier-deliverables">
+                <span class="tier-deliverables-title">Scope & Deliverables</span>
+                <ul>
+                  <li>Pre-launch teaser pacing & blackout sequencing</li>
+                  <li>Multi-tiered asset rollout schedule</li>
+                  <li>High-conversion bio & story highlights architecture</li>
+                  <li>Post-launch performance & aesthetic audit</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Curated Archive Showcase -->
+        <div class="discipline-gallery">
+          <h3 class="discipline-section-title">Curated Client Ecosystems</h3>
+          <div class="gallery-grid">
+            <div class="gallery-item" data-post="C5gNw4tNBbO">
+              <img src="instagram/meauxsvision/images/C5gNw4tNBbO.jpg" alt="Babush Amsterdam" loading="lazy">
+              <div class="gallery-overlay">
+                <h5>Babush Amsterdam</h5>
+                <span>Aesthetic Brand Curation</span>
+              </div>
+            </div>
+            <div class="gallery-item" data-post="C4Ao4jWtDvY">
+              <img src="instagram/meauxsvision/images/C4Ao4jWtDvY.jpg" alt="Babush series" loading="lazy">
+              <div class="gallery-overlay">
+                <h5>Babush Series II</h5>
+                <span>Dina Ait Bibi · Editorial Grid</span>
+              </div>
+            </div>
+            <div class="gallery-item" data-post="C8IHD9Gt_GO">
+              <img src="instagram/meauxsvision/images/C8IHD9Gt_GO.jpg" alt="Modest Art" loading="lazy">
+              <div class="gallery-overlay">
+                <h5>Modest Art</h5>
+                <span>Campaign Visual Flow</span>
+              </div>
+            </div>
+            <div class="gallery-item" data-post="CcTqk0yom1b">
+              <img src="instagram/meauxsvision/images/CcTqk0yom1b.jpg" alt="Josh V HQ" loading="lazy">
+              <div class="gallery-overlay">
+                <h5>Josh V HQ</h5>
+                <span>Khaoula Campaign Rollout</span>
+              </div>
+            </div>
+            <div class="gallery-item" data-post="DObqkm2jfxe">
+              <img src="instagram/meauxsvision/images/DObqkm2jfxe.jpg" alt="Wissal Aziz curation" loading="lazy">
+              <div class="gallery-overlay">
+                <h5>Wissal Aziz</h5>
+                <span>Shari Louise · Jewelry Ecosystem</span>
+              </div>
+            </div>
+            <div class="gallery-item" data-post="CcDIrpvtJA6">
+              <img src="instagram/meauxsvision/images/CcDIrpvtJA6.jpg" alt="Sabri study" loading="lazy">
+              <div class="gallery-overlay">
+                <h5>Sabri Series</h5>
+                <span>Visual Rhythm & Cadence</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Commission CTA Banner -->
+        <div class="discipline-cta-banner">
+          <div class="discipline-cta-text">
+            <h3>Curate Your Digital Flagship</h3>
+            <p>Elevate your brand with a cohesive, gallery-grade visual presence that communicates luxury effortlessly.</p>
+          </div>
+          <button type="button" data-tab-target="enquiries" data-preselect-discipline="Social Media Curation" class="luxury-btn">
+            <span>Initiate Curation Dossier ↗</span>
+          </button>
+        </div>
+      </section>
+    </div>
+
+    <!-- ==========================================
+         TAB 5: INTERIOR DESIGN (DISCIPLINE STORY)
+         ========================================== -->
+    <div id="view-interior-design" class="tab-view" role="tabpanel" aria-labelledby="tab-interior-design" hidden>
+      <section class="discipline-page">
+        <div class="discipline-header">
+          <div class="discipline-tagline">
+            <span>04 // DISCIPLINE</span>
+            <span>·</span>
+            <span>ATELIER MEAUX</span>
+          </div>
+          <h2 class="discipline-title">Interior Design</h2>
+          <p class="discipline-subtitle">
+            “A room is not a container; it is an emotional atmosphere shaped by material and shadow.”
+          </p>
+        </div>
+
+        <!-- Narrative Split -->
+        <div class="discipline-narrative-split">
+          <div class="narrative-image-wrap">
+            <img src="instagram/meauxsvision/images/CfY3m5vNidV.jpg" alt="Spatial and textural study" loading="lazy" width="1440" height="1800">
+            <div class="narrative-image-caption">
+              <span>Spatial Atmosphere Study</span>
+              <span>Light & Shadow Choreography</span>
+            </div>
+          </div>
+          <div class="narrative-text-wrap">
+            <div class="story-chapter">
+              <h3>The Architecture of Feeling</h3>
+              <p>
+                Space is the physical extension of consciousness. Meaux's interior design practice is founded on atmospheric tension: balancing raw, brutalist architectural textures with deep, sensual softness. We reject sterile minimalism in favor of visceral environments that calm the mind and envelope the senses.
+              </p>
+            </div>
+            <div class="story-chapter">
+              <h3>Material Purity & Tactility</h3>
+              <p>
+                We compose rooms using authentic, tactile elements: midnight lambskin, liquid chrome, dark oiled European walnut, hand-troweled lime plaster, and raw basalt stone. These materials do not merely age—they patinate, recording the passage of light and life.
+              </p>
+            </div>
+            <div class="story-chapter">
+              <h3>Light as the Final Material</h3>
+              <p>
+                Natural daylight is treated as a sculptural blade. By orchestrating directional raking daylight, low-voltage grazing luminaires, and warm ambient pools of darkness, our spaces transform continually throughout the day from contemplative sanctuary to dramatic nighttime lounge.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Material Tension Swatches -->
+        <div class="discipline-services">
+          <h3 class="discipline-section-title">The Tactile Material Palette</h3>
+          <p class="discipline-section-intro">
+            Every space designed by Meaux is built from a deliberate balance of temperature, grain, and reflection.
+          </p>
+
+          <div class="material-swatches-grid">
+            <div class="material-card">
+              <div class="material-swatch-box swatch-leather"></div>
+              <h5>Obsidian Lambskin</h5>
+              <p>Supple, non-reflective leather absorbing sound and light, providing intimate sensory comfort.</p>
+            </div>
+
+            <div class="material-card">
+              <div class="material-swatch-box swatch-chrome"></div>
+              <h5>Liquid Chrome</h5>
+              <p>Mirror-polished cold metal accents reflecting shifting shadows and architectural lines.</p>
+            </div>
+
+            <div class="material-card">
+              <div class="material-swatch-box swatch-stone"></div>
+              <h5>Raw Basalt & Tadelakt</h5>
+              <p>Velvety mineral plasters and porous natural stone imparting timeless thermal stability.</p>
+            </div>
+
+            <div class="material-card">
+              <div class="material-swatch-box swatch-wood"></div>
+              <h5>Smoked Oiled Walnut</h5>
+              <p>Deep rich grain with warm undertones, grounding the room in organic quietude.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bespoke Luxury Service Tiers -->
+        <div class="discipline-services">
+          <h3 class="discipline-section-title">Interior Design Service Scope</h3>
+          <p class="discipline-section-intro">
+            From private residential sanctuaries in Amsterdam to international luxury showrooms and hospitality suites.
+          </p>
+
+          <div class="service-tiers-grid">
+            <div class="service-tier-card">
+              <span class="tier-badge">TIER 01 // ARCHITECTURE</span>
+              <h4>Full Spatial Concept & Interior Architecture</h4>
+              <p>
+                Spatial planning, acoustic and lighting choreography, bespoke millwork detailing, 3D atmosphere studies, and material schedules.
+              </p>
+              <div class="tier-deliverables">
+                <span class="tier-deliverables-title">Scope & Deliverables</span>
+                <ul>
+                  <li>Complete spatial layout & circulation design</li>
+                  <li>Lighting architecture & luminaire schedule</li>
+                  <li>Bespoke architectural cabinetry & fixture drawings</li>
+                  <li>3D atmospheric visualization renderings</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="service-tier-card">
+              <span class="tier-badge">TIER 02 // PROCUREMENT</span>
+              <h4>Bespoke Material & Artisan Procurement</h4>
+              <p>
+                Direct sourcing of rare stone slabs, hand-tanned upholstery leathers, patinated bronzes, and blackened steels from European master craftsmen.
+              </p>
+              <div class="tier-deliverables">
+                <span class="tier-deliverables-title">Scope & Deliverables</span>
+                <ul>
+                  <li>Exclusive artisan workshop commission management</li>
+                  <li>Material sampling & bespoke surface prototypes</li>
+                  <li>Custom furniture design & fabrication supervision</li>
+                  <li>On-site installation and craft validation</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="service-tier-card">
+              <span class="tier-badge">TIER 03 // CURATION</span>
+              <h4>Spatial Styling & Sensory Layering</h4>
+              <p>
+                The crucial final layer: curated fine art placement, ceramic and bronze sculptures, tactile cashmere textiles, and bespoke ambient scenting.
+              </p>
+              <div class="tier-deliverables">
+                <span class="tier-deliverables-title">Scope & Deliverables</span>
+                <ul>
+                  <li>Curated art collection procurement & framing</li>
+                  <li>Sculptural object, vessel, and ceramic styling</li>
+                  <li>Tactile textile curation (throws, curtains, rugs)</li>
+                  <li>Custom olfactory atmosphere (bespoke atelier scent)</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Commission CTA Banner -->
+        <div class="discipline-cta-banner">
+          <div class="discipline-cta-text">
+            <h3>Commission a Spatial Project</h3>
+            <p>Private residential suites, creative studio ateliers, and boutique commercial spaces conceived by Dahman.</p>
+          </div>
+          <button type="button" data-tab-target="enquiries" data-preselect-discipline="Interior Design" class="luxury-btn">
+            <span>Initiate Spatial Dossier ↗</span>
+          </button>
+        </div>
+      </section>
+    </div>
+
+    <!-- ==========================================
+         TAB 6: ABOUT ME (EDITORIAL PROFILE)
+         ========================================== -->
+    <div id="view-about" class="tab-view" role="tabpanel" aria-labelledby="tab-about" hidden>
+      <section class="about-page">
+        <!-- Hero Grid -->
+        <div class="about-hero-grid">
+          <div class="about-portrait-wrap">
+            <img src="instagram/meauxsvision/images/DW9lQW_DUjv.jpg" alt="Editorial portrait study by Dahman" loading="lazy" width="1440" height="1919">
+            <div class="about-portrait-caption">
+              <span>Dahman / Meaux</span>
+              <span>Amsterdam · Worldwide</span>
+            </div>
+          </div>
+          <div class="about-hero-copy">
+            <span class="about-moniker">The Creative Behind Meaux</span>
+            <h2>Dahman</h2>
+            <p class="about-statement">
+              “Soft form. Sharp instinct. Form follows feeling.”
+            </p>
+            <div class="about-body-text">
+              <p>
+                I founded Meaux out of an obsession with how image, silhouette, and space interact to produce emotion. Operating from Amsterdam and commissioning worldwide, my practice lives at the intersection where photography, fashion styling, digital curation, and spatial design collapse into a single coherent universe.
+              </p>
+              <p>
+                I believe true luxury is not excessive ornamentation, but radical restraint. It is knowing exactly when to hold back and when to strike with an uncompromising visual gesture. Trained by raw instinct rather than rigid dogma, I treat every project—whether an intimate portrait, a fashion lookbook, an entire brand ecosystem, or an architectural sanctuary—as an emotional atmosphere.
+              </p>
+              <p>
+                Why practice all four disciplines simultaneously? Because they are not separate silos—they are different scales of the exact same question: <em>How does it feel to inhabit this world?</em> When the same creative eye choreographs the room, styles the clothes, directs the photograph, and curates the feed, the result is an unmistakable, unbreakable world.
+              </p>
+            </div>
+            <div class="mt-8 flex flex-wrap gap-4 items-center">
+              <button type="button" data-tab-target="enquiries" class="luxury-btn">
+                <span>Start a Dialogue with Dahman ↗</span>
+              </button>
+              <a href="https://www.instagram.com/meauxsvision/" target="_blank" rel="noopener noreferrer" class="text-link">
+                Instagram @meauxsvision ↗
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Atelier Core Principles -->
+        <div class="about-values-section">
+          <span class="small-label">The Atelier Ethos</span>
+          <h3 class="discipline-section-title mt-3">Three Unwavering Principles</h3>
+
+          <div class="values-grid mt-8">
+            <div class="value-card">
+              <span class="value-num">01 // PRINCIPLE</span>
+              <h3>Radical Restraint</h3>
+              <p>
+                We eliminate anything that merely decorates. Only when superficial distractions are removed does genuine character, weight, and presence reveal itself.
+              </p>
+            </div>
+
+            <div class="value-card">
+              <span class="value-num">02 // PRINCIPLE</span>
+              <h3>Tactile Truth</h3>
+              <p>
+                Whether digital or physical, every work must possess sensory weight. We work with authentic materials—shadow, leather, raw stone, polished chrome, and unfiltered human presence.
+              </p>
+            </div>
+
+            <div class="value-card">
+              <span class="value-num">03 // PRINCIPLE</span>
+              <h3>Singular Authorship</h3>
+              <p>
+                A unified vision cannot be achieved by committee. Every campaign, lookbook, and space directed by Meaux is guided from inception to delivery by Dahman’s singular aesthetic compass.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Selected Collaborations & Clients -->
+        <div class="about-clients-section">
+          <div class="flex justify-between items-baseline flex-wrap gap-4">
+            <div>
+              <span class="small-label">Selected Collaborations</span>
+              <h3 class="discipline-section-title mt-2">Houses, Brands & Collaborators</h3>
+            </div>
+            <span class="text-xs uppercase tracking-[0.18em] text-zinc-400">Amsterdam · Paris · Dubai · London</span>
+          </div>
+
+          <div class="clients-grid">
+            <div class="client-item">Gucci Beauty</div>
+            <div class="client-item">Vanderwilt Amsterdam</div>
+            <div class="client-item">Jean Paul Gaultier Archive</div>
+            <div class="client-item">Jacquemus</div>
+            <div class="client-item">Josh V HQ</div>
+            <div class="client-item">Babush Amsterdam</div>
+            <div class="client-item">Rouhi Restaurant & Atelier</div>
+            <div class="client-item">Modest Art Official</div>
+            <div class="client-item">Wissal Aziz / Gowtu</div>
+            <div class="client-item">Fendi / Versace Editorial</div>
+            <div class="client-item">Larissa Bruin</div>
+            <div class="client-item">Anouk Romee Schmitz</div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ==========================================
+         TAB 7: ENQUIRIES (BESPOKE FORM)
+         ========================================== -->
+    <div id="view-enquiries" class="tab-view" role="tabpanel" aria-labelledby="tab-enquiries" hidden>
+      <section class="enquiries-page">
+        <div class="enquiries-layout">
+          <!-- Sidebar -->
+          <div class="enquiries-sidebar">
+            <div>
+              <span class="small-label">Bespoke Commissions</span>
+              <h2 class="mt-3">Initiate a dialogue.</h2>
+            </div>
+            <p>
+              Meaux accepts a limited number of private and commercial commissions each quarter across Photography, Styling, Social Media Curation, and Interior Design. Every inquiry is reviewed personally by Dahman.
+            </p>
+            
+            <div class="enquiries-meta-list">
+              <div class="enquiries-meta-item">
+                <span class="meta-title">Studio Location</span>
+                <span class="meta-content">Amsterdam, The Netherlands</span>
+              </div>
+              <div class="enquiries-meta-item">
+                <span class="meta-title">Commission Scope</span>
+                <span class="meta-content">Worldwide (EU, UK, UAE, US)</span>
+              </div>
+              <div class="enquiries-meta-item">
+                <span class="meta-title">Direct Inquiries</span>
+                <a href="mailto:bucuralexandrunicolae@gmail.com" class="meta-content hover:underline">bucuralexandrunicolae@gmail.com</a>
+              </div>
+              <div class="enquiries-meta-item">
+                <span class="meta-title">Visual Monograph</span>
+                <a href="https://www.instagram.com/meauxsvision/" target="_blank" rel="noopener noreferrer" class="meta-content hover:underline">@meauxsvision ↗</a>
+              </div>
+              <div class="enquiries-meta-item">
+                <span class="meta-title">Response Protocol</span>
+                <span class="meta-content">Dossiers appraised within 24–48 hours</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Interactive Luxury Form Card -->
+          <div id="enquiry-form-container" class="enquiry-form-card">
+            <form id="atelier-enquiry-form" novalidate>
+              <div class="form-grid">
+                <!-- Name -->
+                <div class="form-group">
+                  <label for="client-name" class="form-label">Client / House Name *</label>
+                  <input type="text" id="client-name" class="form-input" placeholder="e.g. Maison Laurent / Elena Rostova" required>
+                </div>
+
+                <!-- Email -->
+                <div class="form-group">
+                  <label for="client-email" class="form-label">Email Address *</label>
+                  <input type="email" id="client-email" class="form-input" placeholder="elena@maisonlaurent.com" required>
+                </div>
+
+                <!-- Phone -->
+                <div class="form-group">
+                  <label for="client-phone" class="form-label">Telephone / WhatsApp</label>
+                  <input type="tel" id="client-phone" class="form-input" placeholder="+31 6 00 00 00 00">
+                </div>
+
+                <!-- Timeline -->
+                <div class="form-group">
+                  <label for="client-timeline" class="form-label">Target Timeline</label>
+                  <select id="client-timeline" class="form-select">
+                    <option value="Immediate (Within 30 Days)">Immediate (Within 30 Days)</option>
+                    <option value="Next 1 to 3 Months" selected>Next 1 to 3 Months</option>
+                    <option value="Future Season (3 to 6 Months+)">Future Season (3 to 6 Months+)</option>
+                    <option value="Conceptual Exploration / Flexible">Conceptual Exploration / Flexible</option>
+                  </select>
+                </div>
+
+                <!-- Discipline Selection Chips -->
+                <div class="form-group full-width">
+                  <span class="form-label">Disciplines of Interest (Select All Applicable)</span>
+                  <div class="discipline-chips-wrap">
+                    <label class="chip-label">
+                      <input type="checkbox" name="disciplines" value="Photography" checked>
+                      <span class="chip-ui">Photography</span>
+                    </label>
+                    <label class="chip-label">
+                      <input type="checkbox" name="disciplines" value="Styling">
+                      <span class="chip-ui">Styling</span>
+                    </label>
+                    <label class="chip-label">
+                      <input type="checkbox" name="disciplines" value="Social Media Curation">
+                      <span class="chip-ui">Social Media Curation</span>
+                    </label>
+                    <label class="chip-label">
+                      <input type="checkbox" name="disciplines" value="Interior Design">
+                      <span class="chip-ui">Interior Design</span>
+                    </label>
+                    <label class="chip-label">
+                      <input type="checkbox" name="disciplines" value="Full Atelier Creative Direction">
+                      <span class="chip-ui">Full Atelier Direction (All Disciplines)</span>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Budget Tier Selection -->
+                <div class="form-group full-width">
+                  <span class="form-label">Estimated Investment Bracket</span>
+                  <div class="budget-options-grid">
+                    <label class="budget-label">
+                      <input type="radio" name="budget" value="€5,000 – €15,000" checked>
+                      <div class="budget-ui">
+                        <span class="budget-amount">€5,000 – €15,000</span>
+                        <span class="budget-desc">Focused Editorial, Private Portraiture, or Styling Scope</span>
+                      </div>
+                    </label>
+
+                    <label class="budget-label">
+                      <input type="radio" name="budget" value="€15,000 – €35,000">
+                      <div class="budget-ui">
+                        <span class="budget-amount">€15,000 – €35,000</span>
+                        <span class="budget-desc">Comprehensive Campaign, Lookbook, or Spatial Concept</span>
+                      </div>
+                    </label>
+
+                    <label class="budget-label">
+                      <input type="radio" name="budget" value="€35,000 – €75,000+">
+                      <div class="budget-ui">
+                        <span class="budget-amount">€35,000 – €75,000+</span>
+                        <span class="budget-desc">Full Spatial Interior Architecture or Multi-Discipline Atelier</span>
+                      </div>
+                    </label>
+
+                    <label class="budget-label">
+                      <input type="radio" name="budget" value="Tailored Ongoing Retainer">
+                      <div class="budget-ui">
+                        <span class="budget-amount">Tailored Retainer</span>
+                        <span class="budget-desc">Ongoing Creative Direction & Digital Curation</span>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Project Brief -->
+                <div class="form-group full-width">
+                  <label for="client-brief" class="form-label">Project Vision & Brief *</label>
+                  <textarea id="client-brief" class="form-textarea" placeholder="Describe the aesthetic ambition, key deliverables, brand world, and references for this commission..." required></textarea>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="form-submit-row">
+                  <span class="form-notice">Strict confidentiality guaranteed for all dossiers.</span>
+                  <button type="submit" class="luxury-btn">
+                    <span>Submit Atelier Dossier ↵</span>
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <a class="wordmark brand-logo" href="#atelier" data-tab-target="atelier" aria-label="Meaux Atelier Home">MEAUX<span class="brand-star" aria-hidden="true">✳</span></a>
+    <span>Independent in thought. Intentional in form.</span>
+    <div class="flex items-center gap-6">
+      <a href="https://www.instagram.com/meauxsvision/" target="_blank" rel="noopener noreferrer">Instagram @meauxsvision ↗</a>
+      <button type="button" id="replay-intro">Replay entrance</button>
+    </div>
+    <small>© <span id="current-year"></span> Meaux Atelier · All rights reserved.</small>
+  </footer>
+</div>
+<dialog id="project-dialog" aria-labelledby="project-title"><div class="project-dialog-top"><span id="project-position"></span><button type="button" id="close-project" aria-label="Close project">Close <span aria-hidden="true">×</span></button></div><div class="project-dialog-body"><div class="project-image-wrap"><img id="project-image" alt=""></div><div class="project-copy"><p class="small-label">From the photographic archive</p><h2 id="project-title"></h2><p id="project-caption"></p><p id="project-cover-note" class="project-note"></p><a id="project-source" class="text-link" target="_blank" rel="noopener noreferrer">View the original post <span aria-hidden="true">↗</span></a><a class="text-link project-commission" href="mailto:bucuralexandrunicolae@gmail.com">Discuss a project <span aria-hidden="true">↗</span></a></div></div><div class="project-dialog-bottom"><button type="button" id="previous-project">← Previous</button><span>Meaux’s vision</span><button type="button" id="next-project">Next →</button></div></dialog>
+
+<script src="assets/portfolio-data.js"></script>
+<script src="assets/vault.js"></script>
+<script src="assets/materials.js"></script>
+<script src="assets/site.js"></script>
+</body>
+</html>
