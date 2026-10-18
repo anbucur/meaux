@@ -366,10 +366,10 @@ class CmsRuntime {
     document.getElementById('cms-login-close').addEventListener('click', () => modal.remove());
     modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
 
-    document.getElementById('cms-instant-admin-btn').addEventListener('click', () => {
+    document.getElementById('cms-instant-admin-btn').addEventListener('click', async () => {
       sessionStorage.setItem(MOCK_AUTH_KEY, JSON.stringify({ email: this.config.initialAdmin }));
       modal.remove();
-      this.checkAuth();
+      await this.checkAuth();
     });
 
     document.getElementById('cms-toggle-config-btn').addEventListener('click', () => {
