@@ -1656,6 +1656,7 @@ button:disabled {
 
 .chip-label {
   cursor: pointer;
+  -webkit-user-select: none;
   user-select: none;
 }
 
@@ -1701,6 +1702,7 @@ button:disabled {
 
 .budget-label {
   cursor: pointer;
+  -webkit-user-select: none;
   user-select: none;
 }
 
