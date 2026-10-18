@@ -70,6 +70,9 @@ class AdminManager {
       <button type="button" class="cms-bar-btn primary" id="cms-publish-btn">
         <span>Publish Live ↵</span>
       </button>
+      <button type="button" class="cms-bar-btn" id="cms-signout-btn" title="Sign out of Admin session">
+        <span>Sign Out ✕</span>
+      </button>
     `;
     document.body.appendChild(bar);
 
@@ -83,6 +86,14 @@ class AdminManager {
 
     document.getElementById('cms-publish-btn').addEventListener('click', () => {
       this.publish();
+    });
+
+    document.getElementById('cms-signout-btn').addEventListener('click', async () => {
+      if (this.supabase) {
+        await this.supabase.auth.signOut();
+      }
+      sessionStorage.removeItem('meaux_mock_admin_session');
+      window.location.reload();
     });
   }
 

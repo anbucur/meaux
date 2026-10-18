@@ -31,6 +31,13 @@ class CmsRuntime {
             detectSessionInUrl: true
           }
         });
+
+        // Listen for OAuth sign-in redirect and session events
+        this.supabase.auth.onAuthStateChange(async (event, session) => {
+          if (session && session.user) {
+            await this.checkAuth();
+          }
+        });
       } catch (err) {
         console.warn('Could not load Supabase client:', err);
       }
@@ -234,21 +241,31 @@ class CmsRuntime {
         if (session && session.user) {
           const email = (session.user.email || '').toLowerCase();
           // Check if admin in DB
-          const { data: adminRow } = await this.supabase
-            .from('admins')
-            .select('email')
-            .eq('email', email)
-            .maybeSingle();
+          let hasAdminRecord = false;
+          try {
+            const { data: adminRow } = await this.supabase
+              .from('admins')
+              .select('email')
+              .eq('email', email)
+              .maybeSingle();
+            if (adminRow) hasAdminRecord = true;
+          } catch (e) {}
 
-          const isAllowListed = Boolean(adminRow) || (email === this.config.initialAdmin.toLowerCase());
+          const knownAdmins = [
+            'alexandru.n.bucur@gmail.com',
+            'bucuralexandrunicolae@gmail.com',
+            (this.config.initialAdmin || '').toLowerCase()
+          ];
+
+          const isAllowListed = hasAdminRecord || knownAdmins.includes(email);
           if (isAllowListed) {
             this.session = session;
             this.user = session.user;
             this.isAdmin = true;
-            this.loadAdminInterface();
+            await this.loadAdminInterface();
             return;
           } else {
-            console.warn(`User ${email} is signed in but not an authorized admin.`);
+            alert(`Signed in as ${email}, but this account is not in the authorized 'admins' table. Please add it in your Supabase database.`);
           }
         }
       } catch (e) {
