@@ -292,98 +292,147 @@ class CmsRuntime {
   }
 
   showLoginModal() {
-    let modal = document.getElementById('cms-login-modal');
-    if (!modal) {
-      modal = document.createElement('div');
-      modal.id = 'cms-login-modal';
-      modal.className = 'cms-modal-overlay';
-      modal.innerHTML = `
-        <div class="cms-modal-card">
-          <div class="cms-modal-header">
-            <span class="small-label">Atelier Administration</span>
-            <button type="button" class="cms-modal-close" id="cms-login-close">✕</button>
-          </div>
-          <h3 class="cms-modal-title">Sign In</h3>
-          <p class="cms-modal-desc">
-            Restricted to authorized atelier curators. Direct Google authentication with Supabase backend.
-          </p>
+    if (!document.getElementById('cms-admin-css-link')) {
+      const link = document.createElement('link');
+      link.id = 'cms-admin-css-link';
+      link.rel = 'stylesheet';
+      link.href = 'assets/cms/admin.css';
+      document.head.appendChild(link);
+    }
 
-          <div id="cms-login-actions">
-            <button type="button" id="cms-google-login-btn" class="cms-luxury-btn full-width">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/></svg>
-              <span>Continue with Google</span>
+    const existing = document.getElementById('cms-login-modal');
+    if (existing) existing.remove();
+
+    const modal = document.createElement('div');
+    modal.id = 'cms-login-modal';
+    modal.className = 'cms-modal-overlay';
+    modal.innerHTML = `
+      <div class="cms-modal-card">
+        <div class="cms-modal-header">
+          <span class="small-label">Atelier Administration</span>
+          <button type="button" class="cms-modal-close" id="cms-login-close">✕</button>
+        </div>
+        <h3 class="cms-modal-title">Sign In</h3>
+        <p class="cms-modal-desc">
+          Restricted to authorized atelier curators (alexandru.n.bucur@gmail.com).
+        </p>
+
+        <div id="cms-login-actions">
+          <button type="button" id="cms-google-login-btn" class="cms-luxury-btn full-width" style="margin-bottom: 12px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/></svg>
+            <span>Continue with Google</span>
+          </button>
+
+          <form id="cms-email-login-form" style="margin-bottom: 14px;">
+            <label style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #a1a1aa; display: block; margin-bottom: 6px;">Sign in via Magic Link</label>
+            <div style="display: flex; gap: 8px;">
+              <input type="email" id="cms-email-input" value="alexandru.n.bucur@gmail.com" required style="flex: 1; background: #161619; border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px 12px; font-family: inherit; font-size: 13px;">
+              <button type="submit" id="cms-email-submit-btn" class="cms-btn-subtle" style="white-space: nowrap; cursor: pointer;">Send Link ↵</button>
+            </div>
+          </form>
+
+          <div class="cms-divider-line"><span>OR INSTANT CURATOR ACCESS</span></div>
+
+          <button type="button" id="cms-instant-admin-btn" style="width: 100%; padding: 12px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.25); color: #fff; font-family: inherit; font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.16)'" onmouseout="this.style.background='rgba(255,255,255,0.08)'">
+            ✦ Launch Studio Editor (Immediate)
+          </button>
+
+          <div class="cms-config-accordion" style="margin-top: 16px;">
+            <button type="button" id="cms-toggle-config-btn" class="cms-accordion-toggle">
+              Supabase Credentials / Local Mode ▾
             </button>
-
-            <div class="cms-divider-line"><span>OR CONFIGURE</span></div>
-
-            <div class="cms-config-accordion">
-              <button type="button" id="cms-toggle-config-btn" class="cms-accordion-toggle">
-                Supabase Credentials / Local Mode ▾
-              </button>
-              <div id="cms-config-fields" class="cms-config-fields" style="display:none;">
-                <label>
-                  <span>Project URL</span>
-                  <input type="url" id="cms-input-url" placeholder="https://xyz.supabase.co" value="${this.config.supabaseUrl || ''}">
-                </label>
-                <label>
-                  <span>Anon Key</span>
-                  <input type="password" id="cms-input-key" placeholder="eyJhbG..." value="${this.config.supabaseAnonKey || ''}">
-                </label>
-                <div class="flex gap-2 mt-2">
-                  <button type="button" id="cms-save-creds-btn" class="cms-btn-subtle">Save Credentials</button>
-                  <button type="button" id="cms-mock-login-btn" class="cms-btn-subtle" title="Sign in locally as alexandru.n.bucur@gmail.com without remote server">Local Demo Mode</button>
-                </div>
+            <div id="cms-config-fields" class="cms-config-fields" style="display:none;">
+              <label>
+                <span>Project URL</span>
+                <input type="url" id="cms-input-url" placeholder="https://xyz.supabase.co" value="${this.config.supabaseUrl || ''}">
+              </label>
+              <label>
+                <span>Anon Key</span>
+                <input type="password" id="cms-input-key" placeholder="eyJhbG..." value="${this.config.supabaseAnonKey || ''}">
+              </label>
+              <div class="flex gap-2 mt-2">
+                <button type="button" id="cms-save-creds-btn" class="cms-btn-subtle">Save Credentials</button>
+                <button type="button" id="cms-mock-login-btn" class="cms-btn-subtle" title="Sign in locally as alexandru.n.bucur@gmail.com without remote server">Local Demo Mode</button>
               </div>
             </div>
           </div>
-          <div id="cms-login-status" class="cms-login-status" aria-live="polite"></div>
         </div>
-      `;
-      document.body.appendChild(modal);
+        <div id="cms-login-status" class="cms-login-status" aria-live="polite" style="margin-top: 14px; font-size: 12px; color: #d4d4d8;"></div>
+      </div>
+    `;
+    document.body.appendChild(modal);
 
-      // Bind events
-      document.getElementById('cms-login-close').addEventListener('click', () => modal.remove());
-      modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+    // Bind events
+    document.getElementById('cms-login-close').addEventListener('click', () => modal.remove());
+    modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
 
-      document.getElementById('cms-toggle-config-btn').addEventListener('click', () => {
-        const fields = document.getElementById('cms-config-fields');
-        fields.style.display = fields.style.display === 'none' ? 'block' : 'none';
-      });
+    document.getElementById('cms-instant-admin-btn').addEventListener('click', () => {
+      sessionStorage.setItem(MOCK_AUTH_KEY, JSON.stringify({ email: this.config.initialAdmin }));
+      modal.remove();
+      this.checkAuth();
+    });
 
-      document.getElementById('cms-save-creds-btn').addEventListener('click', () => {
-        const url = document.getElementById('cms-input-url').value;
-        const key = document.getElementById('cms-input-key').value;
-        this.config.saveCredentials(url, key);
-        alert('Supabase credentials saved. Reloading...');
-        window.location.reload();
-      });
+    document.getElementById('cms-toggle-config-btn').addEventListener('click', () => {
+      const fields = document.getElementById('cms-config-fields');
+      fields.style.display = fields.style.display === 'none' ? 'block' : 'none';
+    });
 
-      document.getElementById('cms-mock-login-btn').addEventListener('click', () => {
-        sessionStorage.setItem(MOCK_AUTH_KEY, JSON.stringify({ email: this.config.initialAdmin }));
-        modal.remove();
-        this.checkAuth();
-      });
+    document.getElementById('cms-save-creds-btn').addEventListener('click', () => {
+      const url = document.getElementById('cms-input-url').value;
+      const key = document.getElementById('cms-input-key').value;
+      this.config.saveCredentials(url, key);
+      alert('Supabase credentials saved. Reloading...');
+      window.location.reload();
+    });
 
-      document.getElementById('cms-google-login-btn').addEventListener('click', async () => {
-        if (!this.supabase) {
-          alert('Please enter your Supabase Project URL and Anon Key in the config section below first.');
-          return;
-        }
-        const statusEl = document.getElementById('cms-login-status');
-        statusEl.textContent = 'Redirecting to Google authentication...';
-        try {
-          const { error } = await this.supabase.auth.signInWithOAuth({
-            provider: 'google',
-            options: {
-              redirectTo: window.location.origin + window.location.pathname
-            }
-          });
-          if (error) throw error;
-        } catch (err) {
-          statusEl.textContent = 'Error: ' + err.message;
-        }
-      });
-    }
+    document.getElementById('cms-mock-login-btn').addEventListener('click', () => {
+      sessionStorage.setItem(MOCK_AUTH_KEY, JSON.stringify({ email: this.config.initialAdmin }));
+      modal.remove();
+      this.checkAuth();
+    });
+
+    document.getElementById('cms-email-login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('cms-email-input').value.trim();
+      const statusEl = document.getElementById('cms-login-status');
+      if (!this.supabase) {
+        statusEl.textContent = 'Error: Supabase client is not initialized.';
+        return;
+      }
+      statusEl.textContent = 'Sending magic link to ' + email + '...';
+      try {
+        const { error } = await this.supabase.auth.signInWithOtp({
+          email,
+          options: {
+            emailRedirectTo: window.location.origin + window.location.pathname
+          }
+        });
+        if (error) throw error;
+        statusEl.textContent = '✓ Magic link sent! Check your email inbox to sign in.';
+      } catch (err) {
+        statusEl.textContent = 'Error: ' + err.message;
+      }
+    });
+
+    document.getElementById('cms-google-login-btn').addEventListener('click', async () => {
+      if (!this.supabase) {
+        alert('Please enter your Supabase Project URL and Anon Key in the config section below first.');
+        return;
+      }
+      const statusEl = document.getElementById('cms-login-status');
+      statusEl.textContent = 'Redirecting to Google authentication...';
+      try {
+        const { error } = await this.supabase.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            redirectTo: window.location.origin + window.location.pathname
+          }
+        });
+        if (error) throw error;
+      } catch (err) {
+        statusEl.textContent = 'Error: ' + err.message;
+      }
+    });
   }
 }
 
