@@ -1,0 +1,10 @@
+{
+  "name": "meaux-atelier",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@vercel/functions": "^3.10.0",
+    "resend": "^4.0.0"
+  }
+}

@@ -1449,6 +1449,10 @@
           <!-- Interactive Luxury Form Card -->
           <div id="enquiry-form-container" class="enquiry-form-card">
             <form id="atelier-enquiry-form" novalidate>
+              <div style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;" aria-hidden="true">
+                <label for="client-website">Website</label>
+                <input type="text" id="client-website" name="website" tabindex="-1" autocomplete="off">
+              </div>
               <div class="form-grid">
                 <!-- Name -->
                 <div class="form-group">
@@ -1546,7 +1550,7 @@
 <script src="assets/portfolio-data.js"></script>
 <script src="assets/vault.js?v=3"></script>
 <script src="assets/materials.js"></script>
-<script src="assets/site.js?v=5"></script>
+<script src="assets/site.js?v=6"></script>
 <script src="assets/atelier-fluid.js"></script>
 <script src="assets/chrome-spikes.js"></script>
 <!-- Content management: public content loader + lazily loaded admin editor -->

@@ -485,14 +485,45 @@ async function handleEnquirySubmit(form) {
   const phone = value('client-phone');
   const timeline = value('client-timeline');
   const brief = value('client-brief');
+  const website = value('client-website');
 
   const selectedDisciplines = Array.from(form.querySelectorAll('.chip-label input:checked')).map(cb => cb.value);
   const budgetSelected = form.querySelector('.budget-label input:checked');
   const budget = budgetSelected ? budgetSelected.value : 'Custom Commission';
 
+  let errorBanner = form.querySelector('.enquiry-inline-error');
+  const showInlineError = (msg) => {
+    if (!errorBanner) {
+      errorBanner = document.createElement('p');
+      errorBanner.className = 'enquiry-inline-error';
+      errorBanner.setAttribute('role', 'alert');
+      errorBanner.style.cssText = 'grid-column:1/-1;margin:0;padding:12px 14px;border:1px solid rgba(248,113,113,0.45);background:rgba(127,29,29,0.28);color:#fecaca;font-size:12px;letter-spacing:0.06em;line-height:1.55;';
+      const submitRow = form.querySelector('.form-submit-row');
+      if (submitRow) submitRow.parentElement.insertBefore(errorBanner, submitRow);
+      else form.appendChild(errorBanner);
+    }
+    errorBanner.textContent = msg;
+  };
+  if (errorBanner) errorBanner.remove();
+
   if (!name || !email || !brief) {
-    alert('Please fill in your name, email, and project brief to submit your dossier.');
+    showInlineError('Please fill in your name, email address, and project brief to submit your dossier.');
     return;
+  }
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    showInlineError('Please enter a valid email address so Mohammed can reply to your dossier.');
+    return;
+  }
+
+  const submitBtn = form.querySelector('button[type="submit"]');
+  const submitLabel = submitBtn?.querySelector('span');
+  const originalLabel = submitLabel ? submitLabel.textContent : (submitBtn?.textContent || 'Submit Atelier Dossier ↵');
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.style.opacity = '0.68';
+    submitBtn.style.pointerEvents = 'none';
+    if (submitLabel) submitLabel.textContent = 'Transmitting Dossier...';
   }
 
   // Persist enquiry to Supabase database & local fallback so it appears in Admin Inbox
@@ -517,48 +548,78 @@ async function handleEnquirySubmit(form) {
     localStorage.setItem('meaux_enquiries_local', JSON.stringify(localList.slice(0, 100)));
   } catch (e) {}
 
-  try {
-    if (window.MeauxCMS && window.MeauxCMS.supabase) {
-      await window.MeauxCMS.supabase.from('enquiries').insert(enquiryPayload);
+  const dbSavePromise = (async () => {
+    try {
+      if (window.MeauxCMS && window.MeauxCMS.supabase) {
+        await window.MeauxCMS.supabase.from('enquiries').insert(enquiryPayload);
+      }
+    } catch (e) {
+      console.warn('Could not persist enquiry to Supabase:', e);
     }
-  } catch (e) {
-    console.warn('Could not persist enquiry to Supabase:', e);
+  })();
+
+  let apiResult = null;
+  let apiError = null;
+  try {
+    const res = await fetch('/api/enquiry', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name,
+        email,
+        phone,
+        timeline,
+        disciplines: selectedDisciplines,
+        budget,
+        brief,
+        website
+      })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data.ok) {
+      apiError = data.error || 'Could not dispatch your dossier email right now.';
+    } else {
+      apiResult = data;
+    }
+  } catch (err) {
+    apiError = 'Network issue while sending your dossier. Please try again.';
   }
 
-  // Build email draft mailto fallback
-  const subject = encodeURIComponent(`Atelier Meaux Commission: ${name} — ${selectedDisciplines.join(', ') || 'General'}`);
-  const emailBody = encodeURIComponent(
-    `ATELIER MEAUX COMMISSION DOSSIER\n` +
-    `==================================\n\n` +
-    `CLIENT / HOUSE: ${name}\n` +
-    `EMAIL: ${email}\n` +
-    `PHONE: ${phone || 'Not provided'}\n` +
-    `DISCIPLINES: ${selectedDisciplines.join(', ') || 'All Disciplines'}\n` +
-    `INVESTMENT TIER: ${budget}\n` +
-    `TARGET TIMELINE: ${timeline}\n\n` +
-    `CREATIVE BRIEF / VISION:\n${brief}\n\n` +
-    `==================================\n` +
-    `Sent via Meaux Atelier Portal`
-  );
-  const mailtoUrl = `mailto:${contactEmail()}?subject=${subject}&body=${emailBody}`;
+  await dbSavePromise;
+
+  if (apiError) {
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.style.opacity = '';
+      submitBtn.style.pointerEvents = '';
+      if (submitLabel) submitLabel.textContent = originalLabel;
+    }
+    showInlineError(`${apiError} You can also reach Mohammed directly at ${contactEmail()}.`);
+    return;
+  }
+
+  const refBadge = apiResult?.refId ? `DOSSIER ${escapeHTML(apiResult.refId)} // TRANSMITTED` : 'DOSSIER TRANSMITTED // ATELIER MEAUX';
+  const receiptNote = apiResult?.clientReceiptSent
+    ? `A formatted copy has been sent to <strong>${escapeHTML(email)}</strong>, and Mohammed has received your full dossier directly.`
+    : `Mohammed has received your full commission dossier directly in his studio inbox.`;
 
   const card = form.closest('#enquiry-form-container') || document.getElementById('enquiry-form-container');
   if (card) {
     card.innerHTML = `
       <div class="enquiry-confirmation">
         <div class="w-12 h-12 rounded-full border border-white/40 flex items-center justify-center text-white text-xl">✓</div>
-        <span class="text-xs uppercase tracking-[0.25em] text-zinc-400">DOSSIER REGISTERED // ATELIER MEAUX</span>
+        <span class="text-xs uppercase tracking-[0.25em] text-zinc-400">${refBadge}</span>
         <h3>Thank you, ${escapeHTML(name)}.</h3>
         <p>
-          Your commission brief has been recorded in our atelier database. Mohammed reviews all proposals personally to ensure alignment with the atelier's seasonal calendar. You will receive an initial appraisal within 24 to 48 hours.
+          ${receiptNote} Every proposal is reviewed personally to ensure alignment with the atelier's seasonal calendar—expect a personal response within 24 to 48 hours.
         </p>
         <div class="mt-4 flex flex-col sm:flex-row gap-4">
-          <a href="${mailtoUrl}" class="luxury-btn">
-            <span>Open in Mail App ↗</span>
-          </a>
-          <button type="button" onclick="location.reload()" class="border border-white/20 text-white px-6 py-4 uppercase tracking-[0.16em] text-xs">
+          <button type="button" onclick="location.reload()" class="luxury-btn">
             <span>Submit Another Brief</span>
           </button>
+          <a href="https://www.instagram.com/meauxsvision/" target="_blank" rel="noopener noreferrer" class="border border-white/20 text-white px-6 py-4 uppercase tracking-[0.16em] text-xs inline-flex items-center justify-center">
+            <span>Instagram @meauxsvision ↗</span>
+          </a>
         </div>
       </div>
     `;
