@@ -559,9 +559,6 @@ class CmsRuntime {
         view.innerHTML = `
           <section class="discipline-page" data-cms-container>
             <div class="discipline-header">
-              <div class="discipline-tagline">
-                <span>ATELIER MEAUX // BESPOKE</span>
-              </div>
               <h2 class="discipline-title">${this.escape(page.title || label)}</h2>
               <p class="discipline-subtitle">${this.escape(page.subtitle || 'Curated atelier space.')}</p>
             </div>
