@@ -601,8 +601,12 @@ button:disabled {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  background: radial-gradient(ellipse at 35% 25%, #ffffff04, #00000070 85%),
-    url('leather-grain.svg') repeat;
+  background-color: #0a0a0c;
+  background-image: 
+    radial-gradient(1000px circle at 50% 18%, rgba(255, 255, 255, 0.025) 0%, transparent 65%),
+    radial-gradient(ellipse at 50% 100%, rgba(0, 0, 0, 0.5) 0%, transparent 80%),
+    url('leather-grain.svg');
+  background-repeat: no-repeat, no-repeat, repeat;
   color: var(--paper);
   padding: 120px var(--gutter) 80px;
 }
@@ -2132,6 +2136,11 @@ button:disabled {
 
 .project-copy .text-link {
   margin-top: 18px;
+}
+
+#project-source[hidden],
+#project-source[style*="display: none"] {
+  display: none !important;
 }
 
 .project-commission {

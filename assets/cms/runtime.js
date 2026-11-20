@@ -233,6 +233,20 @@ class CmsRuntime {
       window.MeauxSite.setPortfolio(doc.portfolio);
     }
 
+    // Apply custom post links if present
+    if (doc.customPostLinks && window.MeauxSite) {
+      const p = window.MeauxSite.getPortfolio();
+      let changed = false;
+      for (const [sc, link] of Object.entries(doc.customPostLinks)) {
+        const item = p.items.find(i => i.shortcode === sc);
+        if (item) {
+          item.permalink = link || '';
+          changed = true;
+        }
+      }
+      if (changed) window.MeauxSite.setPortfolio(p);
+    }
+
     // Render custom blocks for current tabs
     this.renderCustomBlocks(doc);
   }

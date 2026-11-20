@@ -13,11 +13,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
     
-    <link rel="stylesheet" href="assets/site.css?v=4">
-    <link rel="stylesheet" href="assets/entrance.css?v=4">
+    <link rel="stylesheet" href="assets/site.css?v=5">
+    <link rel="stylesheet" href="assets/entrance.css?v=8">
     <link rel="stylesheet" href="assets/blocks.css?v=4">
     <link rel="stylesheet" href="assets/chrome-spikes.css?v=4">
-    <link rel="stylesheet" href="assets/cms/admin.css?v=4">
+    <link rel="stylesheet" href="assets/cms/admin.css?v=5">
     
     <script>
         tailwind.config = {
@@ -283,7 +283,7 @@
             <filter id="leather-grain-filter" x="0%" y="0%" width="100%" height="100%">
                 <feTurbulence type="fractalNoise" baseFrequency="0.24 0.38" numOctaves="3" stitchTiles="stitch" result="noise" />
                 <feColorMatrix type="saturate" values="0" in="noise" result="monoNoise" />
-                <feDiffuseLighting in="monoNoise" lighting-color="#ffffff" surfaceScale="1.3" result="diffuse">
+                <feDiffuseLighting in="monoNoise" lighting-color="#ffffff" surfaceScale="0.95" result="diffuse">
                     <feDistantLight azimuth="135" elevation="32" />
                 </feDiffuseLighting>
                 <feComposite operator="in" in="diffuse" in2="SourceGraphic" />

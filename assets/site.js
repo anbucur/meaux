@@ -108,8 +108,16 @@ function openProject(id, trigger) {
   document.getElementById('project-caption').textContent = post.caption || '';
   const img = document.getElementById('project-image'); img.src = imagePath(post); img.alt = info.title;
   const source = document.getElementById('project-source');
-  source.hidden = !post.permalink;
-  if (post.permalink) source.href = post.permalink;
+  const permalink = (post.permalink || '').trim();
+  if (permalink) {
+    source.hidden = false;
+    source.style.display = '';
+    source.href = permalink;
+  } else {
+    source.hidden = true;
+    source.style.display = 'none';
+    source.removeAttribute('href');
+  }
   const commission = dialog.querySelector('.project-commission');
   if (commission) commission.href = `mailto:${contactEmail()}`;
   document.getElementById('project-cover-note').textContent = post.media_type === 'carousel' ? 'Cover image from the series. View the original post for the complete carousel.' : '';
@@ -429,6 +437,7 @@ window.MeauxSite = {
     switchTab(activeTab, false);
   },
   getActiveTab: () => activeTab,
+  getActiveProject: () => activeProject,
   switchTab,
   skipIntro,
   openProject,

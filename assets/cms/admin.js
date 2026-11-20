@@ -165,10 +165,13 @@ class AdminManager {
   }
 
   bindImageEditing() {
-    const images = document.querySelectorAll('main img, .hero-image, .about-portrait-wrap img, .discipline-narrative-split img, .project-image-wrap img');
-    images.forEach(img => {
-      if (img.closest('#cms-admin-bar, #cms-admin-drawer, #cms-login-modal, #cms-image-picker-modal, dialog')) return;
-      const container = img.closest('.image-link') || img.closest('.narrative-image-wrap') || img.closest('.about-portrait-wrap') || img.parentElement || img;
+    const selector = 'main img, .hero-image img, .hero-image, .gallery-item img, .gallery-item, .about-portrait-wrap img, .discipline-narrative-split img, .project-image-wrap img, .work-image img';
+    const elements = document.querySelectorAll(selector);
+    elements.forEach(el => {
+      if (el.closest('#cms-admin-bar, #cms-admin-drawer, #cms-login-modal, #cms-image-picker-modal, dialog')) return;
+      const img = el.tagName === 'IMG' ? el : el.querySelector('img');
+      if (!img) return;
+      const container = el.closest('.image-link') || el.closest('.work-image') || el.closest('.gallery-item') || el.closest('.narrative-image-wrap') || el.closest('.about-portrait-wrap') || el.parentElement || el;
       if (this.isEditMode) {
         container.classList.add('cms-image-editable');
         if (!container.__cmsClickHandler) {
@@ -190,12 +193,51 @@ class AdminManager {
     });
   }
 
-  openImagePickerModal(targetImg) {
+  openImagePickerModal(target) {
     let modal = document.getElementById('cms-image-picker-modal');
     if (modal) modal.remove();
 
+    const targetImg = (target && target.tagName === 'IMG') ? target : (target ? target.querySelector('img') || target : null);
+    if (!targetImg) return;
     const currentImgSrc = targetImg.src || '';
-    const imgKey = targetImg.getAttribute('data-cms-img') || this.getElementSelector(targetImg);
+    const imgKey = targetImg.getAttribute('data-cms-img') || (target && target.getAttribute ? target.getAttribute('data-cms-img') : null) || this.getElementSelector(targetImg);
+
+    // Identify associated post if this image is a portfolio item or in dialog
+    let postShortcode = null;
+    const postEl = targetImg.closest('[data-post]') || (target ? target.closest('[data-post]') : null);
+    if (postEl && postEl.dataset.post) {
+      postShortcode = postEl.dataset.post;
+    } else if (targetImg.dataset && targetImg.dataset.post) {
+      postShortcode = targetImg.dataset.post;
+    } else if (targetImg.id === 'project-image' || targetImg.closest('#project-dialog')) {
+      postShortcode = window.MeauxSite && window.MeauxSite.getActiveProject ? window.MeauxSite.getActiveProject() : null;
+    }
+
+    let currentPortfolio = window.MeauxSite ? window.MeauxSite.getPortfolio() : null;
+    if (!currentPortfolio && this.draft && this.draft.portfolio) {
+      currentPortfolio = this.draft.portfolio;
+    }
+
+    let matchedPost = null;
+    if (currentPortfolio && Array.isArray(currentPortfolio.items)) {
+      if (postShortcode) {
+        matchedPost = currentPortfolio.items.find(p => p.shortcode === postShortcode);
+      } else {
+        const cleanSrc = (targetImg.src || '').split('?')[0];
+        matchedPost = currentPortfolio.items.find(p =>
+          (p.image_url && cleanSrc.endsWith(p.image_url)) ||
+          (p.image_file && cleanSrc.endsWith(p.image_file))
+        );
+        if (matchedPost) postShortcode = matchedPost.shortcode;
+      }
+    }
+
+    let currentPostLink = '';
+    if (matchedPost && matchedPost.permalink) {
+      currentPostLink = matchedPost.permalink;
+    } else if (postShortcode && this.draft.customPostLinks && this.draft.customPostLinks[postShortcode]) {
+      currentPostLink = this.draft.customPostLinks[postShortcode];
+    }
 
     modal = document.createElement('div');
     modal.id = 'cms-image-picker-modal';
@@ -205,16 +247,37 @@ class AdminManager {
         <div class="cms-modal-header">
           <div>
             <span class="small-label">Atelier Asset Vault</span>
-            <h3 class="cms-modal-title" style="font-size: 20px; margin: 4px 0;">Swap Image</h3>
-            <span style="font-size: 10px; color: #71717a; font-family: monospace;">Key: ${this.escape(imgKey)}</span>
+            <h3 class="cms-modal-title" style="font-size: 20px; margin: 4px 0;">Swap Image & Link</h3>
+            <div style="display: flex; gap: 8px; align-items: center; margin-top: 2px;">
+              <span style="font-size: 10px; color: #71717a; font-family: monospace;">Key: ${this.escape(imgKey)}</span>
+              ${postShortcode ? `<span style="font-size: 10px; color: #d4d4d8; background: rgba(255,255,255,0.08); padding: 1px 6px; border-radius: 3px; font-family: monospace;">Post #${this.escape(postShortcode)}</span>` : ''}
+            </div>
           </div>
           <button type="button" class="cms-modal-close" id="cms-img-picker-close">✕</button>
+        </div>
+
+        <!-- Social Media / Original Post Link Controls -->
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); padding: 14px; margin-bottom: 16px; border-radius: 4px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 6px;">
+            <label for="cms-post-link-input" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #e4e4e7; font-weight: 600;">
+              Original Post / Social Media Link ${postShortcode ? `(#${this.escape(postShortcode)})` : ''}:
+            </label>
+            <span style="font-size: 10px; color: #a1a1aa;">Controls "View the original post ↗"</span>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <input type="url" id="cms-post-link-input" class="cms-input" placeholder="https://instagram.com/p/... or website (leave empty to hide button)" value="${this.escape(currentPostLink)}" style="flex: 1;">
+            <button type="button" id="cms-clear-link-btn" class="cms-btn-subtle" style="white-space: nowrap;" title="Clear link so the 'View original post' button is hidden">Clear Link ✕</button>
+            <button type="button" id="cms-save-link-only-btn" class="cms-btn-subtle" style="white-space: nowrap;" title="Save updated link immediately without swapping image">Save Link Only ↵</button>
+          </div>
+          <p style="font-size: 10px; color: #71717a; margin: 6px 0 0 0;">
+            ℹ When uploading a photo from PC, the link is automatically cleared so the "View original post" button is hidden. You can paste a link above anytime if you wish to show it.
+          </p>
         </div>
 
         <!-- Quick Upload / URL Controls -->
         <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); padding: 14px; margin-bottom: 16px; border-radius: 4px;">
           <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 10px; flex-wrap: wrap;">
-            <span style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: #a1a1aa;">Upload & Swap:</span>
+            <span style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: #a1a1aa;">Upload & Swap Image:</span>
             <label style="font-size: 11px; display: flex; align-items: center; gap: 4px; cursor: pointer;">
               <input type="radio" name="modal-upload-mode" value="blob" checked>
               <span>Database Blob (Postgres Base64)</span>
@@ -233,7 +296,7 @@ class AdminManager {
 
           <div style="display: flex; gap: 8px;">
             <input type="text" id="cms-img-url-input" class="cms-input" placeholder="Paste image link (https://...)" value="${currentImgSrc}" style="flex: 1;">
-            <button type="button" id="cms-apply-img-url-btn" class="cms-btn-subtle" style="white-space: nowrap;">Apply Link ↵</button>
+            <button type="button" id="cms-apply-img-url-btn" class="cms-btn-subtle" style="white-space: nowrap;">Apply Image & Link ↵</button>
           </div>
         </div>
 
@@ -251,6 +314,91 @@ class AdminManager {
       </div>
     `;
     document.body.appendChild(modal);
+
+    const applyImage = (url, postLink) => {
+      // 1. Immediately update target image in DOM
+      if (targetImg && targetImg.tagName === 'IMG') {
+        targetImg.src = url;
+      }
+      if (target && target !== targetImg) {
+        const innerImg = target.querySelector('img');
+        if (innerImg) innerImg.src = url;
+      }
+
+      // 2. Save in draft customImages
+      if (!this.draft.customImages) this.draft.customImages = {};
+      this.draft.customImages[imgKey] = url;
+      if (target && target.getAttribute && target.getAttribute('data-cms-img')) {
+        this.draft.customImages[target.getAttribute('data-cms-img')] = url;
+      }
+
+      // 3. Immediately reflect across all DOM elements matching imgKey
+      if (imgKey) {
+        try {
+          document.querySelectorAll(`[data-cms-img="${imgKey}"], ${imgKey}`).forEach(el => {
+            if (el.tagName === 'IMG') el.src = url;
+            else {
+              const i = el.querySelector('img');
+              if (i) i.src = url;
+            }
+          });
+        } catch (e) {}
+      }
+
+      // 4. If this image belongs to a post, update the entire portfolio and every matching card on the page!
+      const sc = postShortcode || (matchedPost ? matchedPost.shortcode : null);
+      if (sc) {
+        const linkToSave = postLink !== undefined ? (postLink || '').trim() : '';
+        if (!this.draft.customPostLinks) this.draft.customPostLinks = {};
+        this.draft.customPostLinks[sc] = linkToSave;
+
+        if (window.MeauxSite) {
+          const p = window.MeauxSite.getPortfolio();
+          const targetPost = p.items.find(item => item.shortcode === sc);
+          if (targetPost) {
+            targetPost.image_url = url;
+            targetPost.permalink = linkToSave;
+          }
+          this.draft.portfolio = p;
+          window.MeauxSite.setPortfolio(p);
+        }
+
+        // Update ALL elements with data-post matching this shortcode across the whole page (hero, grid, gallery)
+        document.querySelectorAll(`[data-post="${sc}"]`).forEach(el => {
+          if (el.tagName === 'IMG') {
+            el.src = url;
+          } else {
+            const i = el.querySelector('img');
+            if (i) i.src = url;
+          }
+        });
+
+        // Also update project dialog if open
+        const sourceBtn = document.getElementById('project-source');
+        if (sourceBtn) {
+          const hasLink = Boolean(linkToSave);
+          sourceBtn.hidden = !hasLink;
+          if (hasLink) {
+            sourceBtn.href = linkToSave;
+            sourceBtn.style.display = '';
+          } else {
+            sourceBtn.removeAttribute('href');
+            sourceBtn.style.display = 'none';
+          }
+        }
+        const dialogImg = document.getElementById('project-image');
+        if (dialogImg && (targetImg.id === 'project-image' || (window.MeauxSite && window.MeauxSite.getActiveProject && window.MeauxSite.getActiveProject() === sc))) {
+          dialogImg.src = url;
+        }
+      }
+
+      // 5. Re-bind image editing so newly rendered elements stay editable immediately
+      this.bindImageEditing();
+
+      this.markDraftModified();
+      this.saveDraft();
+      modal.remove();
+    };
 
     const renderThumbs = (query = '') => {
       const grid = document.getElementById('cms-picker-grid');
@@ -272,7 +420,8 @@ class AdminManager {
 
       grid.querySelectorAll('.cms-media-thumb').forEach(thumb => {
         thumb.addEventListener('click', () => {
-          applyImage(thumb.dataset.url);
+          const linkVal = (document.getElementById('cms-post-link-input')?.value || '').trim();
+          applyImage(thumb.dataset.url, linkVal);
         });
       });
     };
@@ -283,20 +432,25 @@ class AdminManager {
       renderThumbs(e.target.value.trim());
     });
 
+    document.getElementById('cms-clear-link-btn').addEventListener('click', () => {
+      const input = document.getElementById('cms-post-link-input');
+      if (input) input.value = '';
+      const statusEl = document.getElementById('cms-modal-upload-status');
+      if (statusEl) statusEl.textContent = 'Link cleared. (Button will be hidden)';
+    });
+
+    document.getElementById('cms-save-link-only-btn').addEventListener('click', () => {
+      const linkVal = (document.getElementById('cms-post-link-input')?.value || '').trim();
+      applyImage(targetImg.src, linkVal);
+    });
+
     document.getElementById('cms-img-picker-close').addEventListener('click', () => modal.remove());
     modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
 
-    const applyImage = (url) => {
-      targetImg.src = url;
-      if (!this.draft.customImages) this.draft.customImages = {};
-      this.draft.customImages[imgKey] = url;
-      this.markDraftModified();
-      modal.remove();
-    };
-
     document.getElementById('cms-apply-img-url-btn').addEventListener('click', () => {
       const url = document.getElementById('cms-img-url-input').value.trim();
-      if (url) applyImage(url);
+      const linkVal = (document.getElementById('cms-post-link-input')?.value || '').trim();
+      if (url) applyImage(url, linkVal);
     });
 
     // Handle instant file upload directly inside picker modal
@@ -304,14 +458,19 @@ class AdminManager {
       const file = e.target.files[0];
       if (!file) return;
       const statusEl = document.getElementById('cms-modal-upload-status');
-      statusEl.textContent = 'Uploading...';
+      if (statusEl) statusEl.textContent = 'Uploading...';
       const mode = modal.querySelector('input[name="modal-upload-mode"]:checked').value;
       
       const newUrl = await this.uploadMediaFile(file, mode);
       if (newUrl) {
-        statusEl.textContent = '✓ Uploaded!';
+        if (statusEl) statusEl.textContent = '✓ Uploaded!';
         renderThumbs();
-        applyImage(newUrl);
+
+        // Upload from PC: link is irrelevant, so clear it automatically without prompting
+        const input = document.getElementById('cms-post-link-input');
+        if (input) input.value = '';
+
+        applyImage(newUrl, '');
       }
     });
   }
@@ -685,18 +844,23 @@ class AdminManager {
     const portfolio = window.MeauxSite.getPortfolio();
     const curatedIds = new Set(portfolio.selected.map(c => c.id));
 
-    const itemsHtml = portfolio.items.slice(0, 20).map(item => `
+    const itemsHtml = portfolio.items.slice(0, 30).map(item => `
       <div class="cms-list-item">
         <div style="display: flex; align-items: center; gap: 10px;">
           <img src="${item.image_url || `instagram/meauxsvision/images/${item.image_file}`}" style="width: 40px; height: 40px; object-fit: cover;">
           <div>
             <strong style="font-size: 11px;">${this.escape(item.shortcode)}</strong>
-            <p style="font-size: 9px; color: #71717a; margin: 0;">${curatedIds.has(item.shortcode) ? '★ Curated in Top 8' : 'Archive'}</p>
+            <p style="font-size: 9px; color: #71717a; margin: 0;">${curatedIds.has(item.shortcode) ? '★ Curated in Top 8' : 'Archive'} • ${item.permalink ? 'Has Post Link' : 'No Link (Button Hidden)'}</p>
           </div>
         </div>
-        <button type="button" class="cms-btn-subtle ${curatedIds.has(item.shortcode) ? 'active' : ''}" data-toggle-curated="${item.shortcode}">
-          ${curatedIds.has(item.shortcode) ? 'Remove' : 'Feature'}
-        </button>
+        <div style="display: flex; gap: 6px; align-items: center;">
+          <button type="button" class="cms-btn-subtle" data-edit-post-link="${item.shortcode}" title="${item.permalink ? this.escape(item.permalink) : 'No post link set (button hidden)'}">
+            ${item.permalink ? '🔗 Link' : '+ Add Link'}
+          </button>
+          <button type="button" class="cms-btn-subtle ${curatedIds.has(item.shortcode) ? 'active' : ''}" data-toggle-curated="${item.shortcode}">
+            ${curatedIds.has(item.shortcode) ? 'Remove' : 'Feature'}
+          </button>
+        </div>
       </div>
     `).join('');
 
@@ -704,11 +868,28 @@ class AdminManager {
       <div class="cms-control-group">
         <label>Selected Portfolio Works (${portfolio.selected.length})</label>
         <p style="font-size: 11px; color: #a1a1aa; margin-bottom: 16px;">
-          Toggle works featured in the main Atelier landing grid.
+          Toggle works featured in the main Atelier landing grid and manage social media links.
         </p>
         <div style="max-height: 450px; overflow-y: auto;">${itemsHtml}</div>
       </div>
     `;
+
+    container.querySelectorAll('[data-edit-post-link]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.editPostLink;
+        const target = portfolio.items.find(i => i.shortcode === id);
+        if (!target) return;
+        const newLink = prompt(`Original Post / Social Media link for #${id}:\n(Leave empty to hide "View the original post" button)`, target.permalink || '');
+        if (newLink === null) return;
+        target.permalink = newLink.trim();
+        if (!this.draft.customPostLinks) this.draft.customPostLinks = {};
+        this.draft.customPostLinks[id] = target.permalink;
+        this.draft.portfolio = portfolio;
+        window.MeauxSite.setPortfolio(portfolio);
+        this.saveDraft();
+        this.renderPortfolioTab(container);
+      });
+    });
 
     container.querySelectorAll('[data-toggle-curated]').forEach(btn => {
       btn.addEventListener('click', () => {

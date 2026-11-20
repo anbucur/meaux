@@ -5,7 +5,7 @@
 #leather-vault #vault-panel-1{top:0;right:0;width:calc(50% + 2px);height:calc(50% + 2px);background-position:100% 0}
 #leather-vault #vault-panel-2{bottom:0;left:0;width:calc(50% + 2px);height:calc(50% + 2px);background-position:0 100%}
 #leather-vault #vault-panel-3{bottom:0;right:0;width:calc(50% + 2px);height:calc(50% + 2px);background-position:100% 100%}
-#leather-vault .leather-grain-overlay{opacity:.105}
+#leather-vault .leather-grain-overlay{opacity:.065}
 #leather-vault .leather-panel>div.border-dashed{display:none}
 #leather-vault #vault-fluid-canvas{z-index:6;opacity:1!important;mix-blend-mode:normal}
 #leather-vault #vault-center-plate{
@@ -89,11 +89,14 @@
     transform:translate3d(0,0,0) scale(1);
     opacity:1;
   }
-  25%{
+  38%{
     opacity:1;
   }
-  65%{
-    opacity:.55;
+  62%{
+    opacity:.62;
+  }
+  82%{
+    opacity:.22;
   }
   100%{
     transform:translate3d(0,0,850px) scale(3.2);
