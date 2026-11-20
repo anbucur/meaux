@@ -457,7 +457,6 @@ function switchTab(tabId, shouldScroll = true, preselectedDiscipline = null) {
     const header = document.querySelector('.site-header');
     const headerH = header ? header.offsetHeight : 80;
     if (mainContent) {
-      const topOffset = mainContent.getBoundingClientRect().top + window.scrollY - 90;
       const topOffset = mainContent.getBoundingClientRect().top + window.scrollY - headerH;
       window.scrollTo({
         top: Math.max(0, topOffset),
