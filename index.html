@@ -2,7 +2,6 @@
 <html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>MEAUX — Visual, Styling & Brand Atelier</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90' fill='%23ffffff'>✳</text></svg>">
@@ -14,14 +13,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
     
-    <link rel="stylesheet" href="assets/site.css?v=10">
-    <link rel="stylesheet" href="assets/entrance.css?v=11">
-    <link rel="stylesheet" href="assets/blocks.css?v=5">
-    <link rel="stylesheet" href="assets/site.css?v=12">
-    <link rel="stylesheet" href="assets/entrance.css?v=13">
+    <link rel="stylesheet" href="assets/site.css?v=14">
+    <link rel="stylesheet" href="assets/entrance.css?v=14">
     <link rel="stylesheet" href="assets/blocks.css?v=6">
     <link rel="stylesheet" href="assets/chrome-spikes.css?v=4">
-    <link rel="stylesheet" href="assets/cms/admin.css?v=11">
     <link rel="stylesheet" href="assets/cms/admin.css?v=12">
     
     <script>
@@ -72,7 +67,6 @@
 
         body.vault-locked {
             overflow: hidden;
-            height: 100vh;
             height: 100dvh;
         }
 
@@ -425,7 +419,6 @@
                 </div>
 
                 <p data-cms="vault.hint" class="mt-3.5 text-[9px] sm:text-[10px] tracking-[0.22em] text-zinc-400 uppercase">
-                    Move your cursor. Disturb the surface.
                     Touch or move to disturb the surface.
                 </p>
             </div>
@@ -557,17 +550,10 @@
         <div class="discipline-cards-grid">
           <!-- 01 Photography -->
           <div class="discipline-card">
-            <div>
-              <span class="card-num">01 // DISCIPLINE</span>
-              <h3>Photography</h3>
-              <p>High-contrast chiaroscuro, sculptured portraits, and high-fashion campaign imagery that isolate character from noise.</p>
             <div class="discipline-card-media">
               <img src="instagram/meauxsvision/images/DTPohhYjdPI.jpg" alt="High-contrast studio portrait photographed by Meaux" loading="lazy" style="object-position: 50% 22%;">
               <span class="discipline-card-badge">01 // DISCIPLINE</span>
             </div>
-            <button type="button" data-tab-target="photography" class="card-cta">
-              Explore photography story <span>↗</span>
-            </button>
             <div class="discipline-card-body">
               <div>
                 <h3>Photography</h3>
@@ -586,17 +572,10 @@
 
           <!-- 02 Styling -->
           <div class="discipline-card">
-            <div>
-              <span class="card-num">02 // DISCIPLINE</span>
-              <h3>Styling</h3>
-              <p>Architectural silhouette, archival garment sourcing, tactile leather drapery, and wardrobe direction commanding quiet authority.</p>
             <div class="discipline-card-media">
               <img src="assets/images/session-styling.jpg" alt="Mohammed styling a client in front of a curated rack of obsidian, bone, and camel garments" loading="lazy" style="object-position: 50% 20%;">
               <span class="discipline-card-badge">02 // DISCIPLINE</span>
             </div>
-            <button type="button" data-tab-target="styling" class="card-cta">
-              Explore styling story <span>↗</span>
-            </button>
             <div class="discipline-card-body">
               <div>
                 <h3>Styling</h3>
@@ -615,17 +594,10 @@
 
           <!-- 03 Social Media Curation -->
           <div class="discipline-card">
-            <div>
-              <span class="card-num">03 // DISCIPLINE</span>
-              <h3>Social Media Curation</h3>
-              <p>The grid as an architectural exhibition. Content Packs, wardrobe cleanup, shopping advice, client styling, and planned photo &amp; video shoots.</p>
             <div class="discipline-card-media">
               <img src="assets/images/session-direction.jpg?v=2" alt="Mohammed reviewing a printed content pack and curated 3x3 Instagram grid with a client" loading="lazy" style="object-position: 50% 22%;">
               <span class="discipline-card-badge">03 // DISCIPLINE</span>
             </div>
-            <button type="button" data-tab-target="social-media" class="card-cta">
-              Explore curation story <span>↗</span>
-            </button>
             <div class="discipline-card-body">
               <div>
                 <h3>Social Media Curation</h3>
@@ -706,9 +678,6 @@
           <details>
             <summary><span>Styling</span><span class="service-plus" aria-hidden="true">+</span></summary>
             <div>
-              <p>Clothing treated as spatial design on the human form. Architectural tailoring, rare archival garments, and tactile leather drapery.</p>
-              <span>Runway & Editorial · Private VIP Dressing · Silhouette Identity</span>
-              <button type="button" data-tab-target="styling" class="text-link mt-4">View Styling Story ↗</button>
               <p>Wardrobe direction tailored around how you move and how you want to be seen—from personal closet edits and guided shopping to red-carpet fittings and fashion-house campaigns.</p>
               <span>Personal Styling &amp; Wardrobe · Shopping Advice · Events &amp; Fashion Houses</span>
               <button type="button" data-tab-target="styling" class="text-link mt-4">Explore Styling Services ↗</button>
@@ -771,7 +740,6 @@
             <p id="photo-style-summary" class="photo-style-summary" aria-live="polite">
               A cross-section of sculptural studio studies, fashion campaigns, intimate portraits, and destination shoots.
             </p>
-            <span class="photo-style-hint">Click any frame to inspect</span>
             <span class="photo-style-hint">Select any frame to inspect</span>
           </div>
         </div>
@@ -779,22 +747,12 @@
         <!-- Asymmetric Bento Portfolio Grid (populated & animated by site.js) -->
         <div id="photo-bento-grid" class="photo-bento-grid" aria-live="polite"></div>
 
-        <!-- Clean, Easy-to-Follow Essentials Strip (Replaces Service Tiers) -->
-        <div class="photo-essentials-strip">
-          <div class="photo-essential-item">
-            <span class="photo-essential-num">01 // SETTING</span>
-            <h3>Studio or On Location</h3>
-            <p>Photographed in our Amsterdam studio or on location worldwide—from desert canyons to European capitals.</p>
         <!-- How a Shoot Works (Visual 3-Step Walkthrough matching Social Media Curation) -->
         <div class="session-walkthrough-section photo-essentials-strip">
           <div class="session-walkthrough-header">
             <span class="small-label">How a Shoot Works</span>
             <h3 class="discipline-section-title mt-3">Inside a Photography Commission</h3>
           </div>
-          <div class="photo-essential-item">
-            <span class="photo-essential-num">02 // DIRECTION</span>
-            <h3>One Cohesive Eye</h3>
-            <p>Concept, lighting, casting, and optional wardrobe styling handled together so every frame feels intentional.</p>
 
           <div class="session-steps-grid">
             <article class="session-step-card">
@@ -851,11 +809,6 @@
               </div>
             </article>
           </div>
-          <div class="photo-essential-item">
-            <span class="photo-essential-num">03 // DELIVERY</span>
-            <h3>Ready for Any Format</h3>
-            <p>Final selects graded with Meaux’s tonal signature and delivered ready for print, campaigns, and social.</p>
-          </div>
         </div>
 
         <!-- Archive Jump Link -->
@@ -878,7 +831,6 @@
     </div>
 
     <!-- ==========================================
-         TAB 3: STYLING (DISCIPLINE STORY)
          TAB 3: STYLING (PERSONAL TO FASHION HOUSE)
          ========================================== -->
     <div id="view-styling" class="tab-view" role="tabpanel" aria-labelledby="tab-styling" hidden>
@@ -891,41 +843,27 @@
           </div>
           <h2 class="discipline-title">Styling</h2>
           <p class="discipline-subtitle">
-            “Garments are not adornment; they are body architecture.”
             “From your everyday wardrobe to fashion-house campaigns—dressing that feels effortless, architectural, and unmistakably yours.”
           </p>
         </div>
 
-        <!-- Narrative Split -->
-        <div class="discipline-narrative-split is-reversed">
         <!-- Overview Split: Editorial Visual + Clear 4-Pillar Scope (Mirroring Social Media Curation) -->
         <div class="discipline-narrative-split styling-overview-split">
           <div class="narrative-image-wrap">
-            <img src="instagram/meauxsvision/images/CqOSc5kN3gA.jpg" alt="Sculptural leather styling for Vanderwilt" loading="lazy" width="1440" height="1800">
             <img src="assets/images/feed-04.jpg" alt="Architectural bone-white wool coat styled over black tailoring in directional light" loading="lazy" style="object-position: 50% 24%;">
             <div class="narrative-image-caption">
-              <span>Vanderwilt Amsterdam</span>
-              <span>Silhouette & Leather Direction</span>
               <span>Meaux Styling Direction</span>
               <span>Personal · Editorial · Brand</span>
             </div>
           </div>
-          <div class="narrative-text-wrap">
 
           <div class="ig-curation-copy">
             <div class="story-chapter">
-              <h3>Silhouette Architecture</h3>
               <h3>From Personal Wardrobe to Fashion House</h3>
               <p>
-                Styling at Meaux is rooted in tactile contrast: heavy oil-tanned lambskins paired with flowing Japanese cottons; structured shoulders framing vulnerability; razor-sharp hemlines cutting through space. We do not dress bodies—we construct living silhouettes that hold sovereign presence in any room.
                 Great styling isn’t about chasing trends or buying more—it’s about understanding proportion, fabric, and presence. Whether we are reorganizing your closet at home, shopping for key pieces, dressing you for a milestone event, or styling a campaign for a fashion house, every look is built with intention.
               </p>
             </div>
-            <div class="story-chapter">
-              <h3>Archival Curation & Atelier Collaborations</h3>
-              <p>
-                Working closely with independent artisan houses like Vanderwilt Amsterdam as well as archival collections from Jean Paul Gaultier, Rick Owens, and Jacquemus, our wardrobe curation favors timeless garments with sculptural weight over ephemeral trends.
-              </p>
 
             <!-- Scannable 4-Pillar Scope Card -->
             <div class="content-pack-card">
@@ -961,21 +899,9 @@
                 </li>
               </ul>
             </div>
-            <div class="story-chapter">
-              <h3>Movement & Sensory Weight</h3>
-              <p>
-                How a textile moves in air, how leather creases under natural light, how a collarbone catches an edge of darkness—these tactile details determine how the garment lives on film and in memory.
-              </p>
-            </div>
           </div>
         </div>
 
-        <!-- Bespoke Luxury Service Tiers -->
-        <div class="discipline-services">
-          <h3 class="discipline-section-title">Styling Service Scope</h3>
-          <p class="discipline-section-intro">
-            Comprehensive wardrobe architecture for high-fashion houses, runway presentations, and private VIP appearances.
-          </p>
         <!-- Visual Styling Services Showcase (Replaces Rigid Service Tiers) -->
         <div class="discipline-services styling-services-visual">
           <div class="session-walkthrough-header">
@@ -986,28 +912,12 @@
             </p>
           </div>
 
-          <div class="service-tiers-grid">
-            <div class="service-tier-card">
-              <span class="tier-badge">TIER 01 // EDITORIAL</span>
-              <h4>Editorial & Runway Wardrobe Architecture</h4>
-              <p>
-                Concept moodboarding, rare archival sourcing, silhouette drafting, bespoke tailoring coordination, and on-set dressing.
-              </p>
-              <div class="tier-deliverables">
-                <span class="tier-deliverables-title">Scope & Deliverables</span>
-                <ul>
-                  <li>Curated runway or editorial wardrobe pulls</li>
-                  <li>Archival designer piece procurement</li>
-                  <li>On-set silhouette management & movement coaching</li>
-                  <li>Accessories, footwear, and tactile detailing</li>
-                </ul>
           <div class="session-steps-grid styling-steps-grid">
             <article class="session-step-card">
               <div class="session-step-media">
                 <img src="assets/images/session-styling.jpg" alt="Mohammed styling a client in front of a curated wardrobe rail of obsidian, bone, and camel coats" loading="lazy" style="object-position: 50% 20%;">
                 <span class="session-step-badge">01 // PERSONAL &amp; WARDROBE</span>
               </div>
-            </div>
               <div class="session-step-body">
                 <h4>Wardrobe Edit &amp; Personal Styling</h4>
                 <p>
@@ -1021,26 +931,11 @@
               </div>
             </article>
 
-            <div class="service-tier-card">
-              <span class="tier-badge">TIER 02 // VIP WARDROBE</span>
-              <h4>Private VIP & Red Carpet Direction</h4>
-              <p>
-                Bespoke wardrobe consulting for artists, founders, and cultural figures for international appearances, galas, and film festivals.
-              </p>
-              <div class="tier-deliverables">
-                <span class="tier-deliverables-title">Scope & Deliverables</span>
-                <ul>
-                  <li>Private silhouette and body-architecture consultation</li>
-                  <li>Bespoke fitting sessions in Amsterdam, Paris, or London</li>
-                  <li>Direct atelier artisan commissions</li>
-                  <li>Complete day-of-event styling suite</li>
-                </ul>
             <article class="session-step-card">
               <div class="session-step-media">
                 <img src="assets/images/feed-06.jpg" alt="Curated minimalist black leather bag, angular sunglasses, and sculptural chrome object on stone" loading="lazy" style="object-position: 50% 50%;">
                 <span class="session-step-badge">02 // PERSONAL SHOPPING</span>
               </div>
-            </div>
               <div class="session-step-body">
                 <h4>Guided Shopping &amp; Piece Sourcing</h4>
                 <p>
@@ -1054,26 +949,11 @@
               </div>
             </article>
 
-            <div class="service-tier-card">
-              <span class="tier-badge">TIER 03 // BRAND IDENTITY</span>
-              <h4>Brand Silhouette & Capsule Styling</h4>
-              <p>
-                Consulting for fashion labels, jewelry houses, and leather ateliers to establish their core styling DNA and signature silhouettes.
-              </p>
-              <div class="tier-deliverables">
-                <span class="tier-deliverables-title">Scope & Deliverables</span>
-                <ul>
-                  <li>Foundational styling guidelines & lookbooks</li>
-                  <li>Seasonal pairing schedules & fabric interaction notes</li>
-                  <li>Showroom presentation choreography</li>
-                  <li>Commercial styling playbook for in-house teams</li>
-                </ul>
             <article class="session-step-card">
               <div class="session-step-media">
                 <img src="assets/images/feed-09.jpg" alt="Client styled in a floor-length sculpted black wool evening coat framed under a stone archway" loading="lazy" style="object-position: 50% 25%;">
                 <span class="session-step-badge">03 // EVENTS &amp; VIP</span>
               </div>
-            </div>
               <div class="session-step-body">
                 <h4>Private Events, Red Carpet &amp; Shoots</h4>
                 <p>
@@ -1109,7 +989,6 @@
 
         <!-- Curated Archive Showcase -->
         <div class="discipline-gallery">
-          <h3 class="discipline-section-title">Selected Styling Case Studies</h3>
           <div class="session-walkthrough-header">
             <span class="small-label">From the Archive</span>
             <h3 class="discipline-section-title mt-3">Selected Styling Works</h3>
@@ -1126,7 +1005,6 @@
               <img src="instagram/meauxsvision/images/CoITMmjtXDQ.jpg" alt="Jacquemus styling" loading="lazy">
               <div class="gallery-overlay">
                 <h5>Jacquemus Session</h5>
-                <span>Silhouette Architecture</span>
                 <span>Silhouette Direction</span>
               </div>
             </div>
@@ -1134,7 +1012,6 @@
               <img src="instagram/meauxsvision/images/DTpuNcKjeUN.jpg" alt="Unidentified" loading="lazy">
               <div class="gallery-overlay">
                 <h5>Unidentified</h5>
-                <span>Styling & Photography Study</span>
                 <span>Styling &amp; Photography</span>
               </div>
             </div>
@@ -1149,7 +1026,6 @@
               <img src="instagram/meauxsvision/images/C7b4UpfNrcR.jpg" alt="Larissa Bruin in Milos" loading="lazy">
               <div class="gallery-overlay">
                 <h5>Milos Series</h5>
-                <span>Larissa Bruin · Tactile Styling</span>
                 <span>Larissa Bruin · Destination Styling</span>
               </div>
             </div>
@@ -1166,13 +1042,9 @@
         <!-- Commission CTA Banner -->
         <div class="discipline-cta-banner">
           <div class="discipline-cta-text">
-            <h3>Commission Styling Direction</h3>
-            <p>Retain Meaux for editorial shoots, red-carpet appearances, or brand silhouette identity consulting.</p>
             <h3>Book a Styling Session</h3>
             <p>Available for personal wardrobe edits, shopping sessions, private events, and fashion house campaigns in Amsterdam and worldwide.</p>
           </div>
-          <button type="button" data-tab-target="enquiries" data-preselect-discipline="Styling" class="luxury-btn">
-            <span>Initiate Styling Dossier ↗</span>
           <button type="button" data-tab-target="enquiries" data-preselect-discipline="Personal Styling & Wardrobe" class="luxury-btn">
             <span>Enquire About Styling ↗</span>
           </button>
@@ -1458,15 +1330,12 @@
             </div>
             <div class="about-body-text">
               <p>
-                I founded Meaux out of an obsession with how image, silhouette, and digital presence interact to produce emotion. Operating from Amsterdam and commissioning worldwide, my practice lives at the intersection where photography, fashion styling, and digital curation collapse into a single coherent universe.
                 I founded Meaux out of an obsession with how image, silhouette, and digital presence work together to create emotion. Working from Amsterdam and commissioning worldwide, my practice brings photography, personal &amp; editorial styling, and social media curation under one roof.
               </p>
               <p>
-                I believe true luxury is not excessive ornamentation, but radical restraint. It is knowing exactly when to hold back and when to strike with an uncompromising visual gesture. Trained by raw instinct rather than rigid dogma, I treat every project—whether an intimate portrait, a fashion lookbook, or an entire brand ecosystem—as an emotional atmosphere.
                 True luxury isn’t excess—it’s radical restraint. Knowing what to strip away so character, proportion, and quiet confidence stand forward. Whether editing a private wardrobe, shooting an intimate portrait, or directing a fashion campaign, every project begins with a feeling and finds its sharpest form.
               </p>
               <p>
-                Why practice all three disciplines simultaneously? Because they are not separate silos—they are different scales of the exact same question: <em>How does it feel to inhabit this world?</em> When the same creative eye styles the clothes, directs the photograph, and curates the feed, the result is an unmistakable, unbreakable world.
                 When the same creative eye styles the clothes, directs the photograph, and curates the feed, the result is a cohesive, unmistakable world.
               </p>
             </div>
@@ -1488,11 +1357,6 @@
 
           <div class="values-grid mt-8">
             <div class="value-card">
-              <span class="value-num">01 // PRINCIPLE</span>
-              <h3>Radical Restraint</h3>
-              <p>
-                We eliminate anything that merely decorates. Only when superficial distractions are removed does genuine character, weight, and presence reveal itself.
-              </p>
               <div class="value-card-media">
                 <img src="instagram/meauxsvision/images/DALs3rUt3RC.jpg" alt="Minimalist sculptural hat study illustrating radical restraint" loading="lazy" style="object-position: 50% 42%;">
               </div>
@@ -1506,11 +1370,6 @@
             </div>
 
             <div class="value-card">
-              <span class="value-num">02 // PRINCIPLE</span>
-              <h3>Tactile Truth</h3>
-              <p>
-                Whether digital or physical, every work must possess sensory weight. We work with authentic materials—shadow, leather, raw stone, polished chrome, and unfiltered human presence.
-              </p>
               <div class="value-card-media">
                 <img src="assets/images/feed-03.jpg" alt="Close-up of silver rings resting on black wool lapel and lambskin sleeve" loading="lazy" style="object-position: 50% 50%;">
               </div>
@@ -1524,11 +1383,6 @@
             </div>
 
             <div class="value-card">
-              <span class="value-num">03 // PRINCIPLE</span>
-              <h3>Singular Authorship</h3>
-              <p>
-                A unified vision cannot be achieved by committee. Every campaign, lookbook, and space directed by Meaux is guided from inception to delivery by Mohammed’s singular aesthetic compass.
-              </p>
               <div class="value-card-media">
                 <img src="assets/images/session-shoot.jpg" alt="Mohammed directing and photographing a look on set" loading="lazy" style="object-position: 50% 25%;">
               </div>
@@ -1578,18 +1432,13 @@
         <div class="enquiries-layout">
           <!-- Sidebar -->
           <div class="enquiries-sidebar">
-            <div>
             <div class="enquiries-intro-block">
               <span class="small-label">Bespoke Commissions</span>
-              <h2 class="mt-6">Initiate a dialogue.</h2>
               <h2 class="mt-4">Initiate a dialogue.</h2>
               <p class="mt-4">
                 Meaux accepts a limited number of personal and commercial commissions each quarter across Photography, Styling, and Social Media Curation. Every inquiry is reviewed personally by Mohammed.
               </p>
             </div>
-            <p>
-              Meaux accepts a limited number of private and commercial commissions each quarter across Photography, Styling, and Social Media Curation. Every inquiry is reviewed personally by Mohammed.
-            </p>
             
             <div class="enquiries-meta-list">
               <div class="enquiries-meta-item">
@@ -1650,7 +1499,6 @@
 
                 <!-- Discipline Selection Chips -->
                 <div class="form-group full-width">
-                  <span class="form-label">Disciplines of Interest (Select All Applicable)</span>
                   <span class="form-label">Services of Interest (Select All Applicable)</span>
                   <div class="discipline-chips-wrap">
                     <label class="chip-label">
@@ -1658,8 +1506,6 @@
                       <span class="chip-ui">Photography</span>
                     </label>
                     <label class="chip-label">
-                      <input type="checkbox" name="disciplines" value="Styling">
-                      <span class="chip-ui">Styling</span>
                       <input type="checkbox" name="disciplines" value="Personal Styling & Wardrobe">
                       <span class="chip-ui">Personal Styling &amp; Wardrobe</span>
                     </label>
@@ -1673,7 +1519,6 @@
                     </label>
                     <label class="chip-label">
                       <input type="checkbox" name="disciplines" value="Full Atelier Creative Direction">
-                      <span class="chip-ui">Full Atelier Direction (All Disciplines)</span>
                       <span class="chip-ui">Full Atelier Direction</span>
                     </label>
                   </div>
@@ -1719,14 +1564,12 @@
 <script src="assets/portfolio-data.js"></script>
 <script src="assets/vault.js?v=3"></script>
 <script src="assets/materials.js"></script>
-<script src="assets/site.js?v=2"></script>
-<script src="assets/site.js?v=4"></script>
+<script src="assets/site.js?v=5"></script>
 <script src="assets/atelier-fluid.js"></script>
 <script src="assets/chrome-spikes.js"></script>
 <!-- Content management: public content loader + lazily loaded admin editor -->
 <script src="assets/cms/default-media.js"></script>
 <script src="assets/cms/config.js"></script>
-<script type="module" src="assets/cms/runtime.js?v=2"></script>
 <script type="module" src="assets/cms/runtime.js?v=3"></script>
 </body>
 </html>

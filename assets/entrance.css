@@ -1,5 +1,4 @@
 /* One composition: quiet lambskin, a magnetic aperture, and the wordmark. */
-#leather-vault{isolation:isolate;background:#080808;transform-style:preserve-3d}
 #leather-vault{isolation:isolate;background:#080808;transform-style:preserve-3d;touch-action:none}
 #leather-vault .leather-panel{border:0!important;outline:none!important;background:radial-gradient(ellipse at 50% 40%,#171717,#090909 75%);background-size:200% 200%;box-shadow:none}
 #leather-vault #vault-panel-0{top:0;left:0;width:calc(50% + 2px);height:calc(50% + 2px);background-position:0 0}
@@ -213,16 +212,6 @@
 @keyframes atelier-arrival{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
 .material-fallback.is-entering:before{opacity:0;transform:scale(2.5);transition:transform 1.3s ease,opacity 1.3s ease}
 @media(max-width:680px){
-  #leather-vault #vault-center-plate{width:93vw!important;height:87dvh!important;padding:0 54px!important}
-  #vault-center-plate .vault-topbar{height:44px}
-  #vault-center-plate .vault-content{width:94vw}
-  #vault-center-plate .vault-logo{font-size:8.5vw}
-  #vault-center-plate .vault-content>p:first-of-type{font-size:7px;margin-bottom:10px;letter-spacing:.14em}
-  #vault-center-plate .vault-content>div.mt-7{margin-top:14px}
-  #vault-center-plate #enter-atelier-btn{font-size:8px;padding:10px 14px}
-  #vault-center-plate .vault-content>p:last-child{font-size:7px;max-width:150px;margin-top:10px;line-height:1.5}
-  #vault-center-plate .vault-bottomline{justify-content:center;font-size:7px}
-  #vault-center-plate .screw-assembly,#vault-center-plate .screw-canvas{width:44px;height:44px}
   #leather-vault #vault-center-plate{
     width:calc(100vw - 24px)!important;
     height:calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 28px)!important;
@@ -239,10 +228,6 @@
   #vault-center-plate .vault-bottomline{justify-content:center;font-size:9px}
   #vault-center-plate .screw-assembly,#vault-center-plate .screw-canvas{width:48px;height:48px}
   #vault-center-plate>div.group{top:auto;bottom:auto;left:auto;right:auto}
-  #vault-center-plate>div.group:nth-of-type(5){top:0;left:0}
-  #vault-center-plate>div.group:nth-of-type(6){top:0;right:0}
-  #vault-center-plate>div.group:nth-of-type(7){bottom:0;left:0}
-  #vault-center-plate>div.group:nth-of-type(8){bottom:0;right:0}
   #vault-center-plate>div.group:nth-of-type(5){top:4px;left:4px}
   #vault-center-plate>div.group:nth-of-type(6){top:4px;right:4px}
   #vault-center-plate>div.group:nth-of-type(7){bottom:4px;left:4px}
