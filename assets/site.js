@@ -354,9 +354,66 @@ function stepProject(direction) {
 
 /* ==========================================
    TAB NAVIGATION SYSTEM (pages are discovered from the DOM)
+   TAB NAVIGATION & MOBILE DRAWER SYSTEM
    ========================================== */
 let activeTab = 'atelier';
 const getTabs = () => Array.from(document.querySelectorAll('.tab-view')).map(v => v.id.replace(/^view-/, ''));
+
+function syncMobileNav() {
+  const list = document.getElementById('mobile-nav-list');
+  const desktopNav = document.querySelector('.atelier-tabs');
+  if (!list || !desktopNav) return;
+
+  const buttons = Array.from(desktopNav.querySelectorAll('.tab-btn[data-tab]'))
+    .filter(btn => btn.style.display !== 'none');
+
+  list.replaceChildren();
+  buttons.forEach((btn, idx) => {
+    const tabId = btn.dataset.tab;
+    const rawLabel = (btn.textContent || '').replace(/↗/g, '').trim();
+    const isActive = tabId === activeTab;
+    const item = document.createElement('button');
+    item.type = 'button';
+    item.className = `mobile-nav-item${isActive ? ' active' : ''}`;
+    item.dataset.mobileTab = tabId;
+    item.setAttribute('aria-current', isActive ? 'page' : 'false');
+    item.innerHTML = `
+      <span class="mobile-nav-item-main">
+        <span class="mobile-nav-num">${String(idx + 1).padStart(2, '0')}</span>
+        <span class="mobile-nav-label">${escapeHTML(rawLabel)}</span>
+      </span>
+      <span class="mobile-nav-arrow" aria-hidden="true">${tabId === 'enquiries' ? '↗' : '→'}</span>
+    `;
+    list.appendChild(item);
+  });
+
+  const mobileEnq = document.querySelector('.mobile-enquire-btn');
+  if (mobileEnq) mobileEnq.classList.toggle('active', activeTab === 'enquiries');
+}
+
+function openMobileNav() {
+  const drawer = document.getElementById('mobile-nav-drawer');
+  const toggle = document.getElementById('mobile-menu-toggle');
+  if (!drawer) return;
+  syncMobileNav();
+  drawer.hidden = false;
+  drawer.setAttribute('aria-hidden', 'false');
+  if (toggle) toggle.setAttribute('aria-expanded', 'true');
+  document.body.classList.add('mobile-nav-open');
+  const closeBtn = document.getElementById('mobile-menu-close');
+  if (closeBtn) closeBtn.focus({ preventScroll: true });
+}
+
+function closeMobileNav(restoreFocus = false) {
+  const drawer = document.getElementById('mobile-nav-drawer');
+  const toggle = document.getElementById('mobile-menu-toggle');
+  if (!drawer || drawer.hidden) return;
+  drawer.hidden = true;
+  drawer.setAttribute('aria-hidden', 'true');
+  if (toggle) toggle.setAttribute('aria-expanded', 'false');
+  document.body.classList.remove('mobile-nav-open');
+  if (restoreFocus && toggle) toggle.focus({ preventScroll: true });
+}
 
 function switchTab(tabId, shouldScroll = true, preselectedDiscipline = null) {
   const tabs = getTabs();
@@ -364,6 +421,7 @@ function switchTab(tabId, shouldScroll = true, preselectedDiscipline = null) {
     tabId = tabs.includes(activeTab) ? activeTab : (tabs[0] || 'atelier');
   }
   activeTab = tabId;
+  closeMobileNav(false);
 
   // Update tab buttons
   document.querySelectorAll('.tab-btn[data-tab]').forEach(btn => {
@@ -371,6 +429,9 @@ function switchTab(tabId, shouldScroll = true, preselectedDiscipline = null) {
     btn.classList.toggle('active', isTarget);
     btn.setAttribute('aria-selected', isTarget ? 'true' : 'false');
   });
+
+  // Keep mobile nav active indicator synced
+  syncMobileNav();
 
   // Update tab panels
   document.querySelectorAll('.tab-view').forEach(viewEl => {
@@ -393,8 +454,11 @@ function switchTab(tabId, shouldScroll = true, preselectedDiscipline = null) {
   // Smoothly scroll to main view top
   if (shouldScroll) {
     const mainContent = document.getElementById('main-content');
+    const header = document.querySelector('.site-header');
+    const headerH = header ? header.offsetHeight : 80;
     if (mainContent) {
       const topOffset = mainContent.getBoundingClientRect().top + window.scrollY - 90;
+      const topOffset = mainContent.getBoundingClientRect().top + window.scrollY - headerH;
       window.scrollTo({
         top: Math.max(0, topOffset),
         behavior: reducedMotion.matches ? 'instant' : 'smooth'
@@ -562,6 +626,37 @@ function replayIntro() {
 const isEditing = () => document.body.classList.contains('cms-editing');
 
 document.addEventListener('click', (event) => {
+  // Mobile menu drawer controls
+  if (event.target.closest('#mobile-menu-toggle')) {
+    const drawer = document.getElementById('mobile-nav-drawer');
+    if (drawer && !drawer.hidden) closeMobileNav(true);
+    else openMobileNav();
+    return;
+  }
+  if (event.target.closest('#mobile-menu-close')) {
+    closeMobileNav(true);
+    return;
+  }
+  if (event.target.closest('#mobile-replay-intro')) {
+    closeMobileNav(false);
+    replayIntro();
+    return;
+  }
+  const mobileTabBtn = event.target.closest('.mobile-nav-item[data-mobile-tab]');
+  if (mobileTabBtn) {
+    switchTab(mobileTabBtn.dataset.mobileTab, true);
+    return;
+  }
+
+  // Touch tap-to-reveal label on curated Instagram tiles
+  const igTile = event.target.closest('.ig-tile');
+  if (igTile && matchMedia('(hover: none)').matches && !isEditing()) {
+    const wasTapped = igTile.classList.contains('is-tapped');
+    document.querySelectorAll('.ig-tile.is-tapped').forEach(t => t.classList.remove('is-tapped'));
+    if (!wasTapped) igTile.classList.add('is-tapped');
+    return;
+  }
+
   // CTA buttons that target a tab take priority over nav buttons
   const target = event.target.closest('[data-tab-target]');
   if (target) {
@@ -660,6 +755,23 @@ if (dialog) {
     document.body.classList.remove('dialog-open');
     returnFocus?.focus({preventScroll:true});
   });
+
+  // Touch swipe left/right navigation inside lightbox dialog
+  let swipeStartX = 0;
+  let swipeStartY = 0;
+  dialog.addEventListener('touchstart', (e) => {
+    if (e.touches.length !== 1) return;
+    swipeStartX = e.touches[0].clientX;
+    swipeStartY = e.touches[0].clientY;
+  }, { passive: true });
+  dialog.addEventListener('touchend', (e) => {
+    if (!e.changedTouches.length) return;
+    const dx = e.changedTouches[0].clientX - swipeStartX;
+    const dy = e.changedTouches[0].clientY - swipeStartY;
+    if (Math.abs(dx) > 54 && Math.abs(dx) > Math.abs(dy) * 1.4) {
+      stepProject(dx < 0 ? 1 : -1);
+    }
+  }, { passive: true });
 }
 
 const prevBtn = document.getElementById('previous-project');
@@ -683,6 +795,11 @@ document.querySelectorAll('.screw-assembly').forEach((button, index) => {
 });
 
 document.addEventListener('keydown', event => {
+  const mobileDrawer = document.getElementById('mobile-nav-drawer');
+  if (mobileDrawer && !mobileDrawer.hidden && event.key === 'Escape') {
+    closeMobileNav(true);
+    return;
+  }
   if (dialog && dialog.open) {
     if (event.key === 'ArrowLeft') stepProject(-1);
     if (event.key === 'ArrowRight') stepProject(1);
@@ -793,7 +910,11 @@ document.addEventListener('meaux:tab', (event) => {
   }
 });
 
+// Keep mobile drawer synced whenever CMS modifies pages/navigation
+document.addEventListener('meaux:nav-synced', syncMobileNav);
+
 // Initialize components
+syncMobileNav();
 renderPortfolio();
 renderPhotoBento(activePhotoStyle, true);
 initScrewCanvases();

@@ -43,6 +43,7 @@ export const EDITABLE_TEXT_SELECTORS = [
   '.ig-handle', '.ig-topbar-meta', '.ig-bio-name', '.ig-bio-text',
   '.ig-profile-stats strong', '.ig-profile-stats span',
   '.ig-highlight > span', '.ig-tile-hover',
+  '.discipline-card-tags span', '.about-fact-label', '.about-fact-value',
   '.services summary > span:first-child', '.services details > div > span',
   '.site-footer > span', '.site-footer small > span',
   '[data-cms]', '[data-cms-key]'
@@ -60,6 +61,8 @@ export const EDITABLE_IMAGE_SELECTORS = [
   '.ig-highlight-ring img',
   '.ig-tile img',
   '.session-step-media img',
+  '.discipline-card-media img',
+  '.value-card-media img',
   '.cms-dynamic-block img'
 ];
 
@@ -567,6 +570,8 @@ class CmsRuntime {
         main.appendChild(view);
       }
     });
+
+    document.dispatchEvent(new CustomEvent('meaux:nav-synced'));
   }
 
   applyPerPageSeo(doc, activeTab) {

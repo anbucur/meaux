@@ -1,5 +1,6 @@
 /* One composition: quiet lambskin, a magnetic aperture, and the wordmark. */
 #leather-vault{isolation:isolate;background:#080808;transform-style:preserve-3d}
+#leather-vault{isolation:isolate;background:#080808;transform-style:preserve-3d;touch-action:none}
 #leather-vault .leather-panel{border:0!important;outline:none!important;background:radial-gradient(ellipse at 50% 40%,#171717,#090909 75%);background-size:200% 200%;box-shadow:none}
 #leather-vault #vault-panel-0{top:0;left:0;width:calc(50% + 2px);height:calc(50% + 2px);background-position:0 0}
 #leather-vault #vault-panel-1{top:0;right:0;width:calc(50% + 2px);height:calc(50% + 2px);background-position:100% 0}
@@ -222,10 +223,30 @@
   #vault-center-plate .vault-content>p:last-child{font-size:7px;max-width:150px;margin-top:10px;line-height:1.5}
   #vault-center-plate .vault-bottomline{justify-content:center;font-size:7px}
   #vault-center-plate .screw-assembly,#vault-center-plate .screw-canvas{width:44px;height:44px}
+  #leather-vault #vault-center-plate{
+    width:calc(100vw - 24px)!important;
+    height:calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 28px)!important;
+    padding:env(safe-area-inset-top, 4px) 16px env(safe-area-inset-bottom, 4px)!important;
+  }
+  #vault-center-plate .vault-topbar{height:52px;padding:0 54px!important;font-size:10px;letter-spacing:.14em}
+  #vault-center-plate #vault-sound-btn{min-height:44px;padding:8px 6px}
+  #vault-center-plate .vault-content{width:88vw}
+  #vault-center-plate .vault-logo{font-size:clamp(32px,10vw,52px);line-height:1}
+  #vault-center-plate .vault-content>p:first-of-type{font-size:9.5px;margin-bottom:14px;letter-spacing:.2em;text-shadow:0 2px 12px rgba(0,0,0,.95)}
+  #vault-center-plate .vault-content>div.mt-7{margin-top:22px}
+  #vault-center-plate #enter-atelier-btn{font-size:10.5px;letter-spacing:.16em;padding:14px 22px;min-height:46px}
+  #vault-center-plate .vault-content>p:last-child{font-size:9.5px;letter-spacing:.1em;max-width:240px;margin-top:16px;line-height:1.55;color:#e4e4e7;text-shadow:0 2px 14px rgba(0,0,0,.98),0 0 6px rgba(0,0,0,.95)}
+  #vault-center-plate .vault-bottomline{justify-content:center;font-size:9px}
+  #vault-center-plate .screw-assembly,#vault-center-plate .screw-canvas{width:48px;height:48px}
   #vault-center-plate>div.group{top:auto;bottom:auto;left:auto;right:auto}
   #vault-center-plate>div.group:nth-of-type(5){top:0;left:0}
   #vault-center-plate>div.group:nth-of-type(6){top:0;right:0}
   #vault-center-plate>div.group:nth-of-type(7){bottom:0;left:0}
   #vault-center-plate>div.group:nth-of-type(8){bottom:0;right:0}
+  #vault-center-plate>div.group:nth-of-type(5){top:4px;left:4px}
+  #vault-center-plate>div.group:nth-of-type(6){top:4px;right:4px}
+  #vault-center-plate>div.group:nth-of-type(7){bottom:4px;left:4px}
+  #vault-center-plate>div.group:nth-of-type(8){bottom:4px;right:4px}
+  #leather-vault .vault-skip{bottom:calc(16px + env(safe-area-inset-bottom, 0px));font-size:10px;padding:10px 16px}
 }
 @media(max-height:600px){#vault-center-plate .vault-logo{font-size:clamp(28px,6.5vmin,50px)}#vault-center-plate .vault-content>p:first-of-type{margin-bottom:15px}#vault-center-plate .vault-content>div.mt-7{margin-top:20px}}

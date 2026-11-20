@@ -1956,3 +1956,19 @@
   margin-bottom: 6px;
   font-size: 11px;
 }
+
+@media (max-width: 768px) {
+  #cms-admin-bar {
+    bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+    max-width: calc(100vw - 16px);
+    padding: 6px 10px;
+  }
+  #cms-admin-drawer {
+    width: 100vw;
+    max-width: 100vw;
+    height: 100dvh;
+  }
+  #cms-admin-drawer.expanded {
+    width: 100vw;
+  }
+}

@@ -46,6 +46,7 @@ window.MEAUX_DEFAULT_CONTENT = {
     kicker: 'A WORLD BY MEAUX',
     tagline: 'IMAGE. IDENTITY. SPACE.',
     hint: 'Move your cursor. Disturb the surface.',
+    hint: 'Touch or move to disturb the surface.',
     motto: 'SOFT FORM. SHARP INSTINCT.',
     enterLabel: 'ENTER THE ATELIER',
     statusLabel: 'READY TO EXPLORE',
