@@ -6,6 +6,9 @@ const EMAIL_DOMAIN = (process.env.RESEND_EMAIL_DOMAIN || 'alexnbucur.space').tri
 const FROM_ADDRESS = `MEAUX Atelier <atelier@${EMAIL_DOMAIN}>`;
 const SITE_URL = 'https://www.alexnbucur.space';
 const INSTAGRAM_URL = 'https://www.instagram.com/meauxsvision/';
+const WORDMARK_IMG = `${SITE_URL}/assets/images/email-meaux-wordmark.png`;
+const ICON_WEB_IMG = `${SITE_URL}/assets/images/email-icon-web.png`;
+const ICON_IG_IMG = `${SITE_URL}/assets/images/email-icon-instagram.png`;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function escapeHtml(value) {
@@ -133,9 +136,29 @@ function renderDisciplinePills(disciplines) {
   return list
     .map(
       (item) =>
-        `<span style="display:inline-block;margin:0 8px 8px 0;padding:6px 12px;background-color:#121216;border:1px solid #2e2e36;color:#f4f4f2;font-family:'Courier New',Courier,monospace;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;line-height:1.2;">${escapeHtml(item)}</span>`
+        `<span style="display:inline-block;margin:0 6px 8px 0;padding:6px 11px;background-color:#131317;border:1px solid #2c2c34;color:#f4f4f2;font-family:'Space Mono','Courier New',Courier,monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;line-height:1.25;white-space:nowrap;">${escapeHtml(item)}</span>`
     )
     .join('');
+}
+
+function renderSpecRows(rows) {
+  const items = rows
+    .map((row, idx) => {
+      const border = idx < rows.length - 1 ? 'border-bottom:1px solid #1d1d23;' : '';
+      return `
+        <tr>
+          <td style="padding:13px 16px;${border}">
+            <div style="font-family:'Space Mono','Courier New',Courier,monospace;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:#7c7c86;margin-bottom:5px;">${escapeHtml(row.label)}</div>
+            <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:14px;line-height:1.45;color:#f4f4f2;word-break:break-word;">${row.valueHtml}</div>
+          </td>
+        </tr>`;
+    })
+    .join('');
+
+  return `
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#09090b" style="width:100%;border:1px solid #1f1f26;background-color:#09090b;margin-bottom:24px;">
+      ${items}
+    </table>`;
 }
 
 function buildEmailShell({ preheader, refId, timestamp, kicker, headline, introHtml, bodyHtml, ctaHtml, footerNote }) {
@@ -147,29 +170,45 @@ function buildEmailShell({ preheader, refId, timestamp, kicker, headline, introH
   <meta name="color-scheme" content="dark">
   <meta name="supported-color-schemes" content="dark">
   <title>${escapeHtml(kicker)} — MEAUX Atelier</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;1,400;1,600&family=Space+Mono:wght@400;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  <style type="text/css">
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;1,400;1,600&family=Space+Mono:wght@400;700&family=Syne:wght@700;800&display=swap');
+    body, table, td { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+    img { -ms-interpolation-mode: bicubic; border: 0; outline: none; text-decoration: none; }
+    @media only screen and (max-width: 600px) {
+      .email-outer { padding: 14px 10px 28px 10px !important; }
+      .email-pad { padding-left: 20px !important; padding-right: 20px !important; }
+      .email-header-pad { padding: 20px 20px 18px 20px !important; }
+      .email-hero-pad { padding: 26px 20px 22px 20px !important; }
+      .email-h1 { font-size: 27px !important; line-height: 1.18 !important; }
+      .wordmark-img { height: 20px !important; width: auto !important; }
+      .cta-btn { display: block !important; width: 100% !important; box-sizing: border-box !important; text-align: center !important; }
+    }
+  </style>
 </head>
 <body bgcolor="#050506" style="margin:0;padding:0;background-color:#050506;color:#f4f4f2;-webkit-font-smoothing:antialiased;">
   <div style="display:none;max-height:0;overflow:hidden;opacity:0;mso-hide:all;">${escapeHtml(preheader)}</div>
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#050506" style="background-color:#050506;width:100%;">
     <tr>
-      <td align="center" style="padding:36px 16px 48px 16px;">
-        <table role="presentation" width="620" cellpadding="0" cellspacing="0" border="0" bgcolor="#0c0c0f" style="width:100%;max-width:620px;background-color:#0c0c0f;border:1px solid #232329;">
+      <td align="center" class="email-outer" style="padding:32px 16px 44px 16px;">
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" bgcolor="#0e0e11" style="width:100%;max-width:600px;background-color:#0e0e11;border:1px solid #24242b;">
           <!-- Chrome hairline accent -->
           <tr>
             <td height="2" bgcolor="#d4d4d8" style="height:2px;line-height:2px;font-size:2px;background:#d4d4d8;background-image:linear-gradient(90deg,#1a1a20 0%,#f4f4f2 50%,#1a1a20 100%);">&nbsp;</td>
           </tr>
 
-          <!-- Top Atelier Wordmark & Dossier Reference -->
+          <!-- Top Atelier Wordmark & Dossier Ref -->
           <tr>
-            <td style="padding:26px 32px 22px 32px;border-bottom:1px solid #1e1e24;">
+            <td class="email-header-pad" style="padding:24px 30px 20px 30px;border-bottom:1px solid #1f1f26;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                 <tr>
                   <td align="left" valign="middle">
-                    <a href="${SITE_URL}" style="color:#ffffff;text-decoration:none;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:22px;font-weight:800;letter-spacing:-0.04em;text-transform:uppercase;">MEAUX<span style="font-weight:400;color:#d4d4d8;">&#10035;</span></a>
+                    <a href="${SITE_URL}" style="color:#ffffff;text-decoration:none;font-family:'Syne','Helvetica Neue',Arial,sans-serif;font-size:22px;font-weight:800;letter-spacing:-0.07em;text-transform:uppercase;white-space:nowrap;">
+                      <img src="${WORDMARK_IMG}" alt="MEAUX&#10035;" height="24" class="wordmark-img" style="display:block;border:0;height:24px;width:auto;max-width:160px;color:#ffffff;font-family:'Syne','Helvetica Neue',Arial,sans-serif;font-size:22px;font-weight:800;letter-spacing:-0.07em;">
+                    </a>
                   </td>
-                  <td align="right" valign="middle" style="font-family:'Courier New',Courier,monospace;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#8e8e93;line-height:1.5;">
-                    <div>DOSSIER // ${escapeHtml(refId)}</div>
-                    <div style="color:#66666d;">${escapeHtml(timestamp)}</div>
+                  <td align="right" valign="middle" style="white-space:nowrap;">
+                    <span style="display:inline-block;padding:5px 10px;border:1px solid #27272f;background-color:#131318;font-family:'Space Mono','Courier New',Courier,monospace;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#a1a1aa;white-space:nowrap;">${escapeHtml(refId)}</span>
                   </td>
                 </tr>
               </table>
@@ -178,11 +217,11 @@ function buildEmailShell({ preheader, refId, timestamp, kicker, headline, introH
 
           <!-- Editorial Hero Header -->
           <tr>
-            <td style="padding:34px 32px 26px 32px;border-bottom:1px solid #1e1e24;">
-              <div style="font-family:'Courier New',Courier,monospace;font-size:10px;letter-spacing:0.24em;text-transform:uppercase;color:#9a9aa2;margin-bottom:12px;">
-                ${escapeHtml(kicker)}
+            <td class="email-hero-pad" style="padding:30px 30px 24px 30px;border-bottom:1px solid #1f1f26;">
+              <div style="font-family:'Space Mono','Courier New',Courier,monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:#8e8e98;margin-bottom:12px;line-height:1.5;">
+                ${escapeHtml(kicker)} &middot; <span style="color:#666670;">${escapeHtml(timestamp)}</span>
               </div>
-              <h1 style="margin:0 0 14px 0;font-family:Georgia,'Times New Roman',serif;font-size:32px;font-weight:400;font-style:italic;line-height:1.18;color:#ffffff;letter-spacing:-0.01em;">
+              <h1 class="email-h1" style="margin:0 0 14px 0;font-family:'Cormorant Garamond',Georgia,'Times New Roman',serif;font-size:34px;font-weight:400;font-style:italic;line-height:1.15;color:#ffffff;letter-spacing:-0.01em;">
                 ${headline}
               </h1>
               ${introHtml}
@@ -191,34 +230,42 @@ function buildEmailShell({ preheader, refId, timestamp, kicker, headline, introH
 
           <!-- Main Content -->
           <tr>
-            <td style="padding:28px 32px 30px 32px;">
+            <td class="email-pad" style="padding:26px 30px 28px 30px;">
               ${bodyHtml}
             </td>
           </tr>
 
           <!-- CTA Row -->
           <tr>
-            <td style="padding:0 32px 34px 32px;">
+            <td class="email-pad" style="padding:0 30px 32px 30px;">
               ${ctaHtml}
             </td>
           </tr>
 
-          <!-- Architectural Footer -->
+          <!-- Architectural Footer with Website & Instagram Icons -->
           <tr>
-            <td style="padding:22px 32px 26px 32px;border-top:1px solid #1e1e24;background-color:#08080a;">
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+            <td class="email-pad" align="center" style="padding:24px 30px 28px 30px;border-top:1px solid #1f1f26;background-color:#09090b;">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:0 auto 18px auto;">
                 <tr>
-                  <td align="left" style="font-family:'Courier New',Courier,monospace;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:#71717a;line-height:1.8;">
-                    <div style="color:#a1a1aa;">SOFT FORM. SHARP INSTINCT.</div>
-                    <div>MEAUX ATELIER · AMSTERDAM · WORLDWIDE</div>
-                    ${footerNote ? `<div style="margin-top:6px;color:#52525b;">${escapeHtml(footerNote)}</div>` : ''}
+                  <td align="center" valign="middle" style="padding:0 6px;">
+                    <a href="${SITE_URL}" style="display:inline-block;padding:8px 14px;border:1px solid #26262e;background-color:#111115;color:#e4e4e7;text-decoration:none;font-family:'Space Mono','Courier New',Courier,monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;white-space:nowrap;">
+                      <img src="${ICON_WEB_IMG}" alt="Website" width="14" height="14" style="display:inline-block;vertical-align:-2px;margin-right:7px;border:0;width:14px;height:14px;">Website
+                    </a>
                   </td>
-                  <td align="right" valign="top" style="font-family:'Courier New',Courier,monospace;font-size:9px;letter-spacing:0.16em;text-transform:uppercase;line-height:1.8;">
-                    <div><a href="${SITE_URL}" style="color:#d4d4d8;text-decoration:none;">alexnbucur.space &#8599;</a></div>
-                    <div><a href="${INSTAGRAM_URL}" style="color:#8e8e93;text-decoration:none;">@meauxsvision &#8599;</a></div>
+                  <td align="center" valign="middle" style="padding:0 6px;">
+                    <a href="${INSTAGRAM_URL}" style="display:inline-block;padding:8px 14px;border:1px solid #26262e;background-color:#111115;color:#e4e4e7;text-decoration:none;font-family:'Space Mono','Courier New',Courier,monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;white-space:nowrap;">
+                      <img src="${ICON_IG_IMG}" alt="Instagram" width="14" height="14" style="display:inline-block;vertical-align:-2px;margin-right:7px;border:0;width:14px;height:14px;">@meauxsvision
+                    </a>
                   </td>
                 </tr>
               </table>
+              <div style="font-family:'Space Mono','Courier New',Courier,monospace;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:#a1a1aa;line-height:1.8;">
+                SOFT FORM. SHARP INSTINCT.
+              </div>
+              <div style="font-family:'Space Mono','Courier New',Courier,monospace;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:#666670;line-height:1.8;">
+                MEAUX ATELIER &middot; AMSTERDAM &middot; WORLDWIDE
+              </div>
+              ${footerNote ? `<div style="margin-top:10px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:11px;line-height:1.55;color:#5a5a64;">${escapeHtml(footerNote)}</div>` : ''}
             </td>
           </tr>
         </table>
@@ -235,57 +282,32 @@ function buildStudioDossierHtml(data) {
   const replyHref = `mailto:${encodeURIComponent(email)}?subject=${replySubject}`;
 
   const bodyHtml = `
-    <!-- Metadata Specification Grid -->
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #1e1e24;background-color:#09090b;margin-bottom:24px;">
-      <tr>
-        <td width="50%" valign="top" style="padding:16px 18px;border-right:1px solid #1e1e24;border-bottom:1px solid #1e1e24;">
-          <div style="font-family:'Courier New',Courier,monospace;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:#71717a;margin-bottom:6px;">CLIENT / HOUSE</div>
-          <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:14px;font-weight:600;color:#ffffff;">${escapeHtml(name)}</div>
-        </td>
-        <td width="50%" valign="top" style="padding:16px 18px;border-bottom:1px solid #1e1e24;">
-          <div style="font-family:'Courier New',Courier,monospace;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:#71717a;margin-bottom:6px;">DIRECT EMAIL</div>
-          <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:14px;"><a href="mailto:${escapeHtml(email)}" style="color:#f4f4f2;text-decoration:underline;">${escapeHtml(email)}</a></div>
-        </td>
-      </tr>
-      <tr>
-        <td width="50%" valign="top" style="padding:16px 18px;border-right:1px solid #1e1e24;">
-          <div style="font-family:'Courier New',Courier,monospace;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:#71717a;margin-bottom:6px;">TELEPHONE / WHATSAPP</div>
-          <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:14px;color:#d4d4d8;">${phone ? escapeHtml(phone) : '<span style="color:#52525b;">Not provided</span>'}</div>
-        </td>
-        <td width="50%" valign="top" style="padding:16px 18px;">
-          <div style="font-family:'Courier New',Courier,monospace;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:#71717a;margin-bottom:6px;">TARGET TIMELINE</div>
-          <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:14px;color:#d4d4d8;">${escapeHtml(timeline || 'Flexible / To be discussed')}</div>
-        </td>
-      </tr>
-    </table>
+    ${renderSpecRows([
+      { label: 'CLIENT / HOUSE', valueHtml: `<strong style="color:#ffffff;font-weight:600;">${escapeHtml(name)}</strong>` },
+      { label: 'DIRECT EMAIL', valueHtml: `<a href="mailto:${escapeHtml(email)}" style="color:#f4f4f2;text-decoration:underline;">${escapeHtml(email)}</a>` },
+      { label: 'TELEPHONE / WHATSAPP', valueHtml: phone ? escapeHtml(phone) : '<span style="color:#666670;">Not provided</span>' },
+      { label: 'TARGET TIMELINE', valueHtml: escapeHtml(timeline || 'Flexible / To be discussed') }
+    ])}
 
-    <!-- Selected Disciplines -->
     <div style="margin-bottom:24px;">
-      <div style="font-family:'Courier New',Courier,monospace;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:#71717a;margin-bottom:10px;">DISCIPLINES OF INTEREST</div>
+      <div style="font-family:'Space Mono','Courier New',Courier,monospace;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:#7c7c86;margin-bottom:10px;">DISCIPLINES OF INTEREST</div>
       <div>${renderDisciplinePills(disciplines)}</div>
     </div>
 
-    <!-- Creative Brief -->
     <div>
-      <div style="font-family:'Courier New',Courier,monospace;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:#71717a;margin-bottom:10px;">PROJECT VISION &amp; BRIEF</div>
-      <div style="padding:20px 22px;background-color:#08080a;border:1px solid #1e1e24;border-left:2px solid #e4e4e7;">
+      <div style="font-family:'Space Mono','Courier New',Courier,monospace;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:#7c7c86;margin-bottom:10px;">PROJECT VISION &amp; BRIEF</div>
+      <div style="padding:18px 20px;background-color:#09090b;border:1px solid #1f1f26;border-left:2px solid #e4e4e7;">
         ${formatBriefHtml(brief)}
       </div>
     </div>
   `;
 
   const ctaHtml = `
-    <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
       <tr>
-        <td bgcolor="#ffffff" style="background-color:#ffffff;border:1px solid #ffffff;">
-          <a href="${replyHref}" style="display:inline-block;padding:14px 26px;font-family:'Courier New',Courier,monospace;font-size:11px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:#050506;text-decoration:none;">
+        <td align="center" bgcolor="#ffffff" style="background-color:#ffffff;border:1px solid #ffffff;">
+          <a href="${replyHref}" class="cta-btn" style="display:block;padding:15px 24px;font-family:'Space Mono','Courier New',Courier,monospace;font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:#050506;text-decoration:none;text-align:center;white-space:nowrap;">
             REPLY TO ${escapeHtml(name.split(/\s+/)[0] || 'CLIENT').toUpperCase()} &#8599;
-          </a>
-        </td>
-        <td width="14">&nbsp;</td>
-        <td style="border:1px solid #2e2e36;">
-          <a href="${SITE_URL}/#enquiries" style="display:inline-block;padding:14px 20px;font-family:'Courier New',Courier,monospace;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#d4d4d8;text-decoration:none;">
-            OPEN PORTAL &#8599;
           </a>
         </td>
       </tr>
@@ -296,12 +318,12 @@ function buildStudioDossierHtml(data) {
     preheader: `New MEAUX commission dossier from ${name} — ${disciplines.join(', ') || 'General Commission'}`,
     refId,
     timestamp,
-    kicker: 'INCOMING COMMISSION DOSSIER',
+    kicker: 'INCOMING DOSSIER',
     headline: escapeHtml(name),
-    introHtml: `<p style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:14px;line-height:1.65;color:#a1a1aa;">A new commission brief has been submitted through the Meaux Atelier portal. Hit reply directly to respond to <strong style="color:#ffffff;font-weight:600;">${escapeHtml(email)}</strong>.</p>`,
+    introHtml: `<p style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:14px;line-height:1.68;color:#a1a1aa;">A new commission brief has arrived via the Meaux Atelier portal. Reply directly to reach <strong style="color:#ffffff;font-weight:600;">${escapeHtml(email)}</strong>.</p>`,
     bodyHtml,
     ctaHtml,
-    footerNote: 'Delivered via Atelier Meaux Portal · Reply directly to reach the client.'
+    footerNote: 'Reply directly to this email to answer the client.'
   });
 }
 
@@ -310,44 +332,30 @@ function buildClientConfirmationHtml(data) {
   const firstName = name.split(/\s+/)[0] || name;
 
   const bodyHtml = `
-    <div style="margin-bottom:22px;">
-      <div style="font-family:'Courier New',Courier,monospace;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:#71717a;margin-bottom:10px;">YOUR RECORDED SCOPE</div>
+    ${renderSpecRows([
+      { label: 'DOSSIER REFERENCE', valueHtml: `<span style="font-family:'Space Mono','Courier New',Courier,monospace;letter-spacing:0.08em;color:#ffffff;">${escapeHtml(refId)}</span>` },
+      { label: 'TARGET TIMELINE', valueHtml: escapeHtml(timeline || 'To be discussed') }
+    ])}
+
+    <div style="margin-bottom:24px;">
+      <div style="font-family:'Space Mono','Courier New',Courier,monospace;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:#7c7c86;margin-bottom:10px;">YOUR RECORDED SCOPE</div>
       <div>${renderDisciplinePills(disciplines)}</div>
     </div>
 
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #1e1e24;background-color:#09090b;margin-bottom:22px;">
-      <tr>
-        <td width="50%" valign="top" style="padding:15px 18px;border-right:1px solid #1e1e24;">
-          <div style="font-family:'Courier New',Courier,monospace;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:#71717a;margin-bottom:6px;">DOSSIER REFERENCE</div>
-          <div style="font-family:'Courier New',Courier,monospace;font-size:13px;color:#ffffff;letter-spacing:0.08em;">${escapeHtml(refId)}</div>
-        </td>
-        <td width="50%" valign="top" style="padding:15px 18px;">
-          <div style="font-family:'Courier New',Courier,monospace;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:#71717a;margin-bottom:6px;">TARGET TIMELINE</div>
-          <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:13px;color:#d4d4d8;">${escapeHtml(timeline || 'To be discussed')}</div>
-        </td>
-      </tr>
-    </table>
-
     <div>
-      <div style="font-family:'Courier New',Courier,monospace;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:#71717a;margin-bottom:10px;">BRIEF SUMMARY</div>
-      <div style="padding:18px 20px;background-color:#08080a;border:1px solid #1e1e24;border-left:2px solid #52525b;">
+      <div style="font-family:'Space Mono','Courier New',Courier,monospace;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:#7c7c86;margin-bottom:10px;">BRIEF SUMMARY</div>
+      <div style="padding:18px 20px;background-color:#09090b;border:1px solid #1f1f26;border-left:2px solid #52525b;">
         ${formatBriefHtml(brief)}
       </div>
     </div>
   `;
 
   const ctaHtml = `
-    <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
       <tr>
-        <td bgcolor="#ffffff" style="background-color:#ffffff;border:1px solid #ffffff;">
-          <a href="${SITE_URL}" style="display:inline-block;padding:14px 26px;font-family:'Courier New',Courier,monospace;font-size:11px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:#050506;text-decoration:none;">
+        <td align="center" bgcolor="#ffffff" style="background-color:#ffffff;border:1px solid #ffffff;">
+          <a href="${SITE_URL}" class="cta-btn" style="display:block;padding:15px 24px;font-family:'Space Mono','Courier New',Courier,monospace;font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:#050506;text-decoration:none;text-align:center;white-space:nowrap;">
             RETURN TO THE ATELIER &#8599;
-          </a>
-        </td>
-        <td width="14">&nbsp;</td>
-        <td style="border:1px solid #2e2e36;">
-          <a href="${INSTAGRAM_URL}" style="display:inline-block;padding:14px 20px;font-family:'Courier New',Courier,monospace;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#d4d4d8;text-decoration:none;">
-            @MEAUXSVISION &#8599;
           </a>
         </td>
       </tr>
@@ -358,12 +366,12 @@ function buildClientConfirmationHtml(data) {
     preheader: `Your MEAUX Atelier commission dossier (${refId}) has been received.`,
     refId,
     timestamp,
-    kicker: 'DOSSIER REGISTERED // ATELIER MEAUX',
+    kicker: 'DOSSIER REGISTERED',
     headline: `Thank you, ${escapeHtml(firstName)}.`,
-    introHtml: `<p style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:14px;line-height:1.72;color:#b4b4bc;">Your commission dossier has been received. Every inquiry is reviewed personally by Mohammed to ensure alignment with the atelier's creative direction and seasonal calendar. You can expect a personal response within <strong style="color:#ffffff;font-weight:600;">24 to 48 hours</strong>.</p>`,
+    introHtml: `<p style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:14px;line-height:1.72;color:#b4b4bc;">Your commission dossier has been received. Every inquiry is reviewed personally by Mohammed to ensure alignment with the atelier's seasonal calendar—expect a personal response within <strong style="color:#ffffff;font-weight:600;">24 to 48 hours</strong>.</p>`,
     bodyHtml,
     ctaHtml,
-    footerNote: 'Strict confidentiality is maintained for every commission dossier. Simply reply to this email to add references or notes.'
+    footerNote: 'Strict confidentiality is maintained for every dossier. Simply reply to this email to share references or notes.'
   });
 }
 
