@@ -1,11 +1,12 @@
 import { Resend } from 'resend';
 import { metric } from '@vercel/functions';
 
-const STUDIO_RECIPIENT = (process.env.ENQUIRY_TO_EMAIL || 'bucuralexandrunicolae@gmail.com').trim();
+const FALLBACK_RECIPIENT = (process.env.ENQUIRY_TO_EMAIL || 'bucuralexandrunicolae@gmail.com').trim();
 const EMAIL_DOMAIN = (process.env.RESEND_EMAIL_DOMAIN || 'alexnbucur.space').trim();
 const FROM_ADDRESS = `MEAUX Atelier <atelier@${EMAIL_DOMAIN}>`;
 const SITE_URL = 'https://www.alexnbucur.space';
 const INSTAGRAM_URL = 'https://www.instagram.com/meauxsvision/';
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function escapeHtml(value) {
   return String(value ?? '')
@@ -16,10 +17,88 @@ function escapeHtml(value) {
     .replace(/'/g, '&#39;');
 }
 
+function parseEmailList(raw) {
+  if (!raw) return [];
+  const items = Array.isArray(raw) ? raw : String(raw).split(/[,;]+/);
+  return Array.from(
+    new Set(
+      items
+        .map((entry) => String(entry || '').trim())
+        .filter((entry) => EMAIL_REGEX.test(entry))
+    )
+  ).slice(0, 5);
+}
+
+async function resolveAdminEmailConfig() {
+  const fallbackTo = parseEmailList(FALLBACK_RECIPIENT);
+  const defaults = {
+    to: fallbackTo.length ? fallbackTo : ['bucuralexandrunicolae@gmail.com'],
+    cc: [],
+    sendClientConfirmation: true,
+    source: 'fallback'
+  };
+
+  const supabaseUrl = (process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || '').replace(/\/+$/, '');
+  const supabaseKey =
+    process.env.SUPABASE_SERVICE_ROLE_KEY ||
+    process.env.SUPABASE_SECRET_KEY ||
+    process.env.SUPABASE_PUBLISHABLE_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+    process.env.SUPABASE_ANON_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+    '';
+
+  if (!supabaseUrl || !supabaseKey) return defaults;
+
+  const headers = {
+    apikey: supabaseKey,
+    Authorization: `Bearer ${supabaseKey}`,
+    Accept: 'application/json'
+  };
+
+  try {
+    const contentRes = await fetch(
+      `${supabaseUrl}/rest/v1/site_content?key=eq.published&select=data&limit=1`,
+      { headers, cache: 'no-store' }
+    );
+    if (contentRes.ok) {
+      const rows = await contentRes.json();
+      const settings = rows?.[0]?.data?.settings;
+      if (settings && typeof settings === 'object') {
+        const to = parseEmailList(settings.contactEmail);
+        const cc = parseEmailList(settings.enquiryCcEmail).filter((addr) => !to.includes(addr));
+        const sendClientConfirmation = settings.sendClientConfirmation !== false;
+        if (to.length) {
+          return { to, cc, sendClientConfirmation, source: 'site_content' };
+        }
+      }
+    }
+
+    const settingsRes = await fetch(
+      `${supabaseUrl}/rest/v1/site_settings?id=eq.default&select=contact_email&limit=1`,
+      { headers, cache: 'no-store' }
+    );
+    if (settingsRes.ok) {
+      const rows = await settingsRes.json();
+      const to = parseEmailList(rows?.[0]?.contact_email);
+      if (to.length) {
+        return { to, cc: [], sendClientConfirmation: true, source: 'site_settings' };
+      }
+    }
+  } catch (err) {
+    console.error('[api/enquiry] Could not load admin email settings from Supabase:', err);
+  }
+
+  return defaults;
+}
+
 function formatBriefHtml(brief) {
   return escapeHtml(brief)
     .split(/\r?\n\s*\r?\n/)
-    .map((paragraph) => `<p style="margin:0 0 14px 0;color:#e4e4e7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:14px;line-height:1.78;">${paragraph.replace(/\r?\n/g, '<br>')}</p>`)
+    .map(
+      (paragraph) =>
+        `<p style="margin:0 0 14px 0;color:#e4e4e7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:14px;line-height:1.78;">${paragraph.replace(/\r?\n/g, '<br>')}</p>`
+    )
     .join('')
     .replace(/margin:0 0 14px 0;(?![\s\S]*margin:0 0 14px 0;)/, 'margin:0;');
 }
@@ -33,15 +112,17 @@ function makeDossierRef() {
 
 function formatAmsterdamTimestamp(date = new Date()) {
   try {
-    return new Intl.DateTimeFormat('en-GB', {
-      timeZone: 'Europe/Amsterdam',
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false
-    }).format(date) + ' CET';
+    return (
+      new Intl.DateTimeFormat('en-GB', {
+        timeZone: 'Europe/Amsterdam',
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      }).format(date) + ' CET'
+    );
   } catch {
     return date.toISOString().replace('T', ' ').slice(0, 16) + ' UTC';
   }
@@ -342,7 +423,7 @@ export async function POST(request) {
       );
     }
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    if (!EMAIL_REGEX.test(email)) {
       metric('enquiry.submitted', 1, { outcome: 'validation_error' });
       return Response.json(
         { ok: false, error: 'Please enter a valid email address.' },
@@ -360,21 +441,30 @@ export async function POST(request) {
       );
     }
 
+    // Resolve recipient email(s) & confirmation preference live from Admin settings in Supabase
+    const emailConfig = await resolveAdminEmailConfig();
+    const primaryRecipient = emailConfig.to[0];
+
     const resend = new Resend(apiKey);
     const refId = makeDossierRef();
     const timestamp = formatAmsterdamTimestamp();
     const payload = { refId, timestamp, name, email, phone, timeline, disciplines, brief };
     const disciplineSummary = disciplines.length ? disciplines.join(', ') : 'General Commission';
 
-    // 1. Send formatted Atelier Dossier to Meaux
-    const studioResult = await resend.emails.send({
+    // 1. Send formatted Atelier Dossier to the Admin-configured recipient(s)
+    const studioEmailParams = {
       from: FROM_ADDRESS,
-      to: [STUDIO_RECIPIENT],
+      to: emailConfig.to,
       replyTo: email,
       subject: `MEAUX✳ Dossier ${refId} — ${name} (${disciplineSummary})`,
       html: buildStudioDossierHtml(payload),
       text: buildPlainTextDossier(payload)
-    });
+    };
+    if (emailConfig.cc.length) {
+      studioEmailParams.cc = emailConfig.cc;
+    }
+
+    const studioResult = await resend.emails.send(studioEmailParams);
 
     if (studioResult.error) {
       console.error('[api/enquiry] Resend studio email error:', studioResult.error);
@@ -385,26 +475,28 @@ export async function POST(request) {
       );
     }
 
-    // 2. Send matching luxury confirmation receipt to the client (best-effort)
+    // 2. Send matching luxury confirmation receipt to the client (if enabled in Admin settings)
     let clientReceiptSent = false;
-    try {
-      const receiptResult = await resend.emails.send({
-        from: FROM_ADDRESS,
-        to: [email],
-        replyTo: STUDIO_RECIPIENT,
-        subject: `MEAUX✳ Atelier — Dossier Received (${refId})`,
-        html: buildClientConfirmationHtml(payload),
-        text: `Thank you, ${name}.\n\nYour MEAUX Atelier commission dossier (${refId}) has been received.\nMohammed reviews every inquiry personally and will respond within 24–48 hours.\n\nScope: ${disciplineSummary}\nTimeline: ${timeline || 'To be discussed'}\n\nMEAUX Atelier · Amsterdam · Worldwide\n${SITE_URL}`
-      });
-      clientReceiptSent = !receiptResult.error;
-      if (receiptResult.error) {
-        console.error('[api/enquiry] Resend client confirmation error:', receiptResult.error);
+    if (emailConfig.sendClientConfirmation) {
+      try {
+        const receiptResult = await resend.emails.send({
+          from: FROM_ADDRESS,
+          to: [email],
+          replyTo: primaryRecipient,
+          subject: `MEAUX✳ Atelier — Dossier Received (${refId})`,
+          html: buildClientConfirmationHtml(payload),
+          text: `Thank you, ${name}.\n\nYour MEAUX Atelier commission dossier (${refId}) has been received.\nMohammed reviews every inquiry personally and will respond within 24–48 hours.\n\nScope: ${disciplineSummary}\nTimeline: ${timeline || 'To be discussed'}\n\nMEAUX Atelier · Amsterdam · Worldwide\n${SITE_URL}`
+        });
+        clientReceiptSent = !receiptResult.error;
+        if (receiptResult.error) {
+          console.error('[api/enquiry] Resend client confirmation error:', receiptResult.error);
+        }
+      } catch (receiptErr) {
+        console.error('[api/enquiry] Unexpected client receipt failure:', receiptErr);
       }
-    } catch (receiptErr) {
-      console.error('[api/enquiry] Unexpected client receipt failure:', receiptErr);
     }
 
-    metric('enquiry.submitted', 1, { outcome: 'success' });
+    metric('enquiry.submitted', 1, { outcome: 'success', config_source: emailConfig.source });
     return Response.json(
       {
         ok: true,

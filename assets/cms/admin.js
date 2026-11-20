@@ -3815,6 +3815,7 @@ class AdminManager {
 
   renderEnquiriesTab(container) {
     const filtered = this.enquiries.filter(e => this.enquiryFilter === 'all' || e.status === this.enquiryFilter);
+    const settings = this.draft.settings || {};
     const counts = {
       all: this.enquiries.length,
       new: this.enquiries.filter(e => e.status === 'new').length,
@@ -3827,6 +3828,31 @@ class AdminManager {
         <h4>Commission Dossiers</h4>
         <button type="button" class="cms-btn-subtle" id="cms-enq-refresh">↻ Sync</button>
       </div>
+
+      <!-- Enquiry Email Delivery Settings -->
+      <div class="cms-glass-card" style="margin-bottom:14px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;">
+          <span class="cms-field-label" style="margin:0;">ENQUIRY EMAIL ROUTING</span>
+          <span class="cms-badge ok">Resend Live</span>
+        </div>
+        <div class="cms-control-group">
+          <label>Receive Enquiries At (comma-separate for multiple)</label>
+          <input type="text" id="cms-enq-recipient" class="cms-input" placeholder="you@domain.com" value="${this.escape(settings.contactEmail || 'bucuralexandrunicolae@gmail.com')}">
+        </div>
+        <div class="cms-control-group">
+          <label>Optional CC Address</label>
+          <input type="text" id="cms-enq-cc" class="cms-input" placeholder="assistant@domain.com (optional)" value="${this.escape(settings.enquiryCcEmail || '')}">
+        </div>
+        <label style="display:flex;align-items:center;gap:8px;margin:8px 0 12px;font-size:11px;color:#e4e4e7;cursor:pointer;">
+          <input type="checkbox" id="cms-enq-client-receipt" ${settings.sendClientConfirmation !== false ? 'checked' : ''}>
+          <span>Send automatic MEAUX confirmation email to clients</span>
+        </label>
+        <button type="button" id="cms-enq-save-routing" class="cms-luxury-btn">Save &amp; Apply Email Address ↵</button>
+        <p class="cms-muted-note" style="margin:8px 0 0;font-size:10px;">
+          Updates both live <code>/api/enquiry</code> email delivery (via Supabase) and the contact email shown on the website.
+        </p>
+      </div>
+
       <p class="cms-muted-note">Every client enquiry submitted via the Enquiries page is logged here and synced to <code>public.enquiries</code>.</p>
 
       <div class="cms-filter-strip" style="margin-bottom:14px;">
@@ -3861,6 +3887,14 @@ class AdminManager {
         </div>
       `).join('') : '<div class="cms-glass-card" style="text-align:center;padding:30px;"><p class="cms-muted-note" style="margin:0;">No commission dossiers in this view yet.</p></div>'}
     `;
+
+    container.querySelector('#cms-enq-save-routing').addEventListener('click', async () => {
+      const btn = container.querySelector('#cms-enq-save-routing');
+      const recipientRaw = container.querySelector('#cms-enq-recipient').value.trim();
+      const ccRaw = container.querySelector('#cms-enq-cc').value.trim();
+      const sendReceipt = container.querySelector('#cms-enq-client-receipt').checked;
+      await this.saveEnquiryRouting({ contactEmail: recipientRaw, enquiryCcEmail: ccRaw, sendClientConfirmation: sendReceipt }, btn);
+    });
 
     container.querySelector('#cms-enq-refresh').addEventListener('click', async () => {
       await this.fetchEnquiries();
@@ -4133,6 +4167,74 @@ class AdminManager {
     }));
   }
 
+  async saveEnquiryRouting({ contactEmail, enquiryCcEmail = '', sendClientConfirmation = true }, triggerBtn = null) {
+    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const cleanList = (raw) =>
+      String(raw || '')
+        .split(/[,;]+/)
+        .map(s => s.trim())
+        .filter(Boolean);
+
+    const recipients = cleanList(contactEmail);
+    if (!recipients.length || recipients.some(addr => !emailRe.test(addr))) {
+      this.toast('Enter at least one valid recipient email address', 'error');
+      return false;
+    }
+
+    const ccList = cleanList(enquiryCcEmail);
+    if (ccList.some(addr => !emailRe.test(addr))) {
+      this.toast('One or more CC email addresses look invalid', 'error');
+      return false;
+    }
+
+    const origText = triggerBtn ? triggerBtn.textContent : '';
+    if (triggerBtn) {
+      triggerBtn.disabled = true;
+      triggerBtn.textContent = 'Saving & Syncing...';
+    }
+
+    this.pushUndoSnapshot();
+    if (!this.draft.settings) this.draft.settings = {};
+    this.draft.settings.contactEmail = recipients.join(', ');
+    this.draft.settings.enquiryCcEmail = ccList.join(', ');
+    this.draft.settings.sendClientConfirmation = Boolean(sendClientConfirmation);
+    this.runtime.applyContent(this.draft);
+    this.markDraftModified();
+
+    // Also update site_settings.contact_email directly & publish live so /api/enquiry uses the new address immediately
+    let syncedCloud = false;
+    if (this.supabase) {
+      try {
+        await this.supabase
+          .from('site_settings')
+          .update({ contact_email: recipients[0], updated_at: new Date().toISOString(), updated_by: this.user?.email || 'admin' })
+          .eq('id', 'default');
+      } catch (e) {}
+      try {
+        const note = `Updated enquiry email routing to ${recipients.join(', ')}`;
+        const { error } = await this.supabase.rpc('publish_site', { doc: this.draft, note });
+        if (!error) syncedCloud = true;
+      } catch (e) {}
+    }
+
+    if (syncedCloud) {
+      try { localStorage.setItem(LOCAL_PUB_KEY, JSON.stringify(this.draft)); } catch (e) {}
+      this.dirtyCount = 0;
+      const indicator = document.getElementById('cms-bar-indicator');
+      if (indicator) indicator.className = 'cms-status-indicator';
+      this.updateHudCounters();
+      this.toast(`Enquiries now route live to ${recipients.join(', ')}`, 'success');
+    } else {
+      this.toast('Saved locally — sign in with Google/Magic Link and Publish to sync live email routing', 'warn');
+    }
+
+    if (triggerBtn) {
+      triggerBtn.disabled = false;
+      triggerBtn.textContent = origText;
+    }
+    return syncedCloud;
+  }
+
   renderSettingsTab(container) {
     const settings = this.draft.settings || {};
 
@@ -4153,15 +4255,23 @@ class AdminManager {
         </div>
         <div class="cms-grid-2">
           <div class="cms-control-group">
-            <label>Commission Direct Email</label>
-            <input type="email" id="cms-contact-email" class="cms-input" value="${this.escape(settings.contactEmail || '')}">
+            <label>Enquiries Recipient Email(s)</label>
+            <input type="text" id="cms-contact-email" class="cms-input" placeholder="you@domain.com" value="${this.escape(settings.contactEmail || '')}">
           </div>
           <div class="cms-control-group">
             <label>Instagram Profile URL</label>
             <input type="url" id="cms-ig-url" class="cms-input" value="${this.escape(settings.instagramUrl || 'https://www.instagram.com/meauxsvision/')}">
           </div>
         </div>
-        <button type="button" id="cms-save-settings-btn" class="cms-luxury-btn">Save Site Settings ↵</button>
+        <div class="cms-control-group">
+          <label>Enquiries Optional CC Email(s)</label>
+          <input type="text" id="cms-enquiry-cc" class="cms-input" placeholder="assistant@domain.com (optional)" value="${this.escape(settings.enquiryCcEmail || '')}">
+        </div>
+        <label style="display:flex;align-items:center;gap:8px;margin:6px 0 14px;font-size:11px;color:#e4e4e7;cursor:pointer;">
+          <input type="checkbox" id="cms-client-receipt" ${settings.sendClientConfirmation !== false ? 'checked' : ''}>
+          <span>Send automatic MEAUX confirmation email to clients</span>
+        </label>
+        <button type="button" id="cms-save-settings-btn" class="cms-luxury-btn">Save &amp; Sync Site Settings ↵</button>
       </div>
 
       <!-- Live Database Schema Health Monitor -->
@@ -4202,18 +4312,19 @@ class AdminManager {
       </div>
     `;
 
-    container.querySelector('#cms-save-settings-btn').addEventListener('click', () => {
-      this.pushUndoSnapshot();
+    container.querySelector('#cms-save-settings-btn').addEventListener('click', async () => {
+      const btn = container.querySelector('#cms-save-settings-btn');
       if (!this.draft.settings) this.draft.settings = {};
       this.draft.settings.siteTitle = container.querySelector('#cms-site-title').value.trim();
       this.draft.settings.metaDescription = container.querySelector('#cms-meta-desc').value.trim();
-      this.draft.settings.contactEmail = container.querySelector('#cms-contact-email').value.trim();
       this.draft.settings.instagramUrl = container.querySelector('#cms-ig-url').value.trim();
       if (!this.draft.footer) this.draft.footer = {};
       this.draft.footer.instagramUrl = this.draft.settings.instagramUrl;
-      this.runtime.applyContent(this.draft);
-      this.markDraftModified();
-      this.toast('Site settings saved', 'success');
+      await this.saveEnquiryRouting({
+        contactEmail: container.querySelector('#cms-contact-email').value.trim(),
+        enquiryCcEmail: container.querySelector('#cms-enquiry-cc').value.trim(),
+        sendClientConfirmation: container.querySelector('#cms-client-receipt').checked
+      }, btn);
     });
 
     container.querySelector('#cms-run-health-btn').addEventListener('click', async () => {

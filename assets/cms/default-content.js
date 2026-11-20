@@ -38,6 +38,8 @@ window.MEAUX_DEFAULT_CONTENT = {
     siteTitle: 'MEAUX — Visual, Styling & Brand Atelier',
     metaDescription: 'Meaux — an independent creative practice in photography, styling, brand identity and social media.',
     contactEmail: 'bucuralexandrunicolae@gmail.com',
+    enquiryCcEmail: '',
+    sendClientConfirmation: true,
     instagramUrl: 'https://www.instagram.com/meauxsvision/',
     allowedAdmins: ['alexandru.n.bucur@gmail.com', 'bucuralexandrunicolae@gmail.com']
   },
@@ -45,7 +47,6 @@ window.MEAUX_DEFAULT_CONTENT = {
     enabled: true,
     kicker: 'A WORLD BY MEAUX',
     tagline: 'IMAGE. IDENTITY. SPACE.',
-    hint: 'Move your cursor. Disturb the surface.',
     hint: 'Touch or move to disturb the surface.',
     motto: 'SOFT FORM. SHARP INSTINCT.',
     enterLabel: 'ENTER THE ATELIER',

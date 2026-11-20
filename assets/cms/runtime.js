@@ -277,14 +277,17 @@ class CmsRuntime {
       }
       window.MEAUX_SETTINGS = doc.settings;
 
-      // Sync direct email links
+      // Sync direct email links (use primary email when multiple comma-separated recipients are configured)
       if (doc.settings.contactEmail) {
-        document.querySelectorAll('a[href^="mailto:"]').forEach(a => {
-          a.href = `mailto:${doc.settings.contactEmail}`;
-          if (a.classList.contains('meta-content') && a.textContent.includes('@')) {
-            a.textContent = doc.settings.contactEmail;
-          }
-        });
+        const primaryEmail = String(doc.settings.contactEmail).split(/[,;]+/)[0].trim();
+        if (primaryEmail) {
+          document.querySelectorAll('a[href^="mailto:"]').forEach(a => {
+            a.href = `mailto:${primaryEmail}`;
+            if (a.classList.contains('meta-content') && a.textContent.includes('@')) {
+              a.textContent = primaryEmail;
+            }
+          });
+        }
       }
       if (doc.settings.instagramUrl || doc.footer?.instagramUrl) {
         const igUrl = doc.settings.instagramUrl || doc.footer.instagramUrl;
@@ -867,7 +870,7 @@ class CmsRuntime {
   async loadAdminInterface() {
     if (this.adminModule) return;
     try {
-      const { initAdmin } = await import('./admin.js?v=11');
+      const { initAdmin } = await import('./admin.js?v=12');
       this.adminModule = await initAdmin(this);
     } catch (err) {
       console.error('Failed to load admin editor:', err);
