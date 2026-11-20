@@ -17,6 +17,206 @@ let view = 'selected';
 let currentItems = [];
 let activeProject = null;
 let returnFocus = null;
+
+/* ==========================================
+   PHOTOGRAPHY BENTO PORTFOLIO (BY SHOOT STYLE)
+   ========================================== */
+const PHOTO_STYLES = {
+  all: {
+    summary: 'A cross-section of sculptural studio studies, fashion campaigns, intimate portraits, and destination shoots.',
+    items: [
+      { id: 'DW9lQW_DUjv', title: 'Anouk', subtitle: 'Chiaroscuro Study', tag: 'Sculptural', span: 'span-6x6', pos: '50% 35%' },
+      { id: 'CqOSc5kN3gA', title: 'Vanderwilt Amsterdam', subtitle: 'Campaign & Direction', tag: 'Campaign', span: 'span-3x3', pos: '50% 42%' },
+      { id: 'CbI4R9FMcTQ', title: 'Gucci Beauty', subtitle: 'Beauty Campaign', tag: 'Campaign', span: 'span-3x3', pos: '50% 50%' },
+      { id: 'DTPohhYjdPI', title: 'Powerwoman', subtitle: 'Fatima Essahsah', tag: 'Portrait', span: 'span-3x3', pos: '50% 30%' },
+      { id: 'C0RNWyrt7sx', title: 'Lanzarote', subtitle: 'Destination Shoot', tag: 'Location', span: 'span-3x3', pos: '50% 50%' },
+      { id: 'DEXuQ0gNbcp', title: 'Tenebris Papilionem', subtitle: 'Coastal Veil Study', tag: 'Sculptural', span: 'span-4x4', pos: '50% 42%' },
+      { id: 'Cr8e19bN3mq', title: 'Jean Paul Gaultier', subtitle: 'Editorial Shoot', tag: 'Campaign', span: 'span-4x4', pos: '50% 38%' },
+      { id: 'C7ZtLU_NaDC', title: 'Sabri', subtitle: 'Shadow Profile', tag: 'Portrait', span: 'span-4x4', pos: '50% 40%' },
+      { id: 'DL-e-W1N1w-', title: 'Fetus', subtitle: 'Sculptural Monochrome', tag: 'Sculptural', span: 'span-6x5', pos: '50% 50%' },
+      { id: 'DALs3rUt3RC', title: 'Vigil', subtitle: 'Princeps Tenebris', tag: 'Sculptural', span: 'span-6x5', pos: '50% 50%' }
+    ]
+  },
+  'avant-garde': {
+    summary: 'Shadow, silhouette, and conceptual studio studies built on high contrast and restraint.',
+    items: [
+      { id: 'DW9lQW_DUjv', title: 'Anouk', subtitle: 'Chiaroscuro Study', tag: 'Sculptural', span: 'span-6x6', pos: '50% 35%' },
+      { id: 'DEXuQ0gNbcp', title: 'Tenebris Papilionem', subtitle: 'Coastal Veil Study', tag: 'Sculptural', span: 'span-3x3', pos: '50% 42%' },
+      { id: 'DTpuNcKjeUN', title: 'Unidentified', subtitle: 'Frosted Glass Study', tag: 'Avant-Garde', span: 'span-3x3', pos: '50% 40%' },
+      { id: 'DF8iodrtbss', title: 'Daan', subtitle: 'Dark Studio Silhouette', tag: 'Avant-Garde', span: 'span-3x3', pos: '50% 38%' },
+      { id: 'DH8FEYCNA1U', title: 'Butterfly', subtitle: 'Backlit Silhouette', tag: 'Sculptural', span: 'span-3x3', pos: '50% 38%' },
+      { id: 'DL-e-W1N1w-', title: 'Fetus', subtitle: 'Sculptural Monochrome', tag: 'Sculptural', span: 'span-4x4', pos: '50% 50%' },
+      { id: 'DALs3rUt3RC', title: 'Vigil', subtitle: 'Princeps Tenebris', tag: 'Sculptural', span: 'span-4x4', pos: '50% 50%' },
+      { id: 'C-vbQzBtHy8', title: 'Cosmica Mullier', subtitle: 'Studio Study', tag: 'Avant-Garde', span: 'span-4x4', pos: '50% 38%' }
+    ]
+  },
+  campaigns: {
+    summary: 'Editorial campaigns and lookbooks directed for fashion houses and independent labels.',
+    items: [
+      { id: 'CqOSc5kN3gA', title: 'Vanderwilt Amsterdam', subtitle: 'Campaign & Direction', tag: 'Campaign', span: 'span-6x6', pos: '50% 42%' },
+      { id: 'Cxz0P5ytark', title: 'Vanderwilt × Gowtu', subtitle: 'Monochrome Editorial', tag: 'Editorial', span: 'span-3x3', pos: '50% 45%' },
+      { id: 'CbI4R9FMcTQ', title: 'Gucci Beauty', subtitle: 'Beauty Campaign', tag: 'Campaign', span: 'span-3x3', pos: '50% 50%' },
+      { id: 'CoITMmjtXDQ', title: 'Jacquemus', subtitle: 'Studio Lookbook', tag: 'Lookbook', span: 'span-3x3', pos: '50% 50%' },
+      { id: 'C7zMIi5tSg4', title: 'Dubai Silhouette', subtitle: 'Editorial Direction', tag: 'Editorial', span: 'span-3x3', pos: '50% 42%' },
+      { id: 'Cr8e19bN3mq', title: 'Jean Paul Gaultier', subtitle: 'Editorial Shoot', tag: 'Editorial', span: 'span-4x4', pos: '50% 38%' },
+      { id: 'CdVsxkntawa', title: 'Fendi / Versace', subtitle: 'Campaign Portrait', tag: 'Campaign', span: 'span-4x4', pos: '50% 35%' },
+      { id: 'CcRGa1DN6AL', title: 'Josh V HQ', subtitle: 'Architectural Lookbook', tag: 'Lookbook', span: 'span-4x4', pos: '50% 42%' }
+    ]
+  },
+  portraits: {
+    summary: 'Intimate studio portraits and beauty frames focused on presence, eyes, and character.',
+    items: [
+      { id: 'DTPohhYjdPI', title: 'Powerwoman', subtitle: 'Fatima Essahsah', tag: 'Portrait', span: 'span-6x6', pos: '50% 30%' },
+      { id: 'C7ZtLU_NaDC', title: 'Sabri', subtitle: 'Shadow Profile', tag: 'Portrait', span: 'span-3x3', pos: '50% 40%' },
+      { id: 'C3Ky93mNNFw', title: 'Isabelle’s Eyes', subtitle: 'Close-Up Study', tag: 'Beauty', span: 'span-3x3', pos: '50% 45%' },
+      { id: 'CneOhP-t126', title: 'Fleur', subtitle: 'Beauty & Makeup', tag: 'Beauty', span: 'span-3x3', pos: '50% 40%' },
+      { id: 'CblHULWsvwV', title: 'Bromtji', subtitle: 'Chiaroscuro Close-Up', tag: 'Portrait', span: 'span-3x3', pos: '50% 40%' },
+      { id: 'DT2XryvjWCB', title: 'Daan Series', subtitle: 'Monochrome Portrait', tag: 'Portrait', span: 'span-4x4', pos: '50% 35%' },
+      { id: 'C4a1FCkNysZ', title: 'Gloom', subtitle: 'Studio Portrait', tag: 'Portrait', span: 'span-4x4', pos: '50% 40%' },
+      { id: 'DRKpcsjDSo2', title: 'Anouk', subtitle: 'Editorial Beauty', tag: 'Beauty', span: 'span-4x4', pos: '50% 38%' }
+    ]
+  },
+  location: {
+    summary: 'Natural light, architectural landscapes, destination shoots, and editorial bridal stories.',
+    items: [
+      { id: 'C0RNWyrt7sx', title: 'Lanzarote', subtitle: 'Destination Shoot', tag: 'Location', span: 'span-6x6', pos: '50% 48%' },
+      { id: 'C7b4UpfNrcR', title: 'Milos', subtitle: 'Coastal Editorial', tag: 'Location', span: 'span-3x3', pos: '50% 40%' },
+      { id: 'CgZWrHYtSBE', title: 'IB', subtitle: 'Architectural Location', tag: 'Location', span: 'span-3x3', pos: '50% 45%' },
+      { id: 'CmUE_30NMYe', title: 'Golden Hour', subtitle: 'Sunset Silhouette', tag: 'Location', span: 'span-3x3', pos: '50% 50%' },
+      { id: 'CnClh0aN_b4', title: 'Oum in Paris', subtitle: 'Night Architecture', tag: 'Location', span: 'span-3x3', pos: '50% 45%' },
+      { id: 'CxlF0ZWtP8T', title: 'Liza & Omar', subtitle: 'Editorial Wedding', tag: 'Bridal', span: 'span-4x4', pos: '50% 45%' },
+      { id: 'CjKj4H5tdNK', title: 'To Have & To Hold', subtitle: 'Bridal Couple', tag: 'Bridal', span: 'span-4x4', pos: '50% 38%' },
+      { id: 'CbaXNFuMYHG', title: 'She Bridal House', subtitle: 'Bridal Campaign', tag: 'Bridal', span: 'span-4x4', pos: '50% 42%' }
+    ]
+  }
+};
+let activePhotoStyle = 'all';
+
+/**
+ * Automatically computes gap-free, portrait-native Bento spans (12-col grid)
+ * for any number of items so adding, removing, or reordering images always
+ * produces a balanced, solid Bento composition with zero empty holes.
+ */
+function computeBentoSpans(count) {
+  if (count <= 0) return [];
+  if (count === 1) return ['span-6x6'];
+  if (count === 2) return ['span-6x6', 'span-6x6'];
+  if (count === 3) return ['span-4x4', 'span-4x4', 'span-4x4'];
+  if (count === 4) return ['span-3x3', 'span-3x3', 'span-3x3', 'span-3x3'];
+  if (count === 5) return ['span-6x6', 'span-3x3', 'span-3x3', 'span-3x3', 'span-3x3'];
+  if (count === 6) return ['span-6x6', 'span-6x6', 'span-3x3', 'span-3x3', 'span-3x3', 'span-3x3'];
+  if (count === 7) return ['span-6x6', 'span-3x3', 'span-3x3', 'span-3x3', 'span-3x3', 'span-6x5', 'span-6x5'];
+  if (count === 8) return ['span-6x6', 'span-3x3', 'span-3x3', 'span-3x3', 'span-3x3', 'span-4x4', 'span-4x4', 'span-4x4'];
+  if (count === 9) return ['span-6x6', 'span-3x3', 'span-3x3', 'span-3x3', 'span-3x3', 'span-3x3', 'span-3x3', 'span-3x3', 'span-3x3'];
+  if (count === 10) return ['span-6x6', 'span-3x3', 'span-3x3', 'span-3x3', 'span-3x3', 'span-4x4', 'span-4x4', 'span-4x4', 'span-6x5', 'span-6x5'];
+
+  // For 11+ items: peel off 5-item Hero blocks, keeping remainder >= 2 (never 1 orphan)
+  const spans = [];
+  let rem = count;
+  while (rem > 10) {
+    spans.push('span-6x6', 'span-3x3', 'span-3x3', 'span-3x3', 'span-3x3');
+    rem -= 5;
+  }
+  return spans.concat(computeBentoSpans(rem));
+}
+
+function renderPhotoBento(styleKey = activePhotoStyle, animate = true) {
+  const grid = document.getElementById('photo-bento-grid');
+  if (!grid) return;
+  const config = PHOTO_STYLES[styleKey] || PHOTO_STYLES.all;
+  activePhotoStyle = PHOTO_STYLES[styleKey] ? styleKey : 'all';
+
+  // Update pill counts dynamically as items are added/removed
+  document.querySelectorAll('.photo-style-pill[data-photo-style]').forEach(pill => {
+    const key = pill.dataset.photoStyle;
+    const isCurrent = key === activePhotoStyle;
+    pill.classList.toggle('active', isCurrent);
+    pill.setAttribute('aria-selected', isCurrent ? 'true' : 'false');
+    const countEl = pill.querySelector('.pill-count');
+    if (countEl && PHOTO_STYLES[key]) {
+      countEl.textContent = String(PHOTO_STYLES[key].items.length).padStart(2, '0');
+    }
+  });
+
+  const summaryEl = document.getElementById('photo-style-summary');
+  if (summaryEl && summaryEl.textContent.trim() !== config.summary) {
+    summaryEl.classList.add('is-swapping');
+    setTimeout(() => {
+      summaryEl.textContent = config.summary;
+      summaryEl.classList.remove('is-swapping');
+    }, reducedMotion.matches ? 0 : 140);
+  }
+
+  const pool = visibleArchive();
+  const resolved = config.items
+    .map((item, rawIdx) => {
+      const post = item.image_url ? item : pool.find(p => p.shortcode === item.id);
+      if (!post && !item.image_url) return null;
+      return { item, post, rawIdx };
+    })
+    .filter(Boolean);
+
+  const autoSpans = computeBentoSpans(resolved.length);
+  grid.replaceChildren();
+  const tiles = [];
+
+  resolved.forEach(({ item, post, rawIdx }, idx) => {
+    const spanClass = autoSpans[idx] || 'span-4x4';
+    const src = item.image_url || imagePath(post);
+    const shortcode = item.id || (post && post.shortcode) || `custom_${rawIdx}`;
+
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = `bento-tile ${spanClass}`;
+    btn.dataset.post = shortcode;
+    btn.dataset.bentoScope = activePhotoStyle;
+    btn.dataset.bentoIndex = String(rawIdx);
+    btn.style.setProperty('--stagger', `${Math.min(idx, 10) * 45}ms`);
+    btn.style.setProperty('--pos', item.pos || '50% 35%');
+    btn.setAttribute('aria-label', `View ${item.title || 'Photograph'} — ${item.subtitle || ''}`);
+
+    const img = document.createElement('img');
+    img.src = src;
+    img.alt = `${item.title || 'Photograph'} — ${item.subtitle || ''}`;
+    img.loading = 'eager';
+    img.decoding = 'async';
+
+    const topBar = document.createElement('span');
+    topBar.className = 'bento-top-bar';
+    const tag = document.createElement('span');
+    tag.className = 'bento-style-tag';
+    tag.textContent = item.tag || 'Photography';
+    const arrow = document.createElement('span');
+    arrow.className = 'bento-arrow';
+    arrow.setAttribute('aria-hidden', 'true');
+    arrow.textContent = '↗';
+    topBar.append(tag, arrow);
+
+    const caption = document.createElement('span');
+    caption.className = 'bento-caption';
+    const heading = document.createElement('h3');
+    heading.textContent = item.title || 'Untitled';
+    const sub = document.createElement('span');
+    sub.textContent = item.subtitle || 'Atelier Meaux';
+    caption.append(heading, sub);
+
+    btn.append(img, topBar, caption);
+    grid.append(btn);
+    tiles.push(btn);
+  });
+
+  if (!animate || reducedMotion.matches) {
+    tiles.forEach(t => t.classList.add('is-revealed'));
+  } else {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        tiles.forEach(t => t.classList.add('is-revealed'));
+      });
+    });
+  }
+
+  document.dispatchEvent(new CustomEvent('meaux:bento-rendered', { detail: { style: activePhotoStyle, count: resolved.length } }));
+}
 const dialog = document.getElementById('project-dialog');
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 const getGrid = () => document.getElementById('portfolio-grid');
@@ -99,7 +299,24 @@ function setView(next, scroll = false) {
 }
 
 function openProject(id, trigger) {
-  const post = archive.find(p => p.shortcode === id);
+  let post = archive.find(p => p.shortcode === id);
+  if (!post) {
+    // Also support custom uploaded Bento items not in the original Instagram archive
+    for (const st of Object.values(PHOTO_STYLES)) {
+      const found = (st.items || []).find(i => i.id === id);
+      if (found) {
+        post = {
+          shortcode: found.id,
+          title: found.title || 'Atelier Frame',
+          category: found.tag || 'Photography',
+          caption: found.subtitle || '',
+          image_url: found.image_url || '',
+          permalink: found.permalink || ''
+        };
+        break;
+      }
+    }
+  }
   if (!post || !dialog) return;
   activeProject = id;
   if (!dialog.open) returnFocus = trigger || document.activeElement;
@@ -122,10 +339,10 @@ function openProject(id, trigger) {
   if (commission) commission.href = `mailto:${contactEmail()}`;
   document.getElementById('project-cover-note').textContent = post.media_type === 'carousel' ? 'Cover image from the series. View the original post for the complete carousel.' : '';
   const items = currentItems.some(p => p.shortcode === id) ? currentItems : visibleArchive();
-  const index = items.findIndex(p => p.shortcode === id);
-  document.getElementById('project-position').textContent = `${String(index+1).padStart(2,'0')} / ${String(items.length).padStart(2,'0')}`;
+  const index = Math.max(0, items.findIndex(p => p.shortcode === id));
+  document.getElementById('project-position').textContent = `${String(index+1).padStart(2,'0')} / ${String(Math.max(1, items.length)).padStart(2,'0')}`;
   document.getElementById('previous-project').disabled = index <= 0;
-  document.getElementById('next-project').disabled = index === items.length - 1;
+  document.getElementById('next-project').disabled = index >= items.length - 1;
   if (!dialog.open) { dialog.showModal(); document.body.classList.add('dialog-open'); }
 }
 
@@ -198,7 +415,7 @@ function handleHashRoute() {
 /* ==========================================
    BESPOKE ENQUIRY FORM LOGIC (delegated, survives content swaps)
    ========================================== */
-function handleEnquirySubmit(form) {
+async function handleEnquirySubmit(form) {
   const value = id => (form.querySelector(`#${id}`)?.value || '').trim();
   const name = value('client-name');
   const email = value('client-email');
@@ -213,6 +430,36 @@ function handleEnquirySubmit(form) {
   if (!name || !email || !brief) {
     alert('Please fill in your name, email, and project brief to submit your dossier.');
     return;
+  }
+
+  // Persist enquiry to Supabase database & local fallback so it appears in Admin Inbox
+  const enquiryPayload = {
+    client_name: name,
+    client_email: email,
+    phone: phone || null,
+    timeline: timeline || null,
+    disciplines: selectedDisciplines,
+    budget,
+    brief,
+    status: 'new'
+  };
+
+  try {
+    const localList = JSON.parse(localStorage.getItem('meaux_enquiries_local') || '[]');
+    localList.unshift({
+      id: 'enq_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+      ...enquiryPayload,
+      created_at: new Date().toISOString()
+    });
+    localStorage.setItem('meaux_enquiries_local', JSON.stringify(localList.slice(0, 100)));
+  } catch (e) {}
+
+  try {
+    if (window.MeauxCMS && window.MeauxCMS.supabase) {
+      await window.MeauxCMS.supabase.from('enquiries').insert(enquiryPayload);
+    }
+  } catch (e) {
+    console.warn('Could not persist enquiry to Supabase:', e);
   }
 
   // Build email draft mailto fallback
@@ -240,7 +487,7 @@ function handleEnquirySubmit(form) {
         <span class="text-xs uppercase tracking-[0.25em] text-zinc-400">DOSSIER REGISTERED // ATELIER MEAUX</span>
         <h3>Thank you, ${escapeHTML(name)}.</h3>
         <p>
-          Your commission brief has been recorded. Mohammed reviews all proposals personally to ensure alignment with the atelier's seasonal calendar. You will receive an initial appraisal within 24 to 48 hours.
+          Your commission brief has been recorded in our atelier database. Mohammed reviews all proposals personally to ensure alignment with the atelier's seasonal calendar. You will receive an initial appraisal within 24 to 48 hours.
         </p>
         <div class="mt-4 flex flex-col sm:flex-row gap-4">
           <a href="${mailtoUrl}" class="luxury-btn">
@@ -265,6 +512,7 @@ function completeVaultEntry() {
   document.getElementById('leather-vault').hidden = true;
   document.getElementById('atelier-world').inert = false;
   resetMaterialExit();
+  document.dispatchEvent(new CustomEvent('meaux:vault-state', { detail: { isOpen: true } }));
   const heroTitle = document.getElementById('hero-title');
   if (heroTitle) heroTitle.focus({preventScroll:true});
 }
@@ -283,6 +531,7 @@ function replayIntro() {
   document.getElementById('leather-vault').hidden = false;
   document.getElementById('atelier-world').inert = true;
   relockVault();
+  document.dispatchEvent(new CustomEvent('meaux:vault-state', { detail: { isOpen: false } }));
   if (reducedMotion.matches) {
     cancelVaultTimers();
     vaultUnlocking = false;
@@ -334,8 +583,41 @@ document.addEventListener('click', (event) => {
     setView(view === 'archive' ? 'selected' : 'archive', true);
     return;
   }
+  const igTab = event.target.closest('.ig-feed-tab[data-ig-filter]');
+  if (igTab) {
+    const frame = igTab.closest('.ig-device-frame');
+    const filter = igTab.dataset.igFilter;
+    if (frame) {
+      frame.querySelectorAll('.ig-feed-tab').forEach(btn => {
+        const active = btn === igTab;
+        btn.classList.toggle('active', active);
+        btn.setAttribute('aria-selected', active ? 'true' : 'false');
+      });
+      frame.querySelectorAll('.ig-tile').forEach(tile => {
+        const dim = filter === 'reel' && tile.dataset.igType !== 'reel';
+        tile.classList.toggle('is-dimmed', dim);
+      });
+    }
+    return;
+  }
+  const photoStylePill = event.target.closest('.photo-style-pill[data-photo-style]');
+  if (photoStylePill) {
+    renderPhotoBento(photoStylePill.dataset.photoStyle, true);
+    return;
+  }
+  if (event.target.closest('#photo-open-archive')) {
+    switchTab('atelier', false);
+    setView('archive', true);
+    return;
+  }
   const postEl = event.target.closest('[data-post]');
   if (postEl && !postEl.closest('dialog') && !isEditing()) {
+    if (postEl.dataset.bentoScope && PHOTO_STYLES[postEl.dataset.bentoScope]) {
+      const pool = visibleArchive();
+      currentItems = PHOTO_STYLES[postEl.dataset.bentoScope].items
+        .map(item => pool.find(p => p.shortcode === item.id))
+        .filter(Boolean);
+    }
     openProject(postEl.dataset.post, postEl);
   }
 });
@@ -421,6 +703,29 @@ setCurrentYear();
 // Window hash routing listener
 window.addEventListener('hashchange', handleHashRoute);
 
+function syncPhotoStylePills() {
+  const wrap = document.querySelector('.photo-style-pills');
+  if (!wrap) return;
+  const defaultLabels = {
+    all: 'All Styles',
+    'avant-garde': 'Sculptural & Avant-Garde',
+    campaigns: 'Fashion & Campaigns',
+    portraits: 'Portraits & Beauty',
+    location: 'Location & Bridal'
+  };
+  wrap.innerHTML = Object.entries(PHOTO_STYLES).map(([key, cfg]) => {
+    const label = cfg.label || defaultLabels[key] || key.replace(/-/g, ' ');
+    const isCurrent = key === activePhotoStyle;
+    const count = String((cfg.items || []).length).padStart(2, '0');
+    return `
+      <button type="button" class="photo-style-pill ${isCurrent ? 'active' : ''}" role="tab" aria-selected="${isCurrent ? 'true' : 'false'}" data-photo-style="${escapeHTML(key)}">
+        <span>${escapeHTML(label)}</span>
+        <span class="pill-count">${count}</span>
+      </button>
+    `;
+  }).join('');
+}
+
 /* Public API used by the CMS (assets/cms/*) */
 window.MeauxSite = {
   getPortfolio: () => ({items: archive.map(p => ({...p})), selected: curated.map(c => ({...c}))}),
@@ -429,23 +734,68 @@ window.MeauxSite = {
     if (Array.isArray(portfolio.items)) archive = portfolio.items.map(p => ({...p}));
     if (Array.isArray(portfolio.selected)) curated = portfolio.selected.map(c => ({...c}));
     renderPortfolio();
+    renderPhotoBento(activePhotoStyle, false);
   },
   refresh() {
     setCurrentYear();
     renderPortfolio();
+    syncPhotoStylePills();
+    renderPhotoBento(activePhotoStyle, false);
     handleHashRoute();
     switchTab(activeTab, false);
   },
   getActiveTab: () => activeTab,
   getActiveProject: () => activeProject,
+  getActivePhotoStyle: () => activePhotoStyle,
+  getPhotoStyles: () => JSON.parse(JSON.stringify(PHOTO_STYLES)),
+  setPhotoStyles(nextStyles) {
+    if (!nextStyles || typeof nextStyles !== 'object') return;
+    // Clear removed non-default keys
+    for (const k of Object.keys(PHOTO_STYLES)) {
+      if (!(k in nextStyles)) delete PHOTO_STYLES[k];
+    }
+    for (const [k, v] of Object.entries(nextStyles)) {
+      if (v && Array.isArray(v.items)) {
+        PHOTO_STYLES[k] = {
+          label: v.label || (PHOTO_STYLES[k] && PHOTO_STYLES[k].label) || '',
+          summary: v.summary !== undefined ? v.summary : ((PHOTO_STYLES[k] && PHOTO_STYLES[k].summary) || ''),
+          items: v.items.map(i => ({ ...i }))
+        };
+      }
+    }
+    if (!PHOTO_STYLES[activePhotoStyle]) activePhotoStyle = Object.keys(PHOTO_STYLES)[0] || 'all';
+    syncPhotoStylePills();
+    renderPhotoBento(activePhotoStyle, false);
+  },
+  syncPhotoStylePills,
+  renderPhotoBento,
   switchTab,
   skipIntro,
+  replayIntro,
   openProject,
   isVaultOpen: () => vaultIsOpen
 };
 
+// Cursor liquid-chrome spotlight tracking on Bento tiles
+document.addEventListener('pointermove', (event) => {
+  if (reducedMotion.matches) return;
+  const tile = event.target.closest('.bento-tile');
+  if (!tile) return;
+  const rect = tile.getBoundingClientRect();
+  tile.style.setProperty('--mx', `${event.clientX - rect.left}px`);
+  tile.style.setProperty('--my', `${event.clientY - rect.top}px`);
+});
+
+// Re-trigger staggered shutter reveal when opening the Photography tab
+document.addEventListener('meaux:tab', (event) => {
+  if (event.detail && event.detail.tab === 'photography') {
+    renderPhotoBento(activePhotoStyle, true);
+  }
+});
+
 // Initialize components
 renderPortfolio();
+renderPhotoBento(activePhotoStyle, true);
 initScrewCanvases();
 initFluidLandingCanvas();
 handleHashRoute();

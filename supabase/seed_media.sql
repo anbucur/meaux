@@ -1,134 +1,92 @@
 -- =====================================================================
---  MEAUX CMS — MEDIA ITEMS TABLE & SEED
---  Run this in: Supabase Dashboard → SQL Editor → New query
+--  MEAUX CMS — MEDIA CATEGORIES & ITEMS SEED (v2.0)
+--  Run supabase/schema.sql first, then run this seed if needed.
 -- =====================================================================
 
-create table if not exists public.media_items (
-  id          text primary key default gen_random_uuid()::text,
-  filename    text not null,
-  title       text,
-  caption     text,
-  url         text,          -- Absolute or relative HTTP link
-  blob_data   text,          -- Optional Base64 data URL / blob for manual direct uploads
-  source      text not null default 'catalog', -- 'catalog', 'upload', 'link'
-  mime_type   text default 'image/jpeg',
-  created_at  timestamptz not null default now(),
-  created_by  text
-);
-
--- Row Level Security
-alter table public.media_items enable row level security;
-
-drop policy if exists "media_items: public read" on public.media_items;
-create policy "media_items: public read" on public.media_items for select to anon, authenticated using (true);
-
-drop policy if exists "media_items: admin insert" on public.media_items;
-create policy "media_items: admin insert" on public.media_items for insert to authenticated with check (public.is_admin());
-
-drop policy if exists "media_items: admin update" on public.media_items;
-create policy "media_items: admin update" on public.media_items for update to authenticated using (public.is_admin()) with check (public.is_admin());
-
-drop policy if exists "media_items: admin delete" on public.media_items;
-create policy "media_items: admin delete" on public.media_items for delete to authenticated using (public.is_admin());
-
-grant select on public.media_items to anon, authenticated;
-grant insert, update, delete on public.media_items to authenticated;
-
--- Seed initial portfolio media items
-insert into public.media_items (id, filename, title, caption, url, source, created_by)
+-- Ensure categories exist
+insert into public.media_categories (id, slug, name, description, color, sort_order)
 values
-  ('media_DW9lQW_DUjv', 'DW9lQW_DUjv.jpg', 'anoukromeeschmitz seduca', '@anoukromeeschmitz seduca 📸📸', 'https://alexnbucur.space/instagram/meauxsvision/images/DW9lQW_DUjv.jpg', 'catalog', 'seed'),
-  ('media_DT2XryvjWCB', 'DT2XryvjWCB.jpg', 'Daan series daan___sanders 🩶🤍', 'Daan series @daan___sanders 🩶🤍📸', 'https://alexnbucur.space/instagram/meauxsvision/images/DT2XryvjWCB.jpg', 'catalog', 'seed'),
-  ('media_DTpuNcKjeUN', 'DTpuNcKjeUN.jpg', 'UNIDENTIFIED anoukromeeschmitz', 'UNIDENTIFIED @anoukromeeschmitz 
-Styling/photography by me', 'https://alexnbucur.space/instagram/meauxsvision/images/DTpuNcKjeUN.jpg', 'catalog', 'seed'),
-  ('media_DTPohhYjdPI', 'DTPohhYjdPI.jpg', 'Powerwoman shoot with fatima_essahsah', 'Powerwoman shoot with @fatima_essahsah', 'https://alexnbucur.space/instagram/meauxsvision/images/DTPohhYjdPI.jpg', 'catalog', 'seed'),
-  ('media_DRKpcsjDSo2', 'DRKpcsjDSo2.jpg', 'anoukromeeschmitz', '@anoukromeeschmitz', 'https://alexnbucur.space/instagram/meauxsvision/images/DRKpcsjDSo2.jpg', 'catalog', 'seed'),
-  ('media_DObqkm2jfxe', 'DObqkm2jfxe.jpg', 'shari.louise for wissalaziz', '@shari.louise for @wissalaziz 
-Pic and styling by @meauxsvision', 'https://alexnbucur.space/instagram/meauxsvision/images/DObqkm2jfxe.jpg', 'catalog', 'seed'),
-  ('media_DL-e-W1N1w-', 'DL-e-W1N1w-.jpg', 'FETUS', 'FETUS 
+  ('cat_photography', 'photography', 'Photography', 'Editorial & sculptural photographic works', '#38bdf8', 1),
+  ('cat_avant_garde', 'avant-garde', 'Avant-Garde', 'High-contrast chiaroscuro & conceptual studies', '#a78bfa', 2),
+  ('cat_campaigns',   'campaigns',   'Campaigns',   'Fashion house campaigns & lookbooks', '#f472b6', 3),
+  ('cat_portraits',   'portraits',   'Portraits',   'Intimate studio portraits & beauty close-ups', '#fbbf24', 4),
+  ('cat_location',    'location',    'Location & Bridal', 'Destination shoots, architecture & bridal', '#34d399', 5),
+  ('cat_styling',     'styling',     'Styling',     'Silhouette architecture & wardrobe curation', '#fb923c', 6),
+  ('cat_social',      'social-media','Social Media','Curated grid visuals, reels & highlights', '#60a5fa', 7),
+  ('cat_editorial',   'editorial',   'Editorial',   'Print, press & archival editorial frames', '#c084fc', 8),
+  ('cat_uncat',       'uncategorized','Uncategorized','General atelier assets', '#94a3b8', 99)
+on conflict (slug) do nothing;
 
-@anoukromeeschmitz', 'https://alexnbucur.space/instagram/meauxsvision/images/DL-e-W1N1w-.jpg', 'catalog', 'seed'),
-  ('media_DH8FEYCNA1U', 'DH8FEYCNA1U.jpg', '🦋🦋 nandin_erdene_enn', '🦋🦋 @nandin_erdene_enn 
-
-Butterfly: @anoukromeeschmitz', 'https://alexnbucur.space/instagram/meauxsvision/images/DH8FEYCNA1U.jpg', 'catalog', 'seed'),
-  ('media_DGgGMqcv5G5', 'DGgGMqcv5G5.jpg', 'daan___sanders', '@daan___sanders', 'https://alexnbucur.space/instagram/meauxsvision/images/DGgGMqcv5G5.jpg', 'catalog', 'seed'),
-  ('media_DF8iodrtbss', 'DF8iodrtbss.jpg', '�️�️', '🕷️🕸️
-
-MODEL : @daan___sanders 
-STYLING/PHOTOGRAPHY/ART DIRECTION: me🖤
-
-#photography', 'https://alexnbucur.space/instagram/meauxsvision/images/DF8iodrtbss.jpg', 'catalog', 'seed'),
-  ('media_DFqKHPlNV1t', 'DFqKHPlNV1t.jpg', 'Surrealism', 'Surrealism 
-
-📸 @meauxsvision @meeaaux', 'https://alexnbucur.space/instagram/meauxsvision/images/DFqKHPlNV1t.jpg', 'catalog', 'seed'),
-  ('media_DEXuQ0gNbcp', 'DEXuQ0gNbcp.jpg', 'TENEBRIS PAPILIONEM', 'TENEBRIS PAPILIONEM 
-
-@anoukromeeschmitz', 'https://alexnbucur.space/instagram/meauxsvision/images/DEXuQ0gNbcp.jpg', 'catalog', 'seed'),
-  ('media_DALs3rUt3RC', 'DALs3rUt3RC.jpg', 'VIGIL - (the watcher)', 'VIGIL - (the watcher) 
-
-PRINCEPS TENEBRIS 
-
-Creative direction/styling/photography by me', 'https://alexnbucur.space/instagram/meauxsvision/images/DALs3rUt3RC.jpg', 'catalog', 'seed'),
-  ('media_C-vbQzBtHy8', 'C-vbQzBtHy8.jpg', 'COSMICA MULLIER - (Cosmic Woman)', 'COSMICA MULLIER - (Cosmic Woman) 
-
-PRINCEPS TENEBRIS 
-
-Creative direction/styling/photography by me', 'https://alexnbucur.space/instagram/meauxsvision/images/C-vbQzBtHy8.jpg', 'catalog', 'seed'),
-  ('media_C-VSlnaNa_c', 'C-VSlnaNa_c.jpg', 'For rouhi.co', 'For @rouhi.co 📸', 'https://alexnbucur.space/instagram/meauxsvision/images/C-VSlnaNa_c.jpg', 'catalog', 'seed'),
-  ('media_C8IHD9Gt_GO', 'C8IHD9Gt_GO.jpg', 'For modestartofficial', 'For @modestartofficial 
-Pics by me', 'https://alexnbucur.space/instagram/meauxsvision/images/C8IHD9Gt_GO.jpg', 'catalog', 'seed'),
-  ('media_C7zMIi5tSg4', 'C7zMIi5tSg4.jpg', 'Shot & styled anissabchiri in Dubai', 'Shot & styled @anissabchiri in Dubai', 'https://alexnbucur.space/instagram/meauxsvision/images/C7zMIi5tSg4.jpg', 'catalog', 'seed'),
-  ('media_C7b4UpfNrcR', 'C7b4UpfNrcR.jpg', 'Shot & styled the beautiful larissabruin in #milos wearing thriftsand_threads', 'Shot & styled the beautiful @larissabruin in #milos wearing @thriftsand_threads', 'https://alexnbucur.space/instagram/meauxsvision/images/C7b4UpfNrcR.jpg', 'catalog', 'seed'),
-  ('media_C7ZtLU_NaDC', 'C7ZtLU_NaDC.jpg', 'Still my absolute favourite work lbsabri', 'Still my absolute favourite work @lbsabri', 'https://alexnbucur.space/instagram/meauxsvision/images/C7ZtLU_NaDC.jpg', 'catalog', 'seed'),
-  ('media_C5gNw4tNBbO', 'C5gNw4tNBbO.jpg', 'Pics for babushamsterdam sihamazouzofficial', 'Pics for @babushamsterdam @sihamazouzofficial', 'https://alexnbucur.space/instagram/meauxsvision/images/C5gNw4tNBbO.jpg', 'catalog', 'seed'),
-  ('media_C48XQvEtjAX', 'C48XQvEtjAX.jpg', 'Shots by me for lallamoulati.nl', 'Shots by me for @lallamoulati.nl', 'https://alexnbucur.space/instagram/meauxsvision/images/C48XQvEtjAX.jpg', 'catalog', 'seed'),
-  ('media_C4a1FCkNysZ', 'C4a1FCkNysZ.jpg', 'Gloom⚪️', 'Gloom⚪️ 📸📸', 'https://alexnbucur.space/instagram/meauxsvision/images/C4a1FCkNysZ.jpg', 'catalog', 'seed'),
-  ('media_C4Ao4jWtDvY', 'C4Ao4jWtDvY.jpg', 'For babushamsterdam beautiful dina_aitbibi', 'For @babushamsterdam beautiful @dina_aitbibi 📸📸', 'https://alexnbucur.space/instagram/meauxsvision/images/C4Ao4jWtDvY.jpg', 'catalog', 'seed'),
-  ('media_C3Ky93mNNFw', 'C3Ky93mNNFw.jpg', 'Isabelle’s eyes❤️ shot by me', 'Isabelle’s eyes❤️ shot by me📸', 'https://alexnbucur.space/instagram/meauxsvision/images/C3Ky93mNNFw.jpg', 'catalog', 'seed'),
-  ('media_C3FTJ2LtZZl', 'C3FTJ2LtZZl.jpg', 'Atelier Work 25', '📸', 'https://alexnbucur.space/instagram/meauxsvision/images/C3FTJ2LtZZl.jpg', 'catalog', 'seed'),
-  ('media_C0RNWyrt7sx', 'C0RNWyrt7sx.jpg', 'Full shooting trip to Lanzarote shot by me for larissabruin', 'Full shooting trip to Lanzarote shot by me for @larissabruin', 'https://alexnbucur.space/instagram/meauxsvision/images/C0RNWyrt7sx.jpg', 'catalog', 'seed'),
-  ('media_CzeoA8tNsj4', 'CzeoA8tNsj4.jpg', 'ISABEL isabelblankenzee shot and directed by me', 'ISABEL @isabelblankenzee shot and directed by me', 'https://alexnbucur.space/instagram/meauxsvision/images/CzeoA8tNsj4.jpg', 'catalog', 'seed'),
-  ('media_CzZIYAtNU9a', 'CzZIYAtNU9a.jpg', 'loubotomized', '@loubotomized 
-pretty gyal shot by me', 'https://alexnbucur.space/instagram/meauxsvision/images/CzZIYAtNU9a.jpg', 'catalog', 'seed'),
-  ('media_Cxz0P5ytark', 'Cxz0P5ytark.jpg', 'gowtubywissalaziz artist wissal in vanderwiltamsterdam', '@gowtubywissalaziz artist wissal in @vanderwiltamsterdam 📸📸', 'https://alexnbucur.space/instagram/meauxsvision/images/Cxz0P5ytark.jpg', 'catalog', 'seed'),
-  ('media_CxzzqKdto53', 'CxzzqKdto53.jpg', 'khaoulaboumeshouli', '@khaoulaboumeshouli 📸📸', 'https://alexnbucur.space/instagram/meauxsvision/images/CxzzqKdto53.jpg', 'catalog', 'seed'),
-  ('media_CxlF0ZWtP8T', 'CxlF0ZWtP8T.jpg', 'Yesterday’s wedding for lizasophie omarwaseq beautiful couple', 'Yesterday’s wedding for @lizasophie @omarwaseq beautiful couple
-
-Shot by moi', 'https://alexnbucur.space/instagram/meauxsvision/images/CxlF0ZWtP8T.jpg', 'catalog', 'seed'),
-  ('media_CvS0lEnNrMr', 'CvS0lEnNrMr.jpg', 'Fun snapping some shots for Zaheera', 'Fun snapping some shots for Zaheera', 'https://alexnbucur.space/instagram/meauxsvision/images/CvS0lEnNrMr.jpg', 'catalog', 'seed'),
-  ('media_Cr8e19bN3mq', 'Cr8e19bN3mq.jpg', 'Shot mel.dlgn in jeanpaulgaultier', 'Shot @mel.dlgn in @jeanpaulgaultier', 'https://alexnbucur.space/instagram/meauxsvision/images/Cr8e19bN3mq.jpg', 'catalog', 'seed'),
-  ('media_CqOSc5kN3gA', 'CqOSc5kN3gA.jpg', 'mel.dlgn for vanderwiltamsterdam', '@mel.dlgn for @vanderwiltamsterdam 
- Pics and creative direction by MOI', 'https://alexnbucur.space/instagram/meauxsvision/images/CqOSc5kN3gA.jpg', 'catalog', 'seed'),
-  ('media_CoITMmjtXDQ', 'CoITMmjtXDQ.jpg', 'A gazelle in jacquemus mysahairclinic', 'A gazelle in jacquemus @mysahairclinic 
-Shot & styled by me', 'https://alexnbucur.space/instagram/meauxsvision/images/CoITMmjtXDQ.jpg', 'catalog', 'seed'),
-  ('media_CnmdLLNtzm_', 'CnmdLLNtzm_.jpg', 'Atelier Work 36', '📸📸', 'https://alexnbucur.space/instagram/meauxsvision/images/CnmdLLNtzm_.jpg', 'catalog', 'seed'),
-  ('media_CneOhP-t126', 'CneOhP-t126.jpg', 'Make up shots for ha.azmani with beautiful model fleurdediver', 'Make up shots for @ha.azmani with beautiful model @fleurdediver', 'https://alexnbucur.space/instagram/meauxsvision/images/CneOhP-t126.jpg', 'catalog', 'seed'),
-  ('media_CnClh0aN_b4', 'CnClh0aN_b4.jpg', 'Oum in paris memaori', 'Oum in paris @memaori 📸', 'https://alexnbucur.space/instagram/meauxsvision/images/CnClh0aN_b4.jpg', 'catalog', 'seed'),
-  ('media_CmUFVnZNhJW', 'CmUFVnZNhJW.jpg', 'Throwback to when I made some shots for sihamazouzofficial', 'Throwback to when I made some shots for @sihamazouzofficial', 'https://alexnbucur.space/instagram/meauxsvision/images/CmUFVnZNhJW.jpg', 'catalog', 'seed'),
-  ('media_CmUE_30NMYe', 'CmUE_30NMYe.jpg', 'Sunset shots are my fave', 'Sunset shots are my fave', 'https://alexnbucur.space/instagram/meauxsvision/images/CmUE_30NMYe.jpg', 'catalog', 'seed'),
-  ('media_Clt2SNGN1YE', 'Clt2SNGN1YE.jpg', 'Back when we were in spain for ibtlssam selfmade clothing! Pic by me', 'Back when we were in spain for @ibtlssam selfmade clothing! Pic by me', 'https://alexnbucur.space/instagram/meauxsvision/images/Clt2SNGN1YE.jpg', 'catalog', 'seed'),
-  ('media_Ck6Roc1tJYn', 'Ck6Roc1tJYn.jpg', 'Styling and pic by me for this beautiful being mel.dlgn', 'Styling and pic by me for this beautiful being @mel.dlgn', 'https://alexnbucur.space/instagram/meauxsvision/images/Ck6Roc1tJYn.jpg', 'catalog', 'seed'),
-  ('media_CjanyD1Nsz4', 'CjanyD1Nsz4.jpg', 'Atelier Work 43', '📸📸', 'https://alexnbucur.space/instagram/meauxsvision/images/CjanyD1Nsz4.jpg', 'catalog', 'seed'),
-  ('media_CjKj4H5tdNK', 'CjKj4H5tdNK.jpg', 'TO HAVE AND TO HOLD, THEY DO.', 'TO HAVE AND TO HOLD, THEY DO.
-Had lots of fun shooting this gorgeous Armenian/italian couple 🤍🖤', 'https://alexnbucur.space/instagram/meauxsvision/images/CjKj4H5tdNK.jpg', 'catalog', 'seed'),
-  ('media_Ciw_6rINvBg', 'Ciw_6rINvBg.jpg', 'My fave shots taken by me for zey.lina_ #photography', 'My fave shots taken by me for @zey.lina_ #photography', 'https://alexnbucur.space/instagram/meauxsvision/images/Ciw_6rINvBg.jpg', 'catalog', 'seed'),
-  ('media_CgZWrHYtSBE', 'CgZWrHYtSBE.jpg', 'IB•', 'IB• 📸📸', 'https://alexnbucur.space/instagram/meauxsvision/images/CgZWrHYtSBE.jpg', 'catalog', 'seed'),
-  ('media_CgP6UOHNggC', 'CgP6UOHNggC.jpg', 'the beautiful najbnr', '📸 the beautiful @najbnr', 'https://alexnbucur.space/instagram/meauxsvision/images/CgP6UOHNggC.jpg', 'catalog', 'seed'),
-  ('media_Cfe1b09toZC', 'Cfe1b09toZC.jpg', 'Shot my caraMel mel.dlgn', 'Shot my caraMel @mel.dlgn', 'https://alexnbucur.space/instagram/meauxsvision/images/Cfe1b09toZC.jpg', 'catalog', 'seed'),
-  ('media_CfY3m5vNidV', 'CfY3m5vNidV.jpg', '‘FLUL’ bromtji ❤️ by me', '‘FLUL’ @bromtji ❤️ 📸by me', 'https://alexnbucur.space/instagram/meauxsvision/images/CfY3m5vNidV.jpg', 'catalog', 'seed'),
-  ('media_CdVsxkntawa', 'CdVsxkntawa.jpg', 'Shot romydfonseca for fendi versace', 'Shot @romydfonseca for @fendi @versace', 'https://alexnbucur.space/instagram/meauxsvision/images/CdVsxkntawa.jpg', 'catalog', 'seed'),
-  ('media_CcTqk0yom1b', 'CcTqk0yom1b.jpg', 'Another one, shot khaoulaboumeshouli for joshvhq', 'Another one, shot @khaoulaboumeshouli for @joshvhq', 'https://alexnbucur.space/instagram/meauxsvision/images/CcTqk0yom1b.jpg', 'catalog', 'seed'),
-  ('media_CcRJMWdtAeS', 'CcRJMWdtAeS.jpg', 'mel.dlgn', '@mel.dlgn', 'https://alexnbucur.space/instagram/meauxsvision/images/CcRJMWdtAeS.jpg', 'catalog', 'seed'),
-  ('media_CcRGa1DN6AL', 'CcRGa1DN6AL.jpg', 'Shot khaoulaboumeshouli for joshvhq', 'Shot @khaoulaboumeshouli for @joshvhq', 'https://alexnbucur.space/instagram/meauxsvision/images/CcRGa1DN6AL.jpg', 'catalog', 'seed'),
-  ('media_CcRGFEht-8K', 'CcRGFEht-8K.jpg', 'khaoulaboumeshouli', '@khaoulaboumeshouli', 'https://alexnbucur.space/instagram/meauxsvision/images/CcRGFEht-8K.jpg', 'catalog', 'seed'),
-  ('media_CcRFg65tlmX', 'CcRFg65tlmX.jpg', 'inez.atili', '@inez.atili', 'https://alexnbucur.space/instagram/meauxsvision/images/CcRFg65tlmX.jpg', 'catalog', 'seed'),
-  ('media_CcRFZXGNk3G', 'CcRFZXGNk3G.jpg', 'najbnr', '@najbnr', 'https://alexnbucur.space/instagram/meauxsvision/images/CcRFZXGNk3G.jpg', 'catalog', 'seed'),
-  ('media_CcRFU0xNlvu', 'CcRFU0xNlvu.jpg', 'lbsabri', '@lbsabri', 'https://alexnbucur.space/instagram/meauxsvision/images/CcRFU0xNlvu.jpg', 'catalog', 'seed'),
-  ('media_CcDIrpvtJA6', 'CcDIrpvtJA6.jpg', 'SABRI. lbsabri', 'SABRI. @lbsabri', 'https://alexnbucur.space/instagram/meauxsvision/images/CcDIrpvtJA6.jpg', 'catalog', 'seed'),
-  ('media_CblHULWsvwV', 'CblHULWsvwV.jpg', 'Bromtji', '📸📸📸 Bromtji', 'https://alexnbucur.space/instagram/meauxsvision/images/CblHULWsvwV.jpg', 'catalog', 'seed'),
-  ('media_CbaXNFuMYHG', 'CbaXNFuMYHG.jpg', 'For shebridalhouse #photography', 'For @shebridalhouse #photography', 'https://alexnbucur.space/instagram/meauxsvision/images/CbaXNFuMYHG.jpg', 'catalog', 'seed'),
-  ('media_CbI4R9FMcTQ', 'CbI4R9FMcTQ.jpg', 'Shot khaoulaboumeshouli for guccibeauty', 'Shot @khaoulaboumeshouli for @guccibeauty', 'https://alexnbucur.space/instagram/meauxsvision/images/CbI4R9FMcTQ.jpg', 'catalog', 'seed')
+-- Seed initial portfolio media items with categories, tags & permalinks
+insert into public.media_items (id, filename, title, caption, alt_text, category, tags, permalink, url, source, featured, created_by)
+values
+  ('media_DW9lQW_DUjv', 'DW9lQW_DUjv.jpg', 'Anouk — Seduca', '@anoukromeeschmitz seduca', 'Sculptural chiaroscuro portrait of Anouk', 'Avant-Garde', ARRAY['chiaroscuro','portrait','anouk','sculptural'], 'https://www.instagram.com/meauxsvision/p/DW9lQW_DUjv/', 'https://alexnbucur.space/instagram/meauxsvision/images/DW9lQW_DUjv.jpg', 'catalog', true, 'seed'),
+  ('media_DT2XryvjWCB', 'DT2XryvjWCB.jpg', 'Daan Series', 'Daan series @daan___sanders', 'Monochrome studio portrait of Daan Sanders', 'Portraits', ARRAY['monochrome','portrait','daan','studio'], 'https://www.instagram.com/meauxsvision/p/DT2XryvjWCB/', 'https://alexnbucur.space/instagram/meauxsvision/images/DT2XryvjWCB.jpg', 'catalog', false, 'seed'),
+  ('media_DTpuNcKjeUN', 'DTpuNcKjeUN.jpg', 'UNIDENTIFIED', 'UNIDENTIFIED @anoukromeeschmitz — Styling/photography by me', 'Frosted glass avant-garde fashion study', 'Avant-Garde', ARRAY['avant-garde','styling','anouk','editorial'], 'https://www.instagram.com/meauxsvision/p/DTpuNcKjeUN/', 'https://alexnbucur.space/instagram/meauxsvision/images/DTpuNcKjeUN.jpg', 'catalog', true, 'seed'),
+  ('media_DTPohhYjdPI', 'DTPohhYjdPI.jpg', 'Powerwoman — Fatima Essahsah', 'Powerwoman shoot with @fatima_essahsah', 'Portrait photography of Fatima Essahsah', 'Portraits', ARRAY['portrait','powerwoman','studio','editorial'], 'https://www.instagram.com/meauxsvision/p/DTPohhYjdPI/', 'https://alexnbucur.space/instagram/meauxsvision/images/DTPohhYjdPI.jpg', 'catalog', true, 'seed'),
+  ('media_DRKpcsjDSo2', 'DRKpcsjDSo2.jpg', 'Anouk — Editorial Beauty', '@anoukromeeschmitz', 'Editorial beauty study of Anouk', 'Portraits', ARRAY['beauty','portrait','anouk'], 'https://www.instagram.com/meauxsvision/p/DRKpcsjDSo2/', 'https://alexnbucur.space/instagram/meauxsvision/images/DRKpcsjDSo2.jpg', 'catalog', false, 'seed'),
+  ('media_DObqkm2jfxe', 'DObqkm2jfxe.jpg', 'Shari Louise for Wissal Aziz', '@shari.louise for @wissalaziz — Pic and styling by @meauxsvision', 'Styling and photography for Wissal Aziz', 'Styling', ARRAY['styling','wissal-aziz','editorial'], 'https://www.instagram.com/meauxsvision/p/DObqkm2jfxe/', 'https://alexnbucur.space/instagram/meauxsvision/images/DObqkm2jfxe.jpg', 'catalog', false, 'seed'),
+  ('media_DL-e-W1N1w-', 'DL-e-W1N1w-.jpg', 'FETUS', 'FETUS — @anoukromeeschmitz', 'Sculptural monochrome photographic study', 'Avant-Garde', ARRAY['monochrome','sculptural','avant-garde','anouk'], 'https://www.instagram.com/meauxsvision/p/DL-e-W1N1w-/', 'https://alexnbucur.space/instagram/meauxsvision/images/DL-e-W1N1w-.jpg', 'catalog', true, 'seed'),
+  ('media_DH8FEYCNA1U', 'DH8FEYCNA1U.jpg', 'Butterfly Silhouette', '@nandin_erdene_enn — Butterfly: @anoukromeeschmitz', 'Backlit sculptural silhouette study', 'Avant-Garde', ARRAY['silhouette','sculptural','backlit'], 'https://www.instagram.com/meauxsvision/p/DH8FEYCNA1U/', 'https://alexnbucur.space/instagram/meauxsvision/images/DH8FEYCNA1U.jpg', 'catalog', false, 'seed'),
+  ('media_DGgGMqcv5G5', 'DGgGMqcv5G5.jpg', 'Daan Sanders Portrait', '@daan___sanders', 'Studio portrait of Daan Sanders', 'Portraits', ARRAY['portrait','daan','studio'], 'https://www.instagram.com/meauxsvision/p/DGgGMqcv5G5/', 'https://alexnbucur.space/instagram/meauxsvision/images/DGgGMqcv5G5.jpg', 'catalog', false, 'seed'),
+  ('media_DF8iodrtbss', 'DF8iodrtbss.jpg', 'Daan — Dark Silhouette', 'MODEL: @daan___sanders — STYLING/PHOTOGRAPHY/ART DIRECTION: me', 'Dark studio avant-garde silhouette', 'Avant-Garde', ARRAY['avant-garde','silhouette','daan','direction'], 'https://www.instagram.com/meauxsvision/p/DF8iodrtbss/', 'https://alexnbucur.space/instagram/meauxsvision/images/DF8iodrtbss.jpg', 'catalog', false, 'seed'),
+  ('media_DFqKHPlNV1t', 'DFqKHPlNV1t.jpg', 'Surrealism', 'Surrealism — @meauxsvision @meeaaux', 'Surrealist photographic composition', 'Avant-Garde', ARRAY['surrealism','avant-garde','editorial'], 'https://www.instagram.com/mel.dlgn/p/DFqKHPlNV1t/', 'https://alexnbucur.space/instagram/meauxsvision/images/DFqKHPlNV1t.jpg', 'catalog', false, 'seed'),
+  ('media_DEXuQ0gNbcp', 'DEXuQ0gNbcp.jpg', 'Tenebris Papilionem', 'TENEBRIS PAPILIONEM — @anoukromeeschmitz', 'Coastal veil sculptural study', 'Avant-Garde', ARRAY['sculptural','coastal','veil','anouk'], 'https://www.instagram.com/meauxsvision/p/DEXuQ0gNbcp/', 'https://alexnbucur.space/instagram/meauxsvision/images/DEXuQ0gNbcp.jpg', 'catalog', true, 'seed'),
+  ('media_DALs3rUt3RC', 'DALs3rUt3RC.jpg', 'VIGIL — Princeps Tenebris', 'VIGIL (the watcher) — PRINCEPS TENEBRIS — Creative direction/styling/photography by me', 'Princeps Tenebris directional styling study', 'Avant-Garde', ARRAY['princeps-tenebris','direction','styling','sculptural'], 'https://www.instagram.com/meauxsvision/p/DALs3rUt3RC/', 'https://alexnbucur.space/instagram/meauxsvision/images/DALs3rUt3RC.jpg', 'catalog', true, 'seed'),
+  ('media_C-vbQzBtHy8', 'C-vbQzBtHy8.jpg', 'Cosmica Mullier', 'COSMICA MULLIER (Cosmic Woman) — PRINCEPS TENEBRIS', 'Avant-garde studio study from Princeps Tenebris', 'Avant-Garde', ARRAY['princeps-tenebris','avant-garde','direction'], 'https://www.instagram.com/meauxsvision/p/C-vbQzBtHy8/', 'https://alexnbucur.space/instagram/meauxsvision/images/C-vbQzBtHy8.jpg', 'catalog', false, 'seed'),
+  ('media_C-VSlnaNa_c', 'C-VSlnaNa_c.jpg', 'Rouhi Campaign', 'For @rouhi.co', 'Brand photography for Rouhi', 'Campaigns', ARRAY['campaign','rouhi','brand'], 'https://www.instagram.com/meauxsvision/p/C-VSlnaNa_c/', 'https://alexnbucur.space/instagram/meauxsvision/images/C-VSlnaNa_c.jpg', 'catalog', false, 'seed'),
+  ('media_C8IHD9Gt_GO', 'C8IHD9Gt_GO.jpg', 'Modest Art Official', 'For @modestartofficial — Pics by me', 'Editorial campaign for Modest Art Official', 'Campaigns', ARRAY['campaign','modest-art','editorial'], 'https://www.instagram.com/meauxsvision/p/C8IHD9Gt_GO/', 'https://alexnbucur.space/instagram/meauxsvision/images/C8IHD9Gt_GO.jpg', 'catalog', false, 'seed'),
+  ('media_C7zMIi5tSg4', 'C7zMIi5tSg4.jpg', 'Dubai Silhouette — Anissa Bchiri', 'Shot & styled @anissabchiri in Dubai', 'Editorial direction in Dubai', 'Campaigns', ARRAY['dubai','editorial','styling','location'], 'https://www.instagram.com/meauxsvision/p/C7zMIi5tSg4/', 'https://alexnbucur.space/instagram/meauxsvision/images/C7zMIi5tSg4.jpg', 'catalog', false, 'seed'),
+  ('media_C7b4UpfNrcR', 'C7b4UpfNrcR.jpg', 'Milos — Larissa Bruin', 'Shot & styled @larissabruin in #milos wearing @thriftsand_threads', 'Coastal editorial in Milos', 'Location & Bridal', ARRAY['milos','location','coastal','styling'], 'https://www.instagram.com/meauxsvision/p/C7b4UpfNrcR/', 'https://alexnbucur.space/instagram/meauxsvision/images/C7b4UpfNrcR.jpg', 'catalog', false, 'seed'),
+  ('media_C7ZtLU_NaDC', 'C7ZtLU_NaDC.jpg', 'Sabri — Shadow Profile', 'Still my absolute favourite work @lbsabri', 'Shadow profile portrait of Sabri', 'Portraits', ARRAY['portrait','shadow','sabri'], 'https://www.instagram.com/meauxsvision/p/C7ZtLU_NaDC/', 'https://alexnbucur.space/instagram/meauxsvision/images/C7ZtLU_NaDC.jpg', 'catalog', false, 'seed'),
+  ('media_C5gNw4tNBbO', 'C5gNw4tNBbO.jpg', 'Babush Amsterdam — Siham', 'Pics for @babushamsterdam @sihamazouzofficial', 'Campaign photography for Babush Amsterdam', 'Campaigns', ARRAY['amsterdam','babush','campaign'], 'https://www.instagram.com/meauxsvision/p/C5gNw4tNBbO/', 'https://alexnbucur.space/instagram/meauxsvision/images/C5gNw4tNBbO.jpg', 'catalog', false, 'seed'),
+  ('media_C48XQvEtjAX', 'C48XQvEtjAX.jpg', 'Lalla Moulati', 'Shots by me for @lallamoulati.nl', 'Brand photography for Lalla Moulati', 'Campaigns', ARRAY['campaign','brand','editorial'], 'https://www.instagram.com/meauxsvision/p/C48XQvEtjAX/', 'https://alexnbucur.space/instagram/meauxsvision/images/C48XQvEtjAX.jpg', 'catalog', false, 'seed'),
+  ('media_C4a1FCkNysZ', 'C4a1FCkNysZ.jpg', 'Gloom', 'Gloom', 'Moody studio portrait study', 'Portraits', ARRAY['portrait','studio','moody'], 'https://www.instagram.com/meauxsvision/p/C4a1FCkNysZ/', 'https://alexnbucur.space/instagram/meauxsvision/images/C4a1FCkNysZ.jpg', 'catalog', false, 'seed'),
+  ('media_C4Ao4jWtDvY', 'C4Ao4jWtDvY.jpg', 'Babush Amsterdam — Dina', 'For @babushamsterdam beautiful @dina_aitbibi', 'Campaign portrait for Babush Amsterdam', 'Campaigns', ARRAY['amsterdam','babush','campaign'], 'https://www.instagram.com/meauxsvision/p/C4Ao4jWtDvY/', 'https://alexnbucur.space/instagram/meauxsvision/images/C4Ao4jWtDvY.jpg', 'catalog', false, 'seed'),
+  ('media_C3Ky93mNNFw', 'C3Ky93mNNFw.jpg', 'Isabelle’s Eyes', 'Isabelle’s eyes shot by me', 'Close-up beauty study', 'Portraits', ARRAY['beauty','closeup','portrait'], 'https://www.instagram.com/meauxsvision/p/C3Ky93mNNFw/', 'https://alexnbucur.space/instagram/meauxsvision/images/C3Ky93mNNFw.jpg', 'catalog', false, 'seed'),
+  ('media_C3FTJ2LtZZl', 'C3FTJ2LtZZl.jpg', 'Atelier Work 25', 'Atelier photographic study', 'Atelier archive photograph', 'Photography', ARRAY['archive','photography'], 'https://www.instagram.com/meauxsvision/p/C3FTJ2LtZZl/', 'https://alexnbucur.space/instagram/meauxsvision/images/C3FTJ2LtZZl.jpg', 'catalog', false, 'seed'),
+  ('media_C0RNWyrt7sx', 'C0RNWyrt7sx.jpg', 'Lanzarote — Larissa Bruin', 'Full shooting trip to Lanzarote shot by me for @larissabruin', 'Destination shoot in Lanzarote', 'Location & Bridal', ARRAY['lanzarote','destination','location','editorial'], 'https://www.instagram.com/meauxsvision/p/C0RNWyrt7sx/', 'https://alexnbucur.space/instagram/meauxsvision/images/C0RNWyrt7sx.jpg', 'catalog', false, 'seed'),
+  ('media_CzeoA8tNsj4', 'CzeoA8tNsj4.jpg', 'ISABEL', 'ISABEL @isabelblankenzee shot and directed by me', 'Directed editorial portrait of Isabel', 'Editorial', ARRAY['editorial','direction','portrait'], 'https://www.instagram.com/meauxsvision/p/CzeoA8tNsj4/', 'https://alexnbucur.space/instagram/meauxsvision/images/CzeoA8tNsj4.jpg', 'catalog', false, 'seed'),
+  ('media_CzZIYAtNU9a', 'CzZIYAtNU9a.jpg', 'Loubotomized Portrait', '@loubotomized shot by me', 'Portrait study', 'Portraits', ARRAY['portrait','editorial'], 'https://www.instagram.com/meauxsvision/p/CzZIYAtNU9a/', 'https://alexnbucur.space/instagram/meauxsvision/images/CzZIYAtNU9a.jpg', 'catalog', false, 'seed'),
+  ('media_Cxz0P5ytark', 'Cxz0P5ytark.jpg', 'Vanderwilt × Gowtu', '@gowtubywissalaziz artist wissal in @vanderwiltamsterdam', 'Monochrome leather styling for Vanderwilt x Gowtu', 'Styling', ARRAY['vanderwilt','leather','styling','monochrome'], 'https://www.instagram.com/meauxsvision/p/Cxz0P5ytark/', 'https://alexnbucur.space/instagram/meauxsvision/images/Cxz0P5ytark.jpg', 'catalog', false, 'seed'),
+  ('media_CxzzqKdto53', 'CxzzqKdto53.jpg', 'Khaoula Boumeshouli', '@khaoulaboumeshouli', 'Editorial portrait of Khaoula', 'Editorial', ARRAY['editorial','portrait','fashion'], 'https://www.instagram.com/meauxsvision/p/CxzzqKdto53/', 'https://alexnbucur.space/instagram/meauxsvision/images/CxzzqKdto53.jpg', 'catalog', false, 'seed'),
+  ('media_CxlF0ZWtP8T', 'CxlF0ZWtP8T.jpg', 'Liza & Omar Wedding', 'Yesterday’s wedding for @lizasophie @omarwaseq', 'Editorial wedding photography', 'Location & Bridal', ARRAY['bridal','wedding','editorial','location'], 'https://www.instagram.com/meauxsvision/p/CxlF0ZWtP8T/', 'https://alexnbucur.space/instagram/meauxsvision/images/CxlF0ZWtP8T.jpg', 'catalog', false, 'seed'),
+  ('media_CvS0lEnNrMr', 'CvS0lEnNrMr.jpg', 'Zaheera Session', 'Fun snapping some shots for Zaheera', 'Portrait session for Zaheera', 'Portraits', ARRAY['portrait','session'], 'https://www.instagram.com/meauxsvision/p/CvS0lEnNrMr/', 'https://alexnbucur.space/instagram/meauxsvision/images/CvS0lEnNrMr.jpg', 'catalog', false, 'seed'),
+  ('media_Cr8e19bN3mq', 'Cr8e19bN3mq.jpg', 'Jean Paul Gaultier — Mel', 'Shot @mel.dlgn in @jeanpaulgaultier', 'Archival Jean Paul Gaultier styling & editorial', 'Styling', ARRAY['jean-paul-gaultier','archival','styling','editorial'], 'https://www.instagram.com/meauxsvision/p/Cr8e19bN3mq/', 'https://alexnbucur.space/instagram/meauxsvision/images/Cr8e19bN3mq.jpg', 'catalog', false, 'seed'),
+  ('media_CqOSc5kN3gA', 'CqOSc5kN3gA.jpg', 'Vanderwilt Amsterdam', '@mel.dlgn for @vanderwiltamsterdam — Pics and creative direction by MOI', 'Sculptural silhouette campaign for Vanderwilt Amsterdam', 'Campaigns', ARRAY['vanderwilt','amsterdam','campaign','direction','styling'], 'https://www.instagram.com/meauxsvision/p/CqOSc5kN3gA/', 'https://alexnbucur.space/instagram/meauxsvision/images/CqOSc5kN3gA.jpg', 'catalog', true, 'seed'),
+  ('media_CoITMmjtXDQ', 'CoITMmjtXDQ.jpg', 'Jacquemus — Studio Lookbook', 'A gazelle in jacquemus @mysahairclinic — Shot & styled by me', 'Jacquemus lookbook styling', 'Styling', ARRAY['jacquemus','lookbook','styling'], 'https://www.instagram.com/meauxsvision/p/CoITMmjtXDQ/', 'https://alexnbucur.space/instagram/meauxsvision/images/CoITMmjtXDQ.jpg', 'catalog', false, 'seed'),
+  ('media_CnmdLLNtzm_', 'CnmdLLNtzm_.jpg', 'Atelier Work 36', 'Atelier archive study', 'Atelier archive frame', 'Photography', ARRAY['archive','photography'], 'https://www.instagram.com/meauxsvision/p/CnmdLLNtzm_/', 'https://alexnbucur.space/instagram/meauxsvision/images/CnmdLLNtzm_.jpg', 'catalog', false, 'seed'),
+  ('media_CneOhP-t126', 'CneOhP-t126.jpg', 'Fleur — Beauty & Makeup', 'Make up shots for @ha.azmani with @fleurdediver', 'Beauty and makeup studio portrait', 'Portraits', ARRAY['beauty','makeup','portrait'], 'https://www.instagram.com/meauxsvision/p/CneOhP-t126/', 'https://alexnbucur.space/instagram/meauxsvision/images/CneOhP-t126.jpg', 'catalog', false, 'seed'),
+  ('media_CnClh0aN_b4', 'CnClh0aN_b4.jpg', 'Oum in Paris', 'Oum in paris @memaori', 'Night architecture editorial in Paris', 'Location & Bridal', ARRAY['paris','night','architecture','location'], 'https://www.instagram.com/meauxsvision/p/CnClh0aN_b4/', 'https://alexnbucur.space/instagram/meauxsvision/images/CnClh0aN_b4.jpg', 'catalog', false, 'seed'),
+  ('media_CmUFVnZNhJW', 'CmUFVnZNhJW.jpg', 'Siham Azouz Archive', 'Throwback shots for @sihamazouzofficial', 'Editorial session with Siham Azouz', 'Editorial', ARRAY['editorial','portrait'], 'https://www.instagram.com/meauxsvision/p/CmUFVnZNhJW/', 'https://alexnbucur.space/instagram/meauxsvision/images/CmUFVnZNhJW.jpg', 'catalog', false, 'seed'),
+  ('media_CmUE_30NMYe', 'CmUE_30NMYe.jpg', 'Golden Hour Silhouette', 'Sunset shots are my fave', 'Golden hour sunset silhouette', 'Location & Bridal', ARRAY['sunset','golden-hour','location','silhouette'], 'https://www.instagram.com/meauxsvision/p/CmUE_30NMYe/', 'https://alexnbucur.space/instagram/meauxsvision/images/CmUE_30NMYe.jpg', 'catalog', false, 'seed'),
+  ('media_Clt2SNGN1YE', 'Clt2SNGN1YE.jpg', 'Spain — Selfmade Editorial', 'In Spain for @ibtlssam selfmade clothing', 'Location fashion shoot in Spain', 'Location & Bridal', ARRAY['spain','location','fashion','styling'], 'https://www.instagram.com/meauxsvision/p/Clt2SNGN1YE/', 'https://alexnbucur.space/instagram/meauxsvision/images/Clt2SNGN1YE.jpg', 'catalog', false, 'seed'),
+  ('media_Ck6Roc1tJYn', 'Ck6Roc1tJYn.jpg', 'Mel — Styling & Direction', 'Styling and pic by me for @mel.dlgn', 'Styled editorial portrait of Mel', 'Styling', ARRAY['styling','mel','editorial'], 'https://www.instagram.com/meauxsvision/p/Ck6Roc1tJYn/', 'https://alexnbucur.space/instagram/meauxsvision/images/Ck6Roc1tJYn.jpg', 'catalog', false, 'seed'),
+  ('media_CjanyD1Nsz4', 'CjanyD1Nsz4.jpg', 'Atelier Work 43', 'Atelier archive study', 'Atelier archive photograph', 'Photography', ARRAY['archive','photography'], 'https://www.instagram.com/meauxsvision/p/CjanyD1Nsz4/', 'https://alexnbucur.space/instagram/meauxsvision/images/CjanyD1Nsz4.jpg', 'catalog', false, 'seed'),
+  ('media_CjKj4H5tdNK', 'CjKj4H5tdNK.jpg', 'To Have & To Hold', 'TO HAVE AND TO HOLD, THEY DO — Armenian/Italian bridal couple', 'Editorial bridal couple portrait', 'Location & Bridal', ARRAY['bridal','couple','editorial'], 'https://www.instagram.com/meauxsvision/p/CjKj4H5tdNK/', 'https://alexnbucur.space/instagram/meauxsvision/images/CjKj4H5tdNK.jpg', 'catalog', false, 'seed'),
+  ('media_Ciw_6rINvBg', 'Ciw_6rINvBg.jpg', 'Zey Lina Series', 'My fave shots taken by me for @zey.lina_', 'Editorial portrait of Zey Lina', 'Portraits', ARRAY['portrait','photography'], 'https://www.instagram.com/meauxsvision/p/Ciw_6rINvBg/', 'https://alexnbucur.space/instagram/meauxsvision/images/Ciw_6rINvBg.jpg', 'catalog', false, 'seed'),
+  ('media_CgZWrHYtSBE', 'CgZWrHYtSBE.jpg', 'IB — Architectural Location', 'IB•', 'Architectural location portrait', 'Location & Bridal', ARRAY['architecture','location'], 'https://www.instagram.com/meauxsvision/p/CgZWrHYtSBE/', 'https://alexnbucur.space/instagram/meauxsvision/images/CgZWrHYtSBE.jpg', 'catalog', false, 'seed'),
+  ('media_CgP6UOHNggC', 'CgP6UOHNggC.jpg', 'Najbnr Portrait', 'The beautiful @najbnr', 'Portrait photography of Najbnr', 'Portraits', ARRAY['portrait','beauty'], 'https://www.instagram.com/meauxsvision/p/CgP6UOHNggC/', 'https://alexnbucur.space/instagram/meauxsvision/images/CgP6UOHNggC.jpg', 'catalog', false, 'seed'),
+  ('media_Cfe1b09toZC', 'Cfe1b09toZC.jpg', 'CaraMel — Mel Editorial', 'Shot my caraMel @mel.dlgn', 'Editorial portrait of Mel', 'Editorial', ARRAY['editorial','mel','portrait'], 'https://www.instagram.com/meauxsvision/p/Cfe1b09toZC/', 'https://alexnbucur.space/instagram/meauxsvision/images/Cfe1b09toZC.jpg', 'catalog', false, 'seed'),
+  ('media_CfY3m5vNidV', 'CfY3m5vNidV.jpg', 'FLUL — Bromtji', '‘FLUL’ @bromtji by me', 'Portrait study of Bromtji', 'Portraits', ARRAY['portrait','editorial'], 'https://www.instagram.com/meauxsvision/p/CfY3m5vNidV/', 'https://alexnbucur.space/instagram/meauxsvision/images/CfY3m5vNidV.jpg', 'catalog', false, 'seed'),
+  ('media_CdVsxkntawa', 'CdVsxkntawa.jpg', 'Fendi / Versace — Romy Fonseca', 'Shot @romydfonseca for @fendi @versace', 'Campaign portrait for Fendi / Versace', 'Campaigns', ARRAY['fendi','versace','campaign','styling'], 'https://www.instagram.com/meauxsvision/p/CdVsxkntawa/', 'https://alexnbucur.space/instagram/meauxsvision/images/CdVsxkntawa.jpg', 'catalog', false, 'seed'),
+  ('media_CcTqk0yom1b', 'CcTqk0yom1b.jpg', 'Josh V HQ — Editorial II', 'Shot @khaoulaboumeshouli for @joshvhq', 'Lookbook editorial for Josh V HQ', 'Campaigns', ARRAY['josh-v','lookbook','campaign'], 'https://www.instagram.com/meauxsvision/p/CcTqk0yom1b/', 'https://alexnbucur.space/instagram/meauxsvision/images/CcTqk0yom1b.jpg', 'catalog', false, 'seed'),
+  ('media_CcRJMWdtAeS', 'CcRJMWdtAeS.jpg', 'Mel Archive Study', '@mel.dlgn', 'Portrait archive study of Mel', 'Portraits', ARRAY['portrait','mel'], 'https://www.instagram.com/meauxsvision/p/CcRJMWdtAeS/', 'https://alexnbucur.space/instagram/meauxsvision/images/CcRJMWdtAeS.jpg', 'catalog', false, 'seed'),
+  ('media_CcRGa1DN6AL', 'CcRGa1DN6AL.jpg', 'Josh V HQ — Architectural Lookbook', 'Shot @khaoulaboumeshouli for @joshvhq', 'Architectural lookbook for Josh V HQ', 'Campaigns', ARRAY['josh-v','architecture','lookbook','campaign'], 'https://www.instagram.com/meauxsvision/p/CcRGa1DN6AL/', 'https://alexnbucur.space/instagram/meauxsvision/images/CcRGa1DN6AL.jpg', 'catalog', false, 'seed'),
+  ('media_CcRGFEht-8K', 'CcRGFEht-8K.jpg', 'Khaoula Study', '@khaoulaboumeshouli', 'Editorial portrait of Khaoula', 'Editorial', ARRAY['editorial','portrait'], 'https://www.instagram.com/meauxsvision/p/CcRGFEht-8K/', 'https://alexnbucur.space/instagram/meauxsvision/images/CcRGFEht-8K.jpg', 'catalog', false, 'seed'),
+  ('media_CcRFg65tlmX', 'CcRFg65tlmX.jpg', 'Inez Atili', '@inez.atili', 'Portrait photography of Inez Atili', 'Portraits', ARRAY['portrait','beauty'], 'https://www.instagram.com/meauxsvision/p/CcRFg65tlmX/', 'https://alexnbucur.space/instagram/meauxsvision/images/CcRFg65tlmX.jpg', 'catalog', false, 'seed'),
+  ('media_CcRFZXGNk3G', 'CcRFZXGNk3G.jpg', 'Najbnr Study II', '@najbnr', 'Portrait study of Najbnr', 'Portraits', ARRAY['portrait'], 'https://www.instagram.com/meauxsvision/p/CcRFZXGNk3G/', 'https://alexnbucur.space/instagram/meauxsvision/images/CcRFZXGNk3G.jpg', 'catalog', false, 'seed'),
+  ('media_CcRFU0xNlvu', 'CcRFU0xNlvu.jpg', 'Sabri Archive', '@lbsabri', 'Portrait study of Sabri', 'Portraits', ARRAY['portrait','sabri'], 'https://www.instagram.com/meauxsvision/p/CcRFU0xNlvu/', 'https://alexnbucur.space/instagram/meauxsvision/images/CcRFU0xNlvu.jpg', 'catalog', false, 'seed'),
+  ('media_CcDIrpvtJA6', 'CcDIrpvtJA6.jpg', 'SABRI.', 'SABRI. @lbsabri', 'Editorial portrait of Sabri', 'Portraits', ARRAY['portrait','sabri','editorial'], 'https://www.instagram.com/meauxsvision/p/CcDIrpvtJA6/', 'https://alexnbucur.space/instagram/meauxsvision/images/CcDIrpvtJA6.jpg', 'catalog', false, 'seed'),
+  ('media_CblHULWsvwV', 'CblHULWsvwV.jpg', 'Bromtji — Chiaroscuro Close-Up', 'Bromtji', 'Chiaroscuro close-up portrait of Bromtji', 'Portraits', ARRAY['chiaroscuro','closeup','portrait'], 'https://www.instagram.com/meauxsvision/p/CblHULWsvwV/', 'https://alexnbucur.space/instagram/meauxsvision/images/CblHULWsvwV.jpg', 'catalog', false, 'seed'),
+  ('media_CbaXNFuMYHG', 'CbaXNFuMYHG.jpg', 'She Bridal House', 'For @shebridalhouse #photography', 'Bridal campaign for She Bridal House', 'Location & Bridal', ARRAY['bridal','campaign','fashion'], 'https://www.instagram.com/meauxsvision/p/CbaXNFuMYHG/', 'https://alexnbucur.space/instagram/meauxsvision/images/CbaXNFuMYHG.jpg', 'catalog', false, 'seed'),
+  ('media_CbI4R9FMcTQ', 'CbI4R9FMcTQ.jpg', 'Gucci Beauty Campaign', 'Shot @khaoulaboumeshouli for @guccibeauty', 'Beauty campaign photography for Gucci Beauty', 'Campaigns', ARRAY['gucci','beauty','campaign','luxury'], 'https://www.instagram.com/meauxsvision/p/CbI4R9FMcTQ/', 'https://alexnbucur.space/instagram/meauxsvision/images/CbI4R9FMcTQ.jpg', 'catalog', true, 'seed')
 on conflict (id) do update
-  set title = excluded.title,
-      caption = excluded.caption,
-      url = excluded.url;
+  set title     = excluded.title,
+      caption   = excluded.caption,
+      alt_text  = coalesce(public.media_items.alt_text, excluded.alt_text),
+      category  = case when public.media_items.category = 'Uncategorized' then excluded.category else public.media_items.category end,
+      tags      = case when cardinality(public.media_items.tags) = 0 then excluded.tags else public.media_items.tags end,
+      permalink = coalesce(public.media_items.permalink, excluded.permalink),
+      url       = excluded.url,
+      updated_at = now();

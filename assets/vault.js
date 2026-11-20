@@ -679,7 +679,6 @@
             if (vaultUnlocking) return;
             const s = screwPhysics[index];
             const wrapEl = document.getElementById(`screw-wrap-${index}`);
-            const statusEl = document.getElementById(`screw-status-${index}`);
 
             screwStates[index] = !screwStates[index];
             playMechanicalRatchet(index * 32, screwStates[index]);
@@ -689,19 +688,11 @@
                 s.targetProgress = 1.0;
                 s.targetAngle -= Math.PI * 6;
                 if (wrapEl) wrapEl.classList.add('is-unscrewed');
-                if (statusEl) {
-                    statusEl.textContent = 'STATE: THREADS EXPOSED';
-                    statusEl.className = 'text-white font-bold';
-                }
             } else {
                 // Re-torque clockwise back into leather socket
                 s.targetProgress = 0.0;
                 s.targetAngle += Math.PI * 6;
                 if (wrapEl) wrapEl.classList.remove('is-unscrewed');
-                if (statusEl) {
-                    statusEl.textContent = 'TORQUE: 18.4 N·m';
-                    statusEl.className = 'text-zinc-400';
-                }
             }
 
             const lockedCount = screwStates.filter(st => !st).length;
@@ -740,7 +731,6 @@
                 scheduleVault(() => {
                     const s = screwPhysics[idx];
                     const wrapEl = document.getElementById(`screw-wrap-${idx}`);
-                    const statusEl = document.getElementById(`screw-status-${idx}`);
                     if (!screwStates[idx]) {
                         screwStates[idx] = true;
                         s.targetProgress = 1.0;
@@ -748,10 +738,6 @@
                         playMechanicalRatchet(idx * 35, true);
                     }
                     if (wrapEl) wrapEl.classList.add('is-unscrewed');
-                    if (statusEl) {
-                        statusEl.textContent = 'STATE: RELEASED';
-                        statusEl.className = 'text-white font-bold';
-                    }
                 }, stagger * 55);
             });
 
@@ -804,12 +790,7 @@
                         playMechanicalRatchet(idx * 25, false);
 
                         const wrapEl = document.getElementById(`screw-wrap-${idx}`);
-                        const statusEl = document.getElementById(`screw-status-${idx}`);
                         if (wrapEl) wrapEl.classList.remove('is-unscrewed');
-                        if (statusEl) {
-                            statusEl.textContent = 'TORQUE: 18.4 N·m';
-                            statusEl.className = 'text-zinc-400';
-                        }
                     }, stagger * 90);
                 });
             }, 320);
@@ -923,8 +904,8 @@
         // --------------------------------------------------
         // 8. VAULT TYPEWRITER CYCLING
         // --------------------------------------------------
-        const disciplinesList = [
-            'INTERIOR DESIGN',
+        let disciplinesList = [
+            'STYLING',
             'BRAND IDENTITY',
             'AVANT-GARDE PHOTOGRAPHY',
             'SOCIAL MEDIA CURATION'
@@ -934,6 +915,24 @@
         let isDeleting = false;
         let typewriterTimer = null;
         const typewriterEl = document.getElementById('vault-typewriter');
+
+        window.MeauxVault = {
+            getDisciplines: () => disciplinesList.slice(),
+            setDisciplines: (list) => {
+                if (Array.isArray(list) && list.length > 0) {
+                    disciplinesList = list.map(s => String(s || '').trim()).filter(Boolean);
+                    if (!disciplinesList.length) disciplinesList = ['STYLING', 'PHOTOGRAPHY'];
+                    discIndex = 0;
+                    charIndex = 0;
+                    isDeleting = false;
+                    if (!vaultIsOpen && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                        runTypewriter();
+                    } else if (typewriterEl) {
+                        typewriterEl.textContent = disciplinesList[0];
+                    }
+                }
+            }
+        };
 
         function runTypewriter() {
             clearTimeout(typewriterTimer);

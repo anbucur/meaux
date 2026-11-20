@@ -26,3 +26,4 @@ yarn-error.log*
 .vercel
 supabase/.temp/
 .env*
+monalisa/

@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MEAUX — Spatial, Visual & Brand Atelier</title>
+    <title>MEAUX — Visual, Styling & Brand Atelier</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90' fill='%23ffffff'>✳</text></svg>">
-    <meta name="description" id="meta-description" content="Meaux — an independent creative practice in photography, interior design, brand identity and social media.">
+    <meta name="description" id="meta-description" content="Meaux — an independent creative practice in photography, styling, brand identity and social media.">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts: Space Mono (Modernized Typewriter), Syne (Architectural Display), Cormorant Garamond (High-Contrast Editorial) -->
@@ -13,11 +13,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
     
-    <link rel="stylesheet" href="assets/site.css?v=5">
-    <link rel="stylesheet" href="assets/entrance.css?v=8">
-    <link rel="stylesheet" href="assets/blocks.css?v=4">
+    <link rel="stylesheet" href="assets/site.css?v=10">
+    <link rel="stylesheet" href="assets/entrance.css?v=11">
+    <link rel="stylesheet" href="assets/blocks.css?v=5">
     <link rel="stylesheet" href="assets/chrome-spikes.css?v=4">
-    <link rel="stylesheet" href="assets/cms/admin.css?v=5">
+    <link rel="stylesheet" href="assets/cms/admin.css?v=11">
     
     <script>
         tailwind.config = {
@@ -351,7 +351,6 @@
                     <div class="leather-dimple-ring"></div>
                     <canvas id="screw-canvas-0" width="224" height="224" class="screw-canvas"></canvas>
                 </div>
-                <span id="screw-status-0" class="sr-only">TORQUE: 18.4 N·m</span>
             </div>
 
             <!-- Top-Right 3D Orb Screw -->
@@ -360,7 +359,6 @@
                     <div class="leather-dimple-ring"></div>
                     <canvas id="screw-canvas-1" width="224" height="224" class="screw-canvas"></canvas>
                 </div>
-                <span id="screw-status-1" class="sr-only">TORQUE: 18.4 N·m</span>
             </div>
 
             <!-- Bottom-Left 3D Orb Screw -->
@@ -369,7 +367,6 @@
                     <div class="leather-dimple-ring"></div>
                     <canvas id="screw-canvas-2" width="224" height="224" class="screw-canvas"></canvas>
                 </div>
-                <span id="screw-status-2" class="sr-only">TORQUE: 18.4 N·m</span>
             </div>
 
             <!-- Bottom-Right 3D Orb Screw -->
@@ -378,7 +375,6 @@
                     <div class="leather-dimple-ring"></div>
                     <canvas id="screw-canvas-3" width="224" height="224" class="screw-canvas"></canvas>
                 </div>
-                <span id="screw-status-3" class="sr-only">TORQUE: 18.4 N·m</span>
             </div>
 
             <!-- Vault Top Technical Bar -->
@@ -409,7 +405,7 @@
                 <!-- Live Typewriter Discipline Cycling -->
                 <div class="h-6 flex items-center justify-center text-xs sm:text-sm tracking-[0.25em] text-zinc-200 uppercase">
                     <span class="text-zinc-500 mr-2">[</span>
-                    <span id="vault-typewriter">INTERIOR DESIGN</span><span class="typewriter-cursor"></span>
+                    <span id="vault-typewriter">STYLING</span><span class="typewriter-cursor"></span>
                     <span class="text-zinc-500 ml-2">]</span>
                 </div>
 
@@ -456,9 +452,6 @@
       <button type="button" class="tab-btn" data-tab="social-media" aria-controls="view-social-media" aria-selected="false">
         <span>Social Media Curation</span>
       </button>
-      <button type="button" class="tab-btn" data-tab="interior-design" aria-controls="view-interior-design" aria-selected="false">
-        <span>Interior Design</span>
-      </button>
       <button type="button" class="tab-btn" data-tab="about" aria-controls="view-about" aria-selected="false">
         <span>About Me</span>
       </button>
@@ -472,13 +465,13 @@
     <!-- ==========================================
          TAB 1: ATELIER (HOME / OVERVIEW)
          ========================================== -->
-    <div id="view-atelier" class="tab-view active" role="tabpanel" aria-labelledby="tab-atelier">
+    <div id="view-atelier" class="tab-view active" role="tabpanel" aria-labelledby="tab-atelier" data-cms-container>
       
       <!-- Hero Section -->
       <section class="hero" id="hero" aria-labelledby="hero-title">
         <div class="hero-topline">
           <span>Independent creative practice</span>
-          <span>Photography · Styling · Social Media · Interior Design</span>
+          <span>Photography · Styling · Social Media Curation</span>
         </div>
         <h1 class="hero-word brand-logo" id="hero-title" tabindex="-1">
           MEAUX<span class="hero-asterisk brand-star" aria-hidden="true">✳</span>
@@ -487,7 +480,7 @@
           <div class="hero-copy">
             <p class="hero-statement">A different<br>way of seeing.</p>
             <p class="hero-description">
-              Shaping images, silhouettes, digital worlds, and physical spaces. A multi-disciplinary atelier guided by instinct, craftsmanship, and radical restraint.
+              Shaping images, silhouettes, and digital worlds. A multi-disciplinary atelier guided by instinct, craftsmanship, and radical restraint.
             </p>
             <div class="flex flex-wrap gap-5 items-center">
               <a class="round-link" href="#works">
@@ -515,12 +508,12 @@
         </div>
       </section>
 
-      <!-- 4-Discipline Luxury Portals Strip -->
+      <!-- 3-Discipline Luxury Portals Strip -->
       <section class="home-disciplines-section" aria-labelledby="disciplines-overview-title">
         <div class="home-disciplines-heading">
           <div>
             <span class="small-label">The Atelier Disciplines</span>
-            <h2 id="disciplines-overview-title">Four disciplines. One vision.</h2>
+            <h2 id="disciplines-overview-title">Three disciplines. One vision.</h2>
           </div>
           <button type="button" data-tab-target="about" class="text-link">Read the philosophy ↗</button>
         </div>
@@ -555,22 +548,10 @@
             <div>
               <span class="card-num">03 // DISCIPLINE</span>
               <h3>Social Media Curation</h3>
-              <p>The grid as an architectural exhibition. Rhythmic pacing, aesthetic ecosystems, and timeless visual identity over fleeting trends.</p>
+              <p>The grid as an architectural exhibition. Content Packs, wardrobe cleanup, shopping advice, client styling, and planned photo &amp; video shoots.</p>
             </div>
             <button type="button" data-tab-target="social-media" class="card-cta">
               Explore curation story <span>↗</span>
-            </button>
-          </div>
-
-          <!-- 04 Interior Design -->
-          <div class="discipline-card">
-            <div>
-              <span class="card-num">04 // DISCIPLINE</span>
-              <h3>Interior Design</h3>
-              <p>Habitable sculpture. Obsidian leathers, raw mineral plasters, liquid chrome accents, and raking light shaping emotional sanctuary.</p>
-            </div>
-            <button type="button" data-tab-target="interior-design" class="card-cta">
-              Explore spatial story <span>↗</span>
             </button>
           </div>
         </div>
@@ -646,17 +627,9 @@
           <details>
             <summary><span>Social Media Curation</span><span class="service-plus" aria-hidden="true">+</span></summary>
             <div>
-              <p>A considered digital presence, image by image. Turning feeds into curated gallery pavilions with rhythmic pacing and negative space.</p>
-              <span>Grid Architecture · Bespoke Content Suites · Brand Repositioning</span>
+              <p>A considered digital presence, image by image. From written Content Packs and wardrobe cleanup to client styling and planned photo &amp; video shoots.</p>
+              <span>Content Packs · Wardrobe &amp; Shopping · Planned Photo &amp; Video</span>
               <button type="button" data-tab-target="social-media" class="text-link mt-4">View Curation Story ↗</button>
-            </div>
-          </details>
-          <details>
-            <summary><span>Interior Design</span><span class="service-plus" aria-hidden="true">+</span></summary>
-            <div>
-              <p>Spaces with an unforgettable atmosphere. An exploration of obsidian leathers, raw plasters, and lighting choreography.</p>
-              <span>Spatial Concepts · Bespoke Materials · Curatorial Atmosphere</span>
-              <button type="button" data-tab-target="interior-design" class="text-link mt-4">View Interior Design Story ↗</button>
             </div>
           </details>
         </div>
@@ -665,171 +638,89 @@
     </div>
 
     <!-- ==========================================
-         TAB 2: PHOTOGRAPHY (DISCIPLINE STORY)
+         TAB 2: PHOTOGRAPHY (BENTO PORTFOLIO BY STYLE)
          ========================================== -->
     <div id="view-photography" class="tab-view" role="tabpanel" aria-labelledby="tab-photography" hidden>
-      <section class="discipline-page" data-cms-container>
-        <div class="discipline-header">
+      <section class="discipline-page photo-showcase-page" data-cms-container>
+        <div class="discipline-header photo-header">
           <div class="discipline-tagline">
             <span>01 // DISCIPLINE</span>
             <span>·</span>
             <span>ATELIER MEAUX</span>
           </div>
-          <h2 class="discipline-title">Photography</h2>
-          <p class="discipline-subtitle">
-            “The camera does not record light; it carves form out of shadow.”
-          </p>
-        </div>
-
-        <!-- Narrative Split -->
-        <div class="discipline-narrative-split">
-          <div class="narrative-image-wrap">
-            <img src="instagram/meauxsvision/images/DW9lQW_DUjv.jpg" alt="Anouk in wide sculptural hat" loading="lazy" width="1440" height="1919">
-            <div class="narrative-image-caption">
-              <span>Anouk Study</span>
-              <span>Photographic Direction</span>
-            </div>
-          </div>
-          <div class="narrative-text-wrap">
-            <div class="story-chapter">
-              <h3>The Archaeology of Light</h3>
-              <p>
-                Photography at Meaux is not passive observation; it is an architectural excavation of human presence. Stripping away superficial ornamentation, we operate in deep, high-contrast monochrome and directional raking light. Every shadow is deliberate—sculpted to accentuate bone structure, posture, and the palpable tension between the subject and the surrounding void.
-              </p>
-            </div>
-            <div class="story-chapter">
-              <h3>Sculptural Portraiture & High Fashion</h3>
-              <p>
-                Having photographed campaigns and editorial stories for houses such as Gucci Beauty, Vanderwilt Amsterdam, and Jacquemus, our visual language draws heavily from classical chiaroscuro, modern brutalism, and avant-garde couture. We treat the human body as an immutable monument in space.
-              </p>
-            </div>
-            <div class="story-chapter">
-              <h3>Surgical Precision</h3>
-              <p>
-                Every frame is treated as a museum monograph. From medium format digital sensor calibration to custom black-and-white tonal curves, each capture delivers immense depth, velvet blacks, and silvery highlights that command quiet awe.
-              </p>
-            </div>
+          <div class="photo-header-row">
+            <h2 class="discipline-title">Photography</h2>
           </div>
         </div>
 
-        <!-- Bespoke Luxury Service Tiers -->
-        <div class="discipline-services">
-          <h3 class="discipline-section-title">Photographic Service Scope</h3>
-          <p class="discipline-section-intro">
-            Executed with complete creative authorship, from initial mood architecture to final exhibition-grade mastering.
-          </p>
-
-          <div class="service-tiers-grid">
-            <div class="service-tier-card">
-              <span class="tier-badge">TIER 01 // EDITORIAL</span>
-              <h4>Haute Editorial & Campaign Direction</h4>
-              <p>
-                Full-scale conceptual direction, location and lighting architecture, model casting, on-set direction, and comprehensive master grading.
-              </p>
-              <div class="tier-deliverables">
-                <span class="tier-deliverables-title">Scope & Deliverables</span>
-                <ul>
-                  <li>Complete creative treatment & lighting plan</li>
-                  <li>30–60 master-graded campaign captures</li>
-                  <li>Full commercial global print & digital rights</li>
-                  <li>Archival TIFF & high-res web deliverables</li>
-                </ul>
-              </div>
-            </div>
-
-            <div class="service-tier-card">
-              <span class="tier-badge">TIER 02 // PORTRAITURE</span>
-              <h4>Private Sculptural Portraiture Studies</h4>
-              <p>
-                Intimate private sessions for artists, cultural icons, founders, and collectors in our Amsterdam studio or worldwide residences.
-              </p>
-              <div class="tier-deliverables">
-                <span class="tier-deliverables-title">Scope & Deliverables</span>
-                <ul>
-                  <li>Half-day or full-day private atelier session</li>
-                  <li>12 bespoke museum-grade portrait studies</li>
-                  <li>Museum rag archival fine-art physical prints</li>
-                  <li>Private digital monograph archive</li>
-                </ul>
-              </div>
-            </div>
-
-            <div class="service-tier-card">
-              <span class="tier-badge">TIER 03 // LOOKBOOK</span>
-              <h4>Architectural Lookbook & Capsule Suites</h4>
-              <p>
-                Precision garment framing, tactile textile macro close-ups, and lookbook suites translating tactile design into digital desire.
-              </p>
-              <div class="tier-deliverables">
-                <span class="tier-deliverables-title">Scope & Deliverables</span>
-                <ul>
-                  <li>Curated seasonal lookbook capture suite</li>
-                  <li>Garment movement & drape choreography</li>
-                  <li>E-commerce & editorial dual delivery</li>
-                  <li>Color-matched tonal consistency across capsule</li>
-                </ul>
-              </div>
-            </div>
+        <!-- Shoot Style Filter Bar -->
+        <div class="photo-style-bar" role="region" aria-label="Filter photography by shoot style">
+          <div class="photo-style-pills" role="tablist" aria-label="Photography shoot styles">
+            <button type="button" class="photo-style-pill active" role="tab" aria-selected="true" data-photo-style="all">
+              <span>All Styles</span>
+              <span class="pill-count">10</span>
+            </button>
+            <button type="button" class="photo-style-pill" role="tab" aria-selected="false" data-photo-style="avant-garde">
+              <span>Sculptural &amp; Avant-Garde</span>
+              <span class="pill-count">08</span>
+            </button>
+            <button type="button" class="photo-style-pill" role="tab" aria-selected="false" data-photo-style="campaigns">
+              <span>Fashion &amp; Campaigns</span>
+              <span class="pill-count">08</span>
+            </button>
+            <button type="button" class="photo-style-pill" role="tab" aria-selected="false" data-photo-style="portraits">
+              <span>Portraits &amp; Beauty</span>
+              <span class="pill-count">08</span>
+            </button>
+            <button type="button" class="photo-style-pill" role="tab" aria-selected="false" data-photo-style="location">
+              <span>Location &amp; Bridal</span>
+              <span class="pill-count">08</span>
+            </button>
+          </div>
+          <div class="photo-style-meta">
+            <p id="photo-style-summary" class="photo-style-summary" aria-live="polite">
+              A cross-section of sculptural studio studies, fashion campaigns, intimate portraits, and destination shoots.
+            </p>
+            <span class="photo-style-hint">Click any frame to inspect</span>
           </div>
         </div>
 
-        <!-- Curated Archive Showcase -->
-        <div class="discipline-gallery">
-          <h3 class="discipline-section-title">Selected Photographic Works</h3>
-          <div class="gallery-grid">
-            <div class="gallery-item" data-post="DEXuQ0gNbcp">
-              <img src="instagram/meauxsvision/images/DEXuQ0gNbcp.jpg" alt="Tenebris Papilionem" loading="lazy">
-              <div class="gallery-overlay">
-                <h5>Tenebris Papilionem</h5>
-                <span>Anouk Study · Chiaroscuro</span>
-              </div>
-            </div>
-            <div class="gallery-item" data-post="CbI4R9FMcTQ">
-              <img src="instagram/meauxsvision/images/CbI4R9FMcTQ.jpg" alt="Gucci Beauty" loading="lazy">
-              <div class="gallery-overlay">
-                <h5>Gucci Beauty</h5>
-                <span>Campaign Direction · Khaoula</span>
-              </div>
-            </div>
-            <div class="gallery-item" data-post="DTPohhYjdPI">
-              <img src="instagram/meauxsvision/images/DTPohhYjdPI.jpg" alt="Powerwoman" loading="lazy">
-              <div class="gallery-overlay">
-                <h5>Powerwoman</h5>
-                <span>Fatima Essahsah · Portrait</span>
-              </div>
-            </div>
-            <div class="gallery-item" data-post="DT2XryvjWCB">
-              <img src="instagram/meauxsvision/images/DT2XryvjWCB.jpg" alt="Daan Sanders" loading="lazy">
-              <div class="gallery-overlay">
-                <h5>Daan Series</h5>
-                <span>Sculptural Form Study</span>
-              </div>
-            </div>
-            <div class="gallery-item" data-post="C4a1FCkNysZ">
-              <img src="instagram/meauxsvision/images/C4a1FCkNysZ.jpg" alt="Gloom" loading="lazy">
-              <div class="gallery-overlay">
-                <h5>Gloom</h5>
-                <span>Monochrome Portrait</span>
-              </div>
-            </div>
-            <div class="gallery-item" data-post="DALs3rUt3RC">
-              <img src="instagram/meauxsvision/images/DALs3rUt3RC.jpg" alt="Vigil" loading="lazy">
-              <div class="gallery-overlay">
-                <h5>Vigil</h5>
-                <span>Princeps Tenebris Direction</span>
-              </div>
-            </div>
+        <!-- Asymmetric Bento Portfolio Grid (populated & animated by site.js) -->
+        <div id="photo-bento-grid" class="photo-bento-grid" aria-live="polite"></div>
+
+        <!-- Clean, Easy-to-Follow Essentials Strip (Replaces Service Tiers) -->
+        <div class="photo-essentials-strip">
+          <div class="photo-essential-item">
+            <span class="photo-essential-num">01 // SETTING</span>
+            <h3>Studio or On Location</h3>
+            <p>Photographed in our Amsterdam studio or on location worldwide—from desert canyons to European capitals.</p>
           </div>
+          <div class="photo-essential-item">
+            <span class="photo-essential-num">02 // DIRECTION</span>
+            <h3>One Cohesive Eye</h3>
+            <p>Concept, lighting, casting, and optional wardrobe styling handled together so every frame feels intentional.</p>
+          </div>
+          <div class="photo-essential-item">
+            <span class="photo-essential-num">03 // DELIVERY</span>
+            <h3>Ready for Any Format</h3>
+            <p>Final selects graded with Meaux’s tonal signature and delivered ready for print, campaigns, and social.</p>
+          </div>
+        </div>
+
+        <!-- Archive Jump Link -->
+        <div class="photo-archive-bar">
+          <span>Want to browse every shoot from the archive?</span>
+          <button type="button" id="photo-open-archive" class="text-link">View all 61 works in the archive <span aria-hidden="true">↗</span></button>
         </div>
 
         <!-- Commission CTA Banner -->
         <div class="discipline-cta-banner">
           <div class="discipline-cta-text">
-            <h3>Commission a Photographic Series</h3>
-            <p>Direct inquiries for seasonal campaigns, private portraits, and lookbook suites in Amsterdam or on global location.</p>
+            <h3>Book a Shoot</h3>
+            <p>Available for fashion campaigns, sculptural portraits, lookbooks, and destination shoots in Amsterdam and worldwide.</p>
           </div>
           <button type="button" data-tab-target="enquiries" data-preselect-discipline="Photography" class="luxury-btn">
-            <span>Initiate Photographic Dossier ↗</span>
+            <span>Enquire About a Shoot ↗</span>
           </button>
         </div>
       </section>
@@ -1023,144 +914,215 @@
           </p>
         </div>
 
-        <!-- Narrative Split -->
-        <div class="discipline-narrative-split">
-          <div class="narrative-image-wrap">
-            <img src="instagram/meauxsvision/images/C-VSlnaNa_c.jpg" alt="Rouhi curation study" loading="lazy" width="1440" height="1800">
-            <div class="narrative-image-caption">
-              <span>Rouhi Amsterdam</span>
-              <span>Aesthetic Feed Architecture</span>
+        <!-- Interactive Curated Instagram Feed Showcase -->
+        <div class="ig-curation-showcase">
+          <!-- Left: Curated Instagram Profile & 3x3 Grid Mockup -->
+          <div class="ig-device-frame" aria-label="Curated Instagram feed preview">
+            <div class="ig-topbar">
+              <span class="ig-handle">@meauxsvision <span class="ig-verified" aria-hidden="true">✳</span></span>
+              <span class="ig-topbar-meta">CURATED FEED PREVIEW</span>
+            </div>
+
+            <div class="ig-profile-header">
+              <div class="ig-avatar-ring">
+                <img src="instagram/meauxsvision/images/DZ5dX4SjAXv.jpg" alt="Meaux Atelier profile avatar" loading="lazy">
+              </div>
+              <div class="ig-profile-stats">
+                <div><strong>61</strong><span>Posts</span></div>
+                <div><strong>9×3</strong><span>Grid Cadence</span></div>
+                <div><strong>Photo + Video</strong><span>Formats</span></div>
+              </div>
+            </div>
+
+            <div class="ig-bio">
+              <p class="ig-bio-name">MEAUX ATELIER</p>
+              <p class="ig-bio-text">Curated Digital Flagship · Content Packs · Wardrobe & Styling · Editorial Photo & Video Direction · Amsterdam</p>
+            </div>
+
+            <!-- Story Highlights -->
+            <div class="ig-highlights" aria-label="Curated story highlights">
+              <div class="ig-highlight">
+                <div class="ig-highlight-ring"><img src="assets/images/session-direction.jpg?v=2" alt="Content Pack highlight" loading="lazy"></div>
+                <span>Content Pack</span>
+              </div>
+              <div class="ig-highlight">
+                <div class="ig-highlight-ring"><img src="assets/images/session-styling.jpg" alt="Wardrobe highlight" loading="lazy"></div>
+                <span>Wardrobe</span>
+              </div>
+              <div class="ig-highlight">
+                <div class="ig-highlight-ring"><img src="assets/images/session-shoot.jpg" alt="On Set highlight" loading="lazy"></div>
+                <span>On Set</span>
+              </div>
+              <div class="ig-highlight">
+                <div class="ig-highlight-ring"><img src="assets/images/feed-02.jpg" alt="Reels highlight" loading="lazy"></div>
+                <span>Reels</span>
+              </div>
+              <div class="ig-highlight">
+                <div class="ig-highlight-ring"><img src="assets/images/feed-06.jpg" alt="Details highlight" loading="lazy"></div>
+                <span>Details</span>
+              </div>
+            </div>
+
+            <!-- Interactive Feed Mode Tabs -->
+            <div class="ig-feed-tabs" role="tablist" aria-label="Feed view filter">
+              <button type="button" class="ig-feed-tab active" data-ig-filter="all" aria-selected="true">⊞ Curated Grid</button>
+              <button type="button" class="ig-feed-tab" data-ig-filter="reel" aria-selected="false">▶ Photo &amp; Video Reels</button>
+            </div>
+
+            <!-- 3x3 Curated Feed Grid (Generated in Meaux's Style) -->
+            <div class="ig-grid" id="ig-curated-grid">
+              <div class="ig-tile" data-ig-type="carousel">
+                <img src="assets/images/feed-01.jpg" alt="Chiaroscuro portrait in sculptural black wide-brimmed hat" loading="lazy">
+                <span class="ig-badge" aria-hidden="true">❐</span>
+                <span class="ig-tile-hover">Portrait · Carousel</span>
+              </div>
+              <div class="ig-tile" data-ig-type="reel">
+                <img src="assets/images/feed-02.jpg" alt="Model in black leather trench coat striding across limestone courtyard" loading="lazy">
+                <span class="ig-badge" aria-hidden="true">▶</span>
+                <span class="ig-tile-hover">Motion · Video Reel</span>
+              </div>
+              <div class="ig-tile" data-ig-type="photo">
+                <img src="assets/images/feed-03.jpg" alt="Macro detail of silver rings on black wool lapel and lambskin" loading="lazy">
+                <span class="ig-tile-hover">Texture · Still</span>
+              </div>
+              <div class="ig-tile" data-ig-type="carousel">
+                <img src="assets/images/feed-04.jpg" alt="Editorial look in bone-white coat against brutalist concrete with diagonal sunlight" loading="lazy">
+                <span class="ig-badge" aria-hidden="true">❐</span>
+                <span class="ig-tile-hover">Lookbook · Carousel</span>
+              </div>
+              <div class="ig-tile" data-ig-type="reel">
+                <img src="assets/images/feed-05.jpg" alt="Sculptural monochrome silhouette portrait with crisp rim lighting" loading="lazy">
+                <span class="ig-badge" aria-hidden="true">▶</span>
+                <span class="ig-tile-hover">Silhouette · Reel</span>
+              </div>
+              <div class="ig-tile" data-ig-type="photo">
+                <img src="assets/images/feed-06.jpg" alt="Minimalist black leather bag, angular sunglasses, and chrome object on basalt stone" loading="lazy">
+                <span class="ig-tile-hover">Objects · Still</span>
+              </div>
+              <div class="ig-tile" data-ig-type="carousel">
+                <img src="assets/images/feed-07.jpg" alt="Editorial street look in oversized dark suit along Amsterdam canal at dusk" loading="lazy">
+                <span class="ig-badge" aria-hidden="true">❐</span>
+                <span class="ig-tile-hover">Amsterdam · Carousel</span>
+              </div>
+              <div class="ig-tile" data-ig-type="reel">
+                <img src="assets/images/feed-08.jpg" alt="Black-and-white beauty portrait draped in sheer black silk tulle" loading="lazy">
+                <span class="ig-badge" aria-hidden="true">▶</span>
+                <span class="ig-tile-hover">Beauty · Video Reel</span>
+              </div>
+              <div class="ig-tile" data-ig-type="photo">
+                <img src="assets/images/feed-09.jpg" alt="Figure in floor-length black wool coat framed in a stone archway with raking light" loading="lazy">
+                <span class="ig-tile-hover">Archway · Still</span>
+              </div>
             </div>
           </div>
-          <div class="narrative-text-wrap">
+
+          <!-- Right: Crisp Overview & At-a-Glance Services -->
+          <div class="ig-curation-copy">
             <div class="story-chapter">
-              <h3>The Digital Flagship</h3>
+              <h3>Your Feed, Directed End-to-End</h3>
               <p>
-                In an era dominated by hyperactive algorithmic noise and disposable video, Meaux builds digital ecosystems governed by stillness, intentional pacing, and supreme aesthetic authority. We transform social presence into an immersive editorial publication where every square has purpose.
+                Every post, silhouette, and frame is planned before the camera comes out—so your Instagram reads like a cohesive gallery, not a random timeline.
               </p>
             </div>
-            <div class="story-chapter">
-              <h3>The Grid as Architectural Pavilion</h3>
-              <p>
-                We curate feeds the way a gallery director hangs an exhibition. We orchestrate alternating rhythms of high-contrast editorial captures, sculptural macro textures, deep shadows, and breathing negative space. The result is a profile that immediately communicates prestige, exclusivity, and pedigree.
-              </p>
-            </div>
-            <div class="story-chapter">
-              <h3>Long-Term Aesthetic Equity</h3>
-              <p>
-                Collaborating with luxury hospitality, high-end beauty, and boutique fashion houses (Rouhi, Babush Amsterdam, Modest Art, Wissal Aziz), our curation elevates brand valuation and commands respect from top-tier clientele and international press.
-              </p>
+
+            <!-- Scannable 4-Pillar Scope -->
+            <div class="content-pack-card">
+              <span class="content-pack-kicker">WHAT’S INCLUDED // FULL CURATION FLOW</span>
+              <ul class="content-pack-list">
+                <li>
+                  <span class="cp-index">01</span>
+                  <div>
+                    <strong>Content Writing &amp; Content Pack</strong>
+                    <p>Post ideas, editorial captions, hooks, and your 3×3 grid plan delivered as a ready-to-use Content Pack.</p>
+                  </div>
+                </li>
+                <li>
+                  <span class="cp-index">02</span>
+                  <div>
+                    <strong>Wardrobe Cleanup &amp; Shopping Advice</strong>
+                    <p>Editing your existing closet, removing clutter, and personal shopping guidance for key missing pieces.</p>
+                  </div>
+                </li>
+                <li>
+                  <span class="cp-index">03</span>
+                  <div>
+                    <strong>Client Styling &amp; Planned Photoshoot</strong>
+                    <p>Full look styling on you, fittings, location scouting, and a look-by-look shot list.</p>
+                  </div>
+                </li>
+                <li>
+                  <span class="cp-index">04</span>
+                  <div>
+                    <strong>Photo &amp; Video Shooting</strong>
+                    <p>Dedicated shoot days capturing both editorial photography and cinematic vertical video / Reels.</p>
+                  </div>
+                </li>
+              </ul>
             </div>
           </div>
         </div>
 
-        <!-- Bespoke Luxury Service Tiers -->
-        <div class="discipline-services">
-          <h3 class="discipline-section-title">Curation Service Scope</h3>
-          <p class="discipline-section-intro">
-            A comprehensive strategic discipline transforming client perception through meticulous visual curation.
-          </p>
-
-          <div class="service-tiers-grid">
-            <div class="service-tier-card">
-              <span class="tier-badge">TIER 01 // ARCHITECTURE</span>
-              <h4>Full-Scope Grid Architecture & Direction</h4>
-              <p>
-                Multi-month visual roadmap, aesthetic identity calibration, color-story development, rhythm sequencing, and typographic restraint.
-              </p>
-              <div class="tier-deliverables">
-                <span class="tier-deliverables-title">Scope & Deliverables</span>
-                <ul>
-                  <li>Complete 3-month grid architecture blueprint</li>
-                  <li>Triptych & negative space choreography</li>
-                  <li>Tonal palette & asset contrast grading</li>
-                  <li>Caption voice & typographic styling rules</li>
-                </ul>
-              </div>
-            </div>
-
-            <div class="service-tier-card">
-              <span class="tier-badge">TIER 02 // PRODUCTION</span>
-              <h4>Bespoke Content Production Suites</h4>
-              <p>
-                Quarterly on-location shoots producing exclusive photography, short-form motion vignettes, and behind-the-scenes glimpses for the grid.
-              </p>
-              <div class="tier-deliverables">
-                <span class="tier-deliverables-title">Scope & Deliverables</span>
-                <ul>
-                  <li>Quarterly high-fashion production days</li>
-                  <li>45+ bespoke editorial assets tailored for grid harmony</li>
-                  <li>Vertical video motion vignettes (cinematic, non-hyped)</li>
-                  <li>Asset bank categorized by aesthetic weight</li>
-                </ul>
-              </div>
-            </div>
-
-            <div class="service-tier-card">
-              <span class="tier-badge">TIER 03 // LAUNCH ROLLOUT</span>
-              <h4>Campaign Drops & Digital Rebranding</h4>
-              <p>
-                High-impact multi-week narrative rollouts for new collection drops, hotel openings, or total brand repositioning.
-              </p>
-              <div class="tier-deliverables">
-                <span class="tier-deliverables-title">Scope & Deliverables</span>
-                <ul>
-                  <li>Pre-launch teaser pacing & blackout sequencing</li>
-                  <li>Multi-tiered asset rollout schedule</li>
-                  <li>High-conversion bio & story highlights architecture</li>
-                  <li>Post-launch performance & aesthetic audit</li>
-                </ul>
-              </div>
-            </div>
+        <!-- Inside a Session with Meaux (3-Step Visual Walkthrough) -->
+        <div class="session-walkthrough-section">
+          <div class="session-walkthrough-header">
+            <span class="small-label">How a Session Works</span>
+            <h3 class="discipline-section-title mt-3">Inside a Session with Meaux</h3>
           </div>
-        </div>
 
-        <!-- Curated Archive Showcase -->
-        <div class="discipline-gallery">
-          <h3 class="discipline-section-title">Curated Client Ecosystems</h3>
-          <div class="gallery-grid">
-            <div class="gallery-item" data-post="C5gNw4tNBbO">
-              <img src="instagram/meauxsvision/images/C5gNw4tNBbO.jpg" alt="Babush Amsterdam" loading="lazy">
-              <div class="gallery-overlay">
-                <h5>Babush Amsterdam</h5>
-                <span>Aesthetic Brand Curation</span>
+          <div class="session-steps-grid">
+            <article class="session-step-card">
+              <div class="session-step-media">
+                <img src="assets/images/session-direction.jpg?v=2" alt="Mohammed reviewing a printed content pack, contact sheets, and a curated 3x3 Instagram grid with a client in his Amsterdam studio" loading="lazy">
+                <span class="session-step-badge">01 // CONTENT PACK</span>
               </div>
-            </div>
-            <div class="gallery-item" data-post="C4Ao4jWtDvY">
-              <img src="instagram/meauxsvision/images/C4Ao4jWtDvY.jpg" alt="Babush series" loading="lazy">
-              <div class="gallery-overlay">
-                <h5>Babush Series II</h5>
-                <span>Dina Ait Bibi · Editorial Grid</span>
+              <div class="session-step-body">
+                <h4>Direction &amp; Content Pack</h4>
+                <p>
+                  We map your concepts, write your captions, and lock the 3×3 feed layout—delivered upfront in your Content Pack.
+                </p>
+                <div class="session-step-tags">
+                  <span>Content Writing</span>
+                  <span>Ideas &amp; Hooks</span>
+                  <span>Grid Plan</span>
+                </div>
               </div>
-            </div>
-            <div class="gallery-item" data-post="C8IHD9Gt_GO">
-              <img src="instagram/meauxsvision/images/C8IHD9Gt_GO.jpg" alt="Modest Art" loading="lazy">
-              <div class="gallery-overlay">
-                <h5>Modest Art</h5>
-                <span>Campaign Visual Flow</span>
+            </article>
+
+            <article class="session-step-card">
+              <div class="session-step-media">
+                <img src="assets/images/session-styling.jpg" alt="Mohammed styling a client in front of a curated rack of obsidian, bone, and camel garments inside the atelier" loading="lazy">
+                <span class="session-step-badge">02 // WARDROBE &amp; STYLING</span>
               </div>
-            </div>
-            <div class="gallery-item" data-post="CcTqk0yom1b">
-              <img src="instagram/meauxsvision/images/CcTqk0yom1b.jpg" alt="Josh V HQ" loading="lazy">
-              <div class="gallery-overlay">
-                <h5>Josh V HQ</h5>
-                <span>Khaoula Campaign Rollout</span>
+              <div class="session-step-body">
+                <h4>Wardrobe Edit &amp; Client Styling</h4>
+                <p>
+                  We clean up your wardrobe, advise on what to shop, and style every silhouette directly on you before shoot day.
+                </p>
+                <div class="session-step-tags">
+                  <span>Wardrobe Cleanup</span>
+                  <span>Shopping Advice</span>
+                  <span>Client Styling</span>
+                </div>
               </div>
-            </div>
-            <div class="gallery-item" data-post="DObqkm2jfxe">
-              <img src="instagram/meauxsvision/images/DObqkm2jfxe.jpg" alt="Wissal Aziz curation" loading="lazy">
-              <div class="gallery-overlay">
-                <h5>Wissal Aziz</h5>
-                <span>Shari Louise · Jewelry Ecosystem</span>
+            </article>
+
+            <article class="session-step-card">
+              <div class="session-step-media">
+                <img src="assets/images/session-shoot.jpg" alt="Mohammed photographing and directing a styled client on set in an architectural stone courtyard under dramatic directional light" loading="lazy">
+                <span class="session-step-badge">03 // PHOTO &amp; VIDEO</span>
               </div>
-            </div>
-            <div class="gallery-item" data-post="CcDIrpvtJA6">
-              <img src="instagram/meauxsvision/images/CcDIrpvtJA6.jpg" alt="Sabri study" loading="lazy">
-              <div class="gallery-overlay">
-                <h5>Sabri Series</h5>
-                <span>Visual Rhythm & Cadence</span>
+              <div class="session-step-body">
+                <h4>The Planned Shoot</h4>
+                <p>
+                  We head to location or the studio to shoot both editorial stills and vertical video—ready to publish straight to your grid.
+                </p>
+                <div class="session-step-tags">
+                  <span>Planned Shoot</span>
+                  <span>Photography</span>
+                  <span>Video &amp; Reels</span>
+                </div>
               </div>
-            </div>
+            </article>
           </div>
         </div>
 
@@ -1178,165 +1140,7 @@
     </div>
 
     <!-- ==========================================
-         TAB 5: INTERIOR DESIGN (DISCIPLINE STORY)
-         ========================================== -->
-    <div id="view-interior-design" class="tab-view" role="tabpanel" aria-labelledby="tab-interior-design" hidden>
-      <section class="discipline-page" data-cms-container>
-        <div class="discipline-header">
-          <div class="discipline-tagline">
-            <span>04 // DISCIPLINE</span>
-            <span>·</span>
-            <span>ATELIER MEAUX</span>
-          </div>
-          <h2 class="discipline-title">Interior Design</h2>
-          <p class="discipline-subtitle">
-            “A room is not a container; it is an emotional atmosphere shaped by material and shadow.”
-          </p>
-        </div>
-
-        <!-- Narrative Split -->
-        <div class="discipline-narrative-split is-reversed">
-          <div class="narrative-image-wrap">
-            <img src="instagram/meauxsvision/images/CfY3m5vNidV.jpg" alt="Spatial and textural study" loading="lazy" width="1440" height="1800">
-            <div class="narrative-image-caption">
-              <span>Spatial Atmosphere Study</span>
-              <span>Light & Shadow Choreography</span>
-            </div>
-          </div>
-          <div class="narrative-text-wrap">
-            <div class="story-chapter">
-              <h3>The Architecture of Feeling</h3>
-              <p>
-                Space is the physical extension of consciousness. Meaux's interior design practice is founded on atmospheric tension: balancing raw, brutalist architectural textures with deep, sensual softness. We reject sterile minimalism in favor of visceral environments that calm the mind and envelope the senses.
-              </p>
-            </div>
-            <div class="story-chapter">
-              <h3>Material Purity & Tactility</h3>
-              <p>
-                We compose rooms using authentic, tactile elements: midnight lambskin, liquid chrome, dark oiled European walnut, hand-troweled lime plaster, and raw basalt stone. These materials do not merely age—they patinate, recording the passage of light and life.
-              </p>
-            </div>
-            <div class="story-chapter">
-              <h3>Light as the Final Material</h3>
-              <p>
-                Natural daylight is treated as a sculptural blade. By orchestrating directional raking daylight, low-voltage grazing luminaires, and warm ambient pools of darkness, our spaces transform continually throughout the day from contemplative sanctuary to dramatic nighttime lounge.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Material Tension Swatches -->
-        <div class="discipline-services">
-          <h3 class="discipline-section-title">The Tactile Material Palette</h3>
-          <p class="discipline-section-intro">
-            Every space designed by Meaux is built from a deliberate balance of temperature, grain, and reflection.
-          </p>
-
-          <div class="material-swatches-grid">
-            <div class="material-card">
-              <div class="material-swatch-box swatch-leather"></div>
-              <h5>Obsidian Lambskin</h5>
-              <p>Supple, non-reflective leather absorbing sound and light, providing intimate sensory comfort.</p>
-            </div>
-
-            <div class="material-card">
-              <div class="material-swatch-box swatch-chrome"></div>
-              <h5>Liquid Chrome</h5>
-              <p>Mirror-polished cold metal accents reflecting shifting shadows and architectural lines.</p>
-            </div>
-
-            <div class="material-card">
-              <div class="material-swatch-box swatch-stone"></div>
-              <h5>Raw Basalt & Tadelakt</h5>
-              <p>Velvety mineral plasters and porous natural stone imparting timeless thermal stability.</p>
-            </div>
-
-            <div class="material-card">
-              <div class="material-swatch-box swatch-wood"></div>
-              <h5>Smoked Oiled Walnut</h5>
-              <p>Deep rich grain with warm undertones, grounding the room in organic quietude.</p>
-            </div>
-          </div>
-        </div>
-
-
-
-        <!-- Bespoke Luxury Service Tiers -->
-        <div class="discipline-services">
-          <h3 class="discipline-section-title">Interior Design Service Scope</h3>
-          <p class="discipline-section-intro">
-            From private residential sanctuaries in Amsterdam to international luxury showrooms and hospitality suites.
-          </p>
-
-          <div class="service-tiers-grid">
-            <div class="service-tier-card">
-              <span class="tier-badge">TIER 01 // ARCHITECTURE</span>
-              <h4>Full Spatial Concept & Interior Architecture</h4>
-              <p>
-                Spatial planning, acoustic and lighting choreography, bespoke millwork detailing, 3D atmosphere studies, and material schedules.
-              </p>
-              <div class="tier-deliverables">
-                <span class="tier-deliverables-title">Scope & Deliverables</span>
-                <ul>
-                  <li>Complete spatial layout & circulation design</li>
-                  <li>Lighting architecture & luminaire schedule</li>
-                  <li>Bespoke architectural cabinetry & fixture drawings</li>
-                  <li>3D atmospheric visualization renderings</li>
-                </ul>
-              </div>
-            </div>
-
-            <div class="service-tier-card">
-              <span class="tier-badge">TIER 02 // PROCUREMENT</span>
-              <h4>Bespoke Material & Artisan Procurement</h4>
-              <p>
-                Direct sourcing of rare stone slabs, hand-tanned upholstery leathers, patinated bronzes, and blackened steels from European master craftsmen.
-              </p>
-              <div class="tier-deliverables">
-                <span class="tier-deliverables-title">Scope & Deliverables</span>
-                <ul>
-                  <li>Exclusive artisan workshop commission management</li>
-                  <li>Material sampling & bespoke surface prototypes</li>
-                  <li>Custom furniture design & fabrication supervision</li>
-                  <li>On-site installation and craft validation</li>
-                </ul>
-              </div>
-            </div>
-
-            <div class="service-tier-card">
-              <span class="tier-badge">TIER 03 // CURATION</span>
-              <h4>Spatial Styling & Sensory Layering</h4>
-              <p>
-                The crucial final layer: curated fine art placement, ceramic and bronze sculptures, tactile cashmere textiles, and bespoke ambient scenting.
-              </p>
-              <div class="tier-deliverables">
-                <span class="tier-deliverables-title">Scope & Deliverables</span>
-                <ul>
-                  <li>Curated art collection procurement & framing</li>
-                  <li>Sculptural object, vessel, and ceramic styling</li>
-                  <li>Tactile textile curation (throws, curtains, rugs)</li>
-                  <li>Custom olfactory atmosphere (bespoke atelier scent)</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Commission CTA Banner -->
-        <div class="discipline-cta-banner">
-          <div class="discipline-cta-text">
-            <h3>Commission a Spatial Project</h3>
-            <p>Private residential suites, creative studio ateliers, and boutique commercial spaces conceived by Mohammed.</p>
-          </div>
-          <button type="button" data-tab-target="enquiries" data-preselect-discipline="Interior Design" class="luxury-btn">
-            <span>Initiate Spatial Dossier ↗</span>
-          </button>
-        </div>
-      </section>
-    </div>
-
-    <!-- ==========================================
-         TAB 6: ABOUT ME (EDITORIAL PROFILE)
+         TAB 5: ABOUT ME (EDITORIAL PROFILE)
          ========================================== -->
     <div id="view-about" class="tab-view" role="tabpanel" aria-labelledby="tab-about" hidden>
       <section class="about-page" data-cms-container>
@@ -1357,13 +1161,13 @@
             </p>
             <div class="about-body-text">
               <p>
-                I founded Meaux out of an obsession with how image, silhouette, and space interact to produce emotion. Operating from Amsterdam and commissioning worldwide, my practice lives at the intersection where photography, fashion styling, digital curation, and spatial design collapse into a single coherent universe.
+                I founded Meaux out of an obsession with how image, silhouette, and digital presence interact to produce emotion. Operating from Amsterdam and commissioning worldwide, my practice lives at the intersection where photography, fashion styling, and digital curation collapse into a single coherent universe.
               </p>
               <p>
-                I believe true luxury is not excessive ornamentation, but radical restraint. It is knowing exactly when to hold back and when to strike with an uncompromising visual gesture. Trained by raw instinct rather than rigid dogma, I treat every project—whether an intimate portrait, a fashion lookbook, an entire brand ecosystem, or an architectural sanctuary—as an emotional atmosphere.
+                I believe true luxury is not excessive ornamentation, but radical restraint. It is knowing exactly when to hold back and when to strike with an uncompromising visual gesture. Trained by raw instinct rather than rigid dogma, I treat every project—whether an intimate portrait, a fashion lookbook, or an entire brand ecosystem—as an emotional atmosphere.
               </p>
               <p>
-                Why practice all four disciplines simultaneously? Because they are not separate silos—they are different scales of the exact same question: <em>How does it feel to inhabit this world?</em> When the same creative eye choreographs the room, styles the clothes, directs the photograph, and curates the feed, the result is an unmistakable, unbreakable world.
+                Why practice all three disciplines simultaneously? Because they are not separate silos—they are different scales of the exact same question: <em>How does it feel to inhabit this world?</em> When the same creative eye styles the clothes, directs the photograph, and curates the feed, the result is an unmistakable, unbreakable world.
               </p>
             </div>
             <div class="about-cta-row">
@@ -1449,7 +1253,7 @@
               <h2 class="mt-6">Initiate a dialogue.</h2>
             </div>
             <p>
-              Meaux accepts a limited number of private and commercial commissions each quarter across Photography, Styling, Social Media Curation, and Interior Design. Every inquiry is reviewed personally by Mohammed.
+              Meaux accepts a limited number of private and commercial commissions each quarter across Photography, Styling, and Social Media Curation. Every inquiry is reviewed personally by Mohammed.
             </p>
             
             <div class="enquiries-meta-list">
@@ -1526,10 +1330,6 @@
                       <span class="chip-ui">Social Media Curation</span>
                     </label>
                     <label class="chip-label">
-                      <input type="checkbox" name="disciplines" value="Interior Design">
-                      <span class="chip-ui">Interior Design</span>
-                    </label>
-                    <label class="chip-label">
                       <input type="checkbox" name="disciplines" value="Full Atelier Creative Direction">
                       <span class="chip-ui">Full Atelier Direction (All Disciplines)</span>
                     </label>
@@ -1574,14 +1374,14 @@
 <dialog id="project-dialog" aria-labelledby="project-title"><div class="project-dialog-top"><span id="project-position"></span><button type="button" id="close-project" aria-label="Close project">Close <span aria-hidden="true">×</span></button></div><div class="project-dialog-body"><div class="project-image-wrap"><img id="project-image" alt=""></div><div class="project-copy"><p class="small-label">From the photographic archive</p><h2 id="project-title"></h2><p id="project-caption"></p><p id="project-cover-note" class="project-note"></p><a id="project-source" class="text-link" target="_blank" rel="noopener noreferrer">View the original post <span aria-hidden="true">↗</span></a><a class="text-link project-commission" href="mailto:bucuralexandrunicolae@gmail.com">Discuss a project <span aria-hidden="true">↗</span></a></div></div><div class="project-dialog-bottom"><button type="button" id="previous-project">← Previous</button><span>Meaux’s vision</span><button type="button" id="next-project">Next →</button></div></dialog>
 
 <script src="assets/portfolio-data.js"></script>
-<script src="assets/vault.js"></script>
+<script src="assets/vault.js?v=3"></script>
 <script src="assets/materials.js"></script>
-<script src="assets/site.js"></script>
+<script src="assets/site.js?v=2"></script>
 <script src="assets/atelier-fluid.js"></script>
 <script src="assets/chrome-spikes.js"></script>
 <!-- Content management: public content loader + lazily loaded admin editor -->
 <script src="assets/cms/default-media.js"></script>
 <script src="assets/cms/config.js"></script>
-<script type="module" src="assets/cms/runtime.js"></script>
+<script type="module" src="assets/cms/runtime.js?v=2"></script>
 </body>
 </html>
